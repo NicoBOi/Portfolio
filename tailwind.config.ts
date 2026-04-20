@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-bebas)", "Impact", "sans-serif"],
+        display: ["var(--font-syne)", "system-ui", "sans-serif"],
         mono: ["var(--font-space-mono)", "monospace"],
       },
       transitionTimingFunction: {

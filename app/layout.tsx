@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Space_Mono } from "next/font/google";
+import { Syne, Space_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
 
-const bebasNeue = Bebas_Neue({
-  weight: "400",
+const syne = Syne({
   subsets: ["latin"],
-  variable: "--font-bebas",
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-syne",
   display: "swap",
 });
 
@@ -39,10 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="fr"
-      className={`${bebasNeue.variable} ${spaceMono.variable}`}
-    >
+    <html lang="fr" className={`${syne.variable} ${spaceMono.variable}`}>
       <body>
         <CustomCursor />
         <Navigation />
