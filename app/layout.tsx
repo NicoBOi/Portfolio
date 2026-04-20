@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Space_Grotesk } from "next/font/google";
+import { Bebas_Neue, Space_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
 
-const cormorant = Cormorant_Garamond({
+const bebasNeue = Bebas_Neue({
+  weight: "400",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
+  variable: "--font-bebas",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
+  variable: "--font-space-mono",
   display: "swap",
 });
 
@@ -26,12 +25,11 @@ export const metadata: Metadata = {
     template: "%s — Nicolas Sempere",
   },
   description:
-    "Nicolas Sempere is a photographer and filmmaker based between Bordeaux and Paris. He works at the intersection of silence and tension.",
+    "Nicolas Sempere is a photographer and filmmaker based between Bordeaux and Paris.",
   openGraph: {
     title: "Nicolas Sempere",
     description: "Photographer & Filmmaker — Bordeaux / Paris",
     type: "website",
-    locale: "en_US",
   },
 };
 
@@ -43,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${cormorant.variable} ${spaceGrotesk.variable}`}
+      className={`${bebasNeue.variable} ${spaceMono.variable}`}
     >
       <body>
         <CustomCursor />

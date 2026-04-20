@@ -12,87 +12,75 @@ interface Props {
   aspectClass: string;
 }
 
-export default function ProjectCard({
-  project,
-  index,
-  colSpan,
-  aspectClass,
-}: Props) {
+export default function ProjectCard({ project, index, colSpan, aspectClass }: Props) {
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-8%" });
-
   const num = String(index + 1).padStart(2, "0");
 
   return (
     <motion.div
       ref={ref}
       className={colSpan}
-      initial={{ opacity: 0, y: 18 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.75,
-        delay: (index % 4) * 0.07,
-        ease: [0.16, 1, 0.3, 1],
-      }}
+      initial={{ opacity: 0 }}
+      animate={inView ? { opacity: 1 } : {}}
+      transition={{ duration: 0.6, delay: (index % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
     >
       <Link
         href={`/work/${project.slug}`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="block group relative overflow-hidden"
-        data-cursor={project.type === "video" ? "PLAY" : "VIEW"}
+        className="block"
+        data-cursor={project.type === "video" ? "Play" : "View"}
       >
         {/* Thumbnail */}
         <div
           className={`relative w-full ${aspectClass} overflow-hidden`}
           style={{ backgroundColor: project.coverPlaceholder }}
         >
-          <div className="placeholder-img">IMAGE</div>
+          <div className="placeholder-img text-white h-full">Image</div>
 
-          {/* Hover overlay */}
+          {/* Hover: brutal white overlay with title */}
           <motion.div
-            className="absolute inset-0 bg-black flex flex-col justify-end p-5 md:p-6"
-            animate={{ opacity: hovered ? 0.88 : 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 bg-white flex flex-col justify-end p-4 md:p-5"
+            animate={{ opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
           >
-            <motion.div
-              animate={{ y: hovered ? 0 : 12 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <p className="font-display italic font-light text-white text-2xl md:text-3xl leading-tight">
-                {project.title}
-              </p>
-              <div className="flex items-center gap-3 mt-3">
-                <span className="label text-white/40">{project.year}</span>
-                <span className="label text-white/20">—</span>
-                <span className="label text-white/40">{project.role}</span>
-              </div>
-            </motion.div>
+            <p className="text-heading text-black leading-none">{project.title}</p>
+            <div className="flex items-center gap-3 mt-2">
+              <span className="label text-black opacity-50">{project.year}</span>
+              <span className="label text-black opacity-30">/</span>
+              <span className="label text-black opacity-50">{project.role}</span>
+            </div>
           </motion.div>
 
-          {/* Type badge */}
+          {/* Index — top left */}
+          <div className="absolute top-3 left-3 z-10 pointer-events-none">
+            <motion.span
+              className="label text-white"
+              animate={{ opacity: hovered ? 0 : 0.3 }}
+            >
+              [{num}]
+            </motion.span>
+          </div>
+
+          {/* Type — top right */}
           {project.type !== "photo" && (
-            <div className="absolute top-4 left-4 z-10">
+            <div className="absolute top-3 right-3 z-10 pointer-events-none">
               <motion.span
-                className="label text-white/50"
-                animate={{ opacity: hovered ? 0 : 0.5 }}
+                className="label text-white"
+                animate={{ opacity: hovered ? 0 : 0.3 }}
               >
-                {project.type === "video" ? "VIDEO" : "EXP."}
+                {project.type === "video" ? "Video" : "Exp."}
               </motion.span>
             </div>
           )}
         </div>
 
-        {/* Index + title below card */}
-        <div className="flex items-start justify-between pt-3 pb-6">
-          <div>
-            <p className="font-sans text-sm font-light text-black/80 leading-snug">
-              {project.title}
-            </p>
-            <p className="label opacity-30 mt-1">{project.year}</p>
-          </div>
-          <span className="label opacity-20 shrink-0 ml-4">{num}</span>
+        {/* Below card */}
+        <div className="flex items-baseline justify-between pt-2 pb-5">
+          <p className="label text-white opacity-40">{project.title}</p>
+          <p className="label text-white opacity-20">{project.year}</p>
         </div>
       </Link>
     </motion.div>

@@ -9,31 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-cormorant)", "Georgia", "serif"],
-        sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+        display: ["var(--font-bebas)", "Impact", "sans-serif"],
+        mono: ["var(--font-space-mono)", "monospace"],
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "in-out-expo": "cubic-bezier(0.87, 0, 0.13, 1)",
       },
       transitionDuration: {
         "600": "600ms",
         "800": "800ms",
-        "1200": "1200ms",
-      },
-      keyframes: {
-        "line-down": {
-          "0%": { transform: "scaleY(0)", transformOrigin: "top" },
-          "100%": { transform: "scaleY(1)", transformOrigin: "top" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(10px)" },
-        },
-      },
-      animation: {
-        "line-down": "line-down 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        float: "float 2.5s ease-in-out infinite",
       },
     },
   },

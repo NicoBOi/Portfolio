@@ -9,49 +9,33 @@ export default function ProjectNav({
   next: Project | null;
 }) {
   return (
-    <div className="px-6 md:px-10 py-10 border-t border-[#E8E8E8] grid grid-cols-3 items-center">
-      {/* Prev */}
+    <div className="px-5 md:px-8 py-8 border-t border-white/10 grid grid-cols-3 items-center gap-4">
       <div>
         {prev && (
-          <Link
-            href={`/work/${prev.slug}`}
-            className="group flex items-center gap-4"
-          >
-            <span className="w-6 h-px bg-black transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:w-12" />
+          <Link href={`/work/${prev.slug}`} className="group flex items-center gap-3">
+            <span className="w-5 h-px bg-white opacity-40 transition-all duration-400 group-hover:w-10 group-hover:opacity-80" />
             <div>
-              <p className="label opacity-30 mb-1">PREVIOUS</p>
-              <p className="font-display italic font-light text-lg leading-tight">
-                {prev.title}
-              </p>
+              <p className="label text-white opacity-25 mb-1">Prev</p>
+              <p className="text-heading text-white leading-none">{prev.title}</p>
             </div>
           </Link>
         )}
       </div>
 
-      {/* Center */}
       <div className="flex justify-center">
-        <Link
-          href="/work"
-          className="label opacity-30 hover:opacity-100 transition-opacity duration-300"
-        >
-          ALL WORK
+        <Link href="/work" className="label text-white opacity-25 hover:opacity-70 transition-opacity duration-300">
+          All Work
         </Link>
       </div>
 
-      {/* Next */}
       <div className="flex justify-end">
         {next && (
-          <Link
-            href={`/work/${next.slug}`}
-            className="group flex items-center gap-4 text-right"
-          >
+          <Link href={`/work/${next.slug}`} className="group flex items-center gap-3 text-right">
             <div>
-              <p className="label opacity-30 mb-1">NEXT</p>
-              <p className="font-display italic font-light text-lg leading-tight">
-                {next.title}
-              </p>
+              <p className="label text-white opacity-25 mb-1">Next</p>
+              <p className="text-heading text-white leading-none">{next.title}</p>
             </div>
-            <span className="w-6 h-px bg-black transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:w-12" />
+            <span className="w-5 h-px bg-white opacity-40 transition-all duration-400 group-hover:w-10 group-hover:opacity-80" />
           </Link>
         )}
       </div>

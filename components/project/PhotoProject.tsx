@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
 
-// Alternating photo layout pattern for a series
-const PHOTO_PATTERN: { cols: string; aspect: string }[] = [
+const PATTERN: { cols: string; aspect: string }[] = [
   { cols: "col-span-12", aspect: "aspect-[21/9]" },
   { cols: "col-span-12 md:col-span-7", aspect: "aspect-[4/3]" },
   { cols: "col-span-12 md:col-span-5", aspect: "aspect-[3/4]" },
@@ -23,58 +22,47 @@ export default function PhotoProject({ project, prev, next }: Props) {
   const count = project.images ?? 5;
 
   return (
-    <article className="pt-14">
-      {/* ── Hero ──────────────────────────────────────── */}
+    <article className="pt-14 bg-black min-h-screen">
+      {/* Hero */}
       <motion.div
         className="w-full aspect-[21/9] md:aspect-[3/1] overflow-hidden"
         style={{ backgroundColor: project.coverPlaceholder }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="placeholder-img h-full">IMAGE</div>
+        <div className="placeholder-img text-white h-full">Image</div>
       </motion.div>
 
-      {/* ── Metadata ──────────────────────────────────── */}
-      <motion.div
-        className="px-6 md:px-10 py-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-[#E8E8E8]"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <h1 className="font-display font-light italic text-display-lg leading-none">
-          {project.title}
-        </h1>
-        <div className="flex items-center gap-5 shrink-0">
-          <span className="label opacity-35">{project.year}</span>
-          <span className="label opacity-15">—</span>
-          <span className="label opacity-35">{project.role}</span>
-          <span className="label opacity-15">—</span>
-          <span className="label opacity-35">{project.category.toUpperCase()}</span>
+      {/* Metadata */}
+      <div className="px-5 md:px-8 py-6 border-b border-white/10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <h1 className="text-title text-white">{project.title}</h1>
+        <div className="flex items-center gap-4 shrink-0">
+          <span className="label text-white opacity-30">{project.year}</span>
+          <span className="label text-white opacity-15">/</span>
+          <span className="label text-white opacity-30">{project.role}</span>
+          <span className="label text-white opacity-15">/</span>
+          <span className="label text-white opacity-30">{project.category.toUpperCase()}</span>
         </div>
-      </motion.div>
+      </div>
 
-      {/* ── Photo series ──────────────────────────────── */}
-      <div className="px-6 md:px-10 py-6">
-        <div className="grid grid-cols-12 gap-x-4 md:gap-x-6 gap-y-4 md:gap-y-6">
+      {/* Series */}
+      <div className="px-5 md:px-8 py-5">
+        <div className="grid grid-cols-12 gap-3 md:gap-5">
           {Array.from({ length: count }).map((_, i) => {
-            const pat = PHOTO_PATTERN[i % PHOTO_PATTERN.length];
+            const pat = PATTERN[i % PATTERN.length];
             return (
               <motion.div
                 key={i}
                 className={`${pat.cols} ${pat.aspect} overflow-hidden`}
                 style={{ backgroundColor: project.coverPlaceholder }}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-6%" }}
-                transition={{
-                  duration: 0.75,
-                  delay: i * 0.06,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-8%" }}
+                transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="placeholder-img h-full">
-                  IMAGE {String(i + 1).padStart(2, "0")}
+                <div className="placeholder-img text-white h-full">
+                  [{String(i + 1).padStart(2, "0")}]
                 </div>
               </motion.div>
             );
@@ -82,7 +70,6 @@ export default function PhotoProject({ project, prev, next }: Props) {
         </div>
       </div>
 
-      {/* ── Nav ───────────────────────────────────────── */}
       <ProjectNav prev={prev} next={next} />
     </article>
   );
