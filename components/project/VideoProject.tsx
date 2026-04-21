@@ -18,9 +18,9 @@ export default function VideoProject({ project, prev, next }: Props) {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <article className="pt-14 bg-black min-h-screen">
+    <article className="bg-black min-h-screen">
       {/* Back */}
-      <div className="px-6 md:px-10 pt-6 pb-0">
+      <div className="px-6 md:px-10 pt-20 pb-0">
         <Link
           href="/work"
           className="label text-white hover:opacity-60 transition-opacity duration-300 flex items-center gap-3"
@@ -31,23 +31,23 @@ export default function VideoProject({ project, prev, next }: Props) {
         </Link>
       </div>
 
-      {/* Full-viewport player */}
+      {/* Player */}
       <div
-        className="relative w-full mt-6 flex items-center justify-center overflow-hidden"
-        style={{ minHeight: "calc(100vh - 8rem)", backgroundColor: project.coverPlaceholder }}
+        className="relative w-full mt-8 flex items-center justify-center overflow-hidden"
+        style={{ aspectRatio: "16/9", maxHeight: "80vh", backgroundColor: project.coverPlaceholder }}
       >
         <div className="placeholder-img absolute inset-0 text-white">Video</div>
 
         <motion.div
           className="absolute inset-0 bg-black"
-          animate={{ opacity: playing ? 0 : 0.65 }}
+          animate={{ opacity: playing ? 0 : 0.62 }}
           transition={{ duration: 0.6 }}
         />
 
         {!playing && (
           <motion.button
             onClick={() => setPlaying(true)}
-            className="relative z-10 group flex flex-col items-center gap-6"
+            className="relative z-10 group flex flex-col items-center gap-5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -58,50 +58,55 @@ export default function VideoProject({ project, prev, next }: Props) {
                 <path d="M1 1L15 9L1 17V1Z" fill="white" />
               </svg>
             </div>
-            <span className="label text-white opacity-50 group-hover:opacity-100 transition-opacity duration-300">
-              Play
-            </span>
+            <span className="label text-white opacity-50 group-hover:opacity-100 transition-opacity duration-300">Play</span>
           </motion.button>
         )}
 
-        {/* Title overlay — bottom left */}
         <motion.div
-          className="absolute bottom-8 left-6 md:left-10 z-10"
+          className="absolute bottom-6 left-6 md:left-10 z-10"
           animate={{ opacity: playing ? 0 : 1 }}
           transition={{ duration: 0.4 }}
         >
-          <p className="label text-white mb-2" style={{ opacity: 0.3 }}>
-            {project.year} — {project.role}
-          </p>
-          <h1
-            className="text-white title"
-            style={{ fontSize: "clamp(1.5rem, 3.5vw, 3rem)" }}
-          >
+          <p className="label text-white mb-2" style={{ opacity: 0.3 }}>{project.year} — {project.role}</p>
+          <h1 className="text-white title" style={{ fontSize: "clamp(1.5rem, 3.5vw, 3rem)" }}>
             {project.title}
           </h1>
         </motion.div>
-
-        <div className="absolute top-6 right-6 md:right-10 z-10">
-          <span className="label text-white" style={{ opacity: 0.2 }}>{project.category.toUpperCase()}</span>
-        </div>
       </div>
 
-      {/* Description */}
-      {project.description && (
-        <div className="px-6 md:px-10 py-10 border-b border-white/10 max-w-2xl">
-          <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.5, lineHeight: 1.9 }}>
+      {/* Info + description */}
+      <div className="px-6 md:px-10 py-8 border-b border-white/10 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex items-center gap-3">
+          <span className="label text-white" style={{ opacity: 0.28 }}>{project.year}</span>
+          <span className="label text-white" style={{ opacity: 0.12 }}>/</span>
+          <span className="label text-white" style={{ opacity: 0.28 }}>{project.role}</span>
+          <span className="label text-white" style={{ opacity: 0.12 }}>/</span>
+          <span className="label text-white" style={{ opacity: 0.28 }}>{project.category}</span>
+        </div>
+        {project.description && (
+          <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.875rem", opacity: 0.45, lineHeight: 1.9 }}>
             {project.description}
           </p>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Credits strip */}
-      <div className="px-6 md:px-10 py-6 border-b border-white/10 flex items-center gap-4">
-        <span className="label text-white" style={{ opacity: 0.3 }}>{project.year}</span>
-        <span className="label text-white" style={{ opacity: 0.15 }}>/</span>
-        <span className="label text-white" style={{ opacity: 0.3 }}>{project.role}</span>
-        <span className="label text-white" style={{ opacity: 0.15 }}>/</span>
-        <span className="label text-white" style={{ opacity: 0.3 }}>{project.category.toUpperCase()}</span>
+      {/* Stills — symmetric 2-col */}
+      <div className="px-6 md:px-10 py-10">
+        <div className="grid grid-cols-2 gap-4 md:gap-6">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              className="aspect-video"
+              style={{ backgroundColor: project.coverPlaceholder + (i % 2 === 0 ? "88" : "55") }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-6%" }}
+              transition={{ duration: 0.6, delay: (i % 2) * 0.08, ease: SOFT }}
+            >
+              <div className="placeholder-img text-white h-full">Still {i + 1}</div>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       <ProjectNav prev={prev} next={next} />

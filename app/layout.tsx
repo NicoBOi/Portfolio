@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Cormorant_Garamond } from "next/font/google";
+import { Poppins, Abril_Fatface } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
@@ -13,11 +13,10 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
+const abril = Abril_Fatface({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
+  weight: ["400"],
+  variable: "--font-abril",
   display: "swap",
 });
 
@@ -36,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${poppins.variable} ${cormorant.variable}`}>
+    <html lang="fr" className={`${poppins.variable} ${abril.variable}`}>
       <body>
         <CustomCursor />
         <Navigation />

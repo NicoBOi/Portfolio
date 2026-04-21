@@ -34,13 +34,12 @@ body {
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); }
 
-/* ── Title (Cormorant Garamond) ──────────────────────────── */
+/* ── Title (Abril Fatface) ───────────────────────────────── */
 .title {
-  font-family: var(--font-cormorant), Georgia, serif;
-  font-weight: 300;
-  font-style: italic;
-  line-height: 1.05;
-  letter-spacing: 0.04em;
+  font-family: var(--font-abril), Georgia, serif;
+  font-weight: 400;
+  line-height: 1.0;
+  letter-spacing: 0.01em;
 }
 
 /* ── Label ───────────────────────────────────────────────── */
@@ -68,3 +67,9 @@ body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Cursor REC blink ────────────────────────────────────── */
+@keyframes rec-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}

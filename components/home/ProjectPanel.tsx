@@ -50,7 +50,7 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
               <span className="label text-white" style={{ opacity: 0.22 }}>
                 {String(idx + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(projects.length).padStart(2, "0")}
               </span>
-              <h2 className="text-white title" style={{ fontSize: "clamp(1rem, 2vw, 1.4rem)" }}>
+              <h2 className="text-white title" style={{ fontSize: "clamp(0.9rem, 1.8vw, 1.3rem)" }}>
                 {project.title}
               </h2>
             </div>
@@ -59,39 +59,31 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
               <span className="label text-white hidden md:block" style={{ opacity: 0.28 }}>
                 {project.role}&nbsp;—&nbsp;{project.year}
               </span>
-
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => prev && onNavigate(prev.slug)}
                   className="label text-white hover:opacity-80 transition-opacity duration-300"
                   style={{ opacity: prev ? 0.4 : 0.12 }}
                   disabled={!prev}
-                  aria-label="Previous project"
-                >
-                  ←
-                </button>
+                  aria-label="Previous"
+                >←</button>
                 <button
                   onClick={() => next && onNavigate(next.slug)}
                   className="label text-white hover:opacity-80 transition-opacity duration-300"
                   style={{ opacity: next ? 0.4 : 0.12 }}
                   disabled={!next}
-                  aria-label="Next project"
-                >
-                  →
-                </button>
+                  aria-label="Next"
+                >→</button>
               </div>
-
               <button
                 onClick={onClose}
                 className="label text-white hover:opacity-100 transition-opacity duration-300"
                 style={{ opacity: 0.45 }}
-              >
-                Close
-              </button>
+              >Close</button>
             </div>
           </div>
 
-          {/* Scrollable content */}
+          {/* Content */}
           <div className="flex-1 overflow-y-auto no-scrollbar">
             <AnimatePresence mode="wait">
               <motion.div
@@ -139,13 +131,15 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
 
 function PhotoContent({ project }: { project: Project }) {
   const count = project.images ?? 4;
+  const isPortrait = project.aspectRatio === "portrait";
+
   return (
-    <div className="max-w-4xl mx-auto px-6 md:px-10 pt-12 pb-16">
+    <div className="max-w-5xl mx-auto px-6 md:px-10 pt-12 pb-16">
       {/* Cover */}
       <div
-        className="w-full mb-12"
+        className="w-full mb-10"
         style={{
-          aspectRatio: project.aspectRatio === "portrait" ? "2/3" : "16/10",
+          aspectRatio: isPortrait ? "3/4" : "16/10",
           backgroundColor: project.coverPlaceholder,
         }}
       >
@@ -153,49 +147,36 @@ function PhotoContent({ project }: { project: Project }) {
       </div>
 
       {/* Title + description */}
-      <div className="mb-14 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
-        <div className="md:col-span-5">
-          <h3
-            className="text-white title"
-            style={{ fontSize: "clamp(1.8rem, 4vw, 3.5rem)" }}
-          >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-12 pb-12 border-b border-white/10">
+        <div>
+          <h3 className="text-white title" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1 }}>
             {project.title}
           </h3>
-          <p className="label text-white mt-3" style={{ opacity: 0.3 }}>
-            {project.category} — {project.year}
+          <p className="label text-white mt-4" style={{ opacity: 0.28 }}>
+            {project.category}&nbsp;—&nbsp;{project.year}
           </p>
+          <p className="label text-white mt-1" style={{ opacity: 0.2 }}>{project.role}</p>
         </div>
         {project.description && (
-          <p
-            className="md:col-span-7 text-white font-light leading-relaxed"
-            style={{ fontSize: "0.9rem", opacity: 0.55, lineHeight: 1.8 }}
-          >
+          <p className="text-white font-light leading-relaxed self-center" style={{ fontSize: "0.875rem", opacity: 0.5, lineHeight: 1.9 }}>
             {project.description}
           </p>
         )}
       </div>
 
-      {/* Image grid */}
-      <div className="grid grid-cols-12 gap-3 md:gap-5">
-        {Array.from({ length: count - 1 }).map((_, i) => {
-          const col = i % 3 === 0 ? "col-span-12" : i % 3 === 1 ? "col-span-7" : "col-span-5";
-          const ratio = i % 2 === 0 ? "3/2" : "2/3";
-          return (
-            <div
-              key={i}
-              className={col}
-              style={{ aspectRatio: ratio, backgroundColor: project.coverPlaceholder + "99" }}
-            >
-              <div className="placeholder-img text-white h-full">Image {i + 2}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-14 pt-8 border-t border-white/10 flex items-center justify-between">
-        <span className="label text-white" style={{ opacity: 0.25 }}>{project.role}</span>
-        <span className="label text-white" style={{ opacity: 0.25 }}>{project.category}</span>
+      {/* Symmetric image grid — equal 2-col pairs */}
+      <div className="grid grid-cols-2 gap-4 md:gap-6">
+        {Array.from({ length: count - 1 }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              aspectRatio: isPortrait ? "3/4" : "4/3",
+              backgroundColor: project.coverPlaceholder + "aa",
+            }}
+          >
+            <div className="placeholder-img text-white h-full">Image {i + 2}</div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -203,10 +184,10 @@ function PhotoContent({ project }: { project: Project }) {
 
 function VideoContent({ project }: { project: Project }) {
   return (
-    <div className="max-w-4xl mx-auto px-6 md:px-10 pt-12 pb-16">
-      {/* Video placeholder */}
+    <div className="max-w-5xl mx-auto px-6 md:px-10 pt-12 pb-16">
+      {/* Video */}
       <div
-        className="w-full aspect-video flex items-center justify-center mb-12"
+        className="w-full aspect-video flex items-center justify-center mb-10"
         style={{ backgroundColor: project.coverPlaceholder }}
       >
         <div className="flex flex-col items-center gap-3">
@@ -221,30 +202,25 @@ function VideoContent({ project }: { project: Project }) {
       </div>
 
       {/* Title + description */}
-      <div className="mb-14 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
-        <div className="md:col-span-5">
-          <h3
-            className="text-white title"
-            style={{ fontSize: "clamp(1.8rem, 4vw, 3.5rem)" }}
-          >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-12 pb-12 border-b border-white/10">
+        <div>
+          <h3 className="text-white title" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1 }}>
             {project.title}
           </h3>
-          <p className="label text-white mt-3" style={{ opacity: 0.3 }}>
-            {project.category} — {project.year}
+          <p className="label text-white mt-4" style={{ opacity: 0.28 }}>
+            {project.category}&nbsp;—&nbsp;{project.year}
           </p>
+          <p className="label text-white mt-1" style={{ opacity: 0.2 }}>{project.role}</p>
         </div>
         {project.description && (
-          <p
-            className="md:col-span-7 text-white font-light leading-relaxed"
-            style={{ fontSize: "0.9rem", opacity: 0.55, lineHeight: 1.8 }}
-          >
+          <p className="text-white font-light leading-relaxed self-center" style={{ fontSize: "0.875rem", opacity: 0.5, lineHeight: 1.9 }}>
             {project.description}
           </p>
         )}
       </div>
 
-      {/* Stills */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Stills — equal 2-col */}
+      <div className="grid grid-cols-2 gap-4 md:gap-6">
         {[0, 1].map((i) => (
           <div
             key={i}
@@ -254,12 +230,6 @@ function VideoContent({ project }: { project: Project }) {
             <div className="placeholder-img text-white h-full">Still {i + 1}</div>
           </div>
         ))}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-14 pt-8 border-t border-white/10 flex items-center justify-between">
-        <span className="label text-white" style={{ opacity: 0.25 }}>{project.role}</span>
-        <span className="label text-white" style={{ opacity: 0.25 }}>{project.category}</span>
       </div>
     </div>
   );
