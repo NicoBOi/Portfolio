@@ -16,6 +16,22 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+  // ── SHOWREEL ─────────────────────────────────────────
+  {
+    slug: "showreel-2026",
+    title: "Showreel 2026",
+    year: 2026,
+    role: "Direction · DOP · Edit",
+    type: "video",
+    category: "Showreel",
+    coverPlaceholder: "#080808",
+    description:
+      "An overview of work across documentary, commercial, and personal projects — 2022 to 2025. Shot on various formats, edited for atmosphere over sequence.",
+    videoUrl: "https://vimeo.com/1175061669",
+    featured: true,
+    aspectRatio: "landscape",
+  },
+
   // ── PHOTO ────────────────────────────────────────────
   {
     slug: "silence-study-i",

@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects, type Project } from "@/data/projects";
 
+function getVimeoId(url: string): string | null {
+  return url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null;
+}
+
 const EASE: [number, number, number, number] = [0.76, 0, 0.24, 1];
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -183,22 +187,30 @@ function PhotoContent({ project }: { project: Project }) {
 }
 
 function VideoContent({ project }: { project: Project }) {
+  const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
+
   return (
     <div className="max-w-5xl mx-auto px-6 md:px-10 pt-12 pb-16">
       {/* Video */}
-      <div
-        className="w-full aspect-video flex items-center justify-center mb-10"
-        style={{ backgroundColor: project.coverPlaceholder }}
-      >
-        <div className="flex flex-col items-center gap-3">
-          <div
-            className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center"
-            style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
-          >
-            <span className="text-white text-xl" style={{ marginLeft: 4 }}>▶</span>
+      <div className="w-full aspect-video mb-10" style={{ backgroundColor: project.coverPlaceholder }}>
+        {vimeoId ? (
+          <iframe
+            src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
+            className="w-full h-full"
+            style={{ border: 0 }}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center" style={{ backgroundColor: "rgba(0,0,0,0.35)" }}>
+                <span className="text-white text-xl" style={{ marginLeft: 4 }}>▶</span>
+              </div>
+              <span className="label text-white" style={{ opacity: 0.25 }}>Coming soon</span>
+            </div>
           </div>
-          <span className="label text-white" style={{ opacity: 0.25 }}>Play</span>
-        </div>
+        )}
       </div>
 
       {/* Title + description */}

@@ -10,24 +10,28 @@ const FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCROLL_LOCK_MS = 850;
 
-interface Ripple {
-  x: number;
-  y: number;
-  r: number;
-  maxR: number;
-  born: number;
-}
-
-const RIPPLE_DURATION = 1400;
+// ── Water simulation constants ──────────────────────────────────
+const W = 320;
+const H = 180;
+const DAMP = 0.987;
+// Light direction (upper-left) — normalised once
+const _lx = -0.25, _ly = -0.6, _lz = 2.8;
+const _ll = Math.sqrt(_lx * _lx + _ly * _ly + _lz * _lz);
+const LXN = _lx / _ll, LYN = _ly / _ll, LZN = _lz / _ll;
+const NZ = 4.0; // controls how "flat" the water surface appears
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
+
+  // Stable refs for the water sim (survive re-renders, keep wave state on panel close)
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const ripplesRef = useRef<Ripple[]>([]);
-  const rafRef = useRef<number>(0);
-  const lastMoveRef = useRef({ x: 0, y: 0, t: 0 });
+  const waterRef = useRef({
+    buf1: new Float32Array(W * H),
+    buf2: new Float32Array(W * H),
+  });
+  const rafRef = useRef(0);
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
   const current = FEATURED[index];
@@ -45,7 +49,7 @@ export default function Hero() {
     return () => clearInterval(t);
   }, [openSlug]);
 
-  // Wheel navigation
+  // Wheel
   useEffect(() => {
     if (openSlug) return;
     let locked = false;
@@ -65,80 +69,103 @@ export default function Hero() {
   // Touch swipe
   useEffect(() => {
     if (openSlug) return;
-    let startY = 0;
-    const onTouchStart = (e: TouchEvent) => { startY = e.touches[0].clientY; };
-    const onTouchEnd = (e: TouchEvent) => {
-      const delta = startY - e.changedTouches[0].clientY;
-      if (Math.abs(delta) < 50) return;
-      setIndex((i) =>
-        delta > 0 ? (i + 1) % FEATURED.length : (i - 1 + FEATURED.length) % FEATURED.length
-      );
+    let sy = 0;
+    const ts = (e: TouchEvent) => { sy = e.touches[0].clientY; };
+    const te = (e: TouchEvent) => {
+      const d = sy - e.changedTouches[0].clientY;
+      if (Math.abs(d) < 50) return;
+      setIndex((i) => d > 0 ? (i + 1) % FEATURED.length : (i - 1 + FEATURED.length) % FEATURED.length);
     };
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchend", onTouchEnd);
-    };
+    window.addEventListener("touchstart", ts, { passive: true });
+    window.addEventListener("touchend", te, { passive: true });
+    return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
   }, [openSlug]);
 
-  // Water ripple canvas
+  // ── Water height-field simulation ────────────────────────────
   useEffect(() => {
+    if (openSlug) return; // pause sim while panel is open
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    const resize = () => {
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      ctx.scale(dpr, dpr);
-    };
-    resize();
-    window.addEventListener("resize", resize);
+    canvas.width = W;
+    canvas.height = H;
 
+    const water = waterRef.current;
+    const imgData = ctx.createImageData(W, H);
+    const px = imgData.data;
+
+    const disturb = (screenX: number, screenY: number) => {
+      const sx = Math.floor((screenX / window.innerWidth) * W);
+      const sy = Math.floor((screenY / window.innerHeight) * H);
+      const r = 7, r2 = r * r;
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          const d2 = dx * dx + dy * dy;
+          if (d2 > r2) continue;
+          const px2 = sx + dx, py = sy + dy;
+          if (px2 < 1 || px2 >= W - 1 || py < 1 || py >= H - 1) continue;
+          water.buf1[py * W + px2] += -280 * (1 - d2 / r2);
+        }
+      }
+    };
+
+    let prevX = 0, prevY = 0, prevT = 0;
     const onMove = (e: MouseEvent) => {
-      if (openSlug) return;
-      const now = Date.now();
-      const dx = e.clientX - lastMoveRef.current.x;
-      const dy = e.clientY - lastMoveRef.current.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > 60 && now - lastMoveRef.current.t > 90) {
-        ripplesRef.current.push({
-          x: e.clientX,
-          y: e.clientY,
-          r: 0,
-          maxR: 90 + Math.random() * 50,
-          born: now,
-        });
-        lastMoveRef.current = { x: e.clientX, y: e.clientY, t: now };
-        if (ripplesRef.current.length > 14) ripplesRef.current.shift();
+      const now = performance.now();
+      const dx = e.clientX - prevX, dy = e.clientY - prevY;
+      if (dx * dx + dy * dy > 600 && now - prevT > 40) {
+        disturb(e.clientX, e.clientY);
+        prevX = e.clientX; prevY = e.clientY; prevT = now;
       }
     };
 
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const now = Date.now();
-      ripplesRef.current = ripplesRef.current.filter((r) => now - r.born < RIPPLE_DURATION);
-      for (const r of ripplesRef.current) {
-        const p = (now - r.born) / RIPPLE_DURATION;
-        const radius = r.maxR * Math.pow(p, 0.6);
-        const alpha = 0.35 * (1 - p);
-        ctx.beginPath();
-        ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
+    const tick = () => {
+      const { buf1, buf2 } = water;
+
+      // Wave propagation
+      for (let y = 1; y < H - 1; y++) {
+        for (let x = 1; x < W - 1; x++) {
+          const i = y * W + x;
+          buf2[i] = (buf1[i - 1] + buf1[i + 1] + buf1[i - W] + buf1[i + W]) * 0.5 - buf2[i];
+          buf2[i] *= DAMP;
+        }
       }
-      rafRef.current = requestAnimationFrame(draw);
+      water.buf1 = buf2;
+      water.buf2 = buf1;
+
+      // Specular caustic rendering
+      const b = water.buf1;
+      for (let y = 1; y < H - 1; y++) {
+        for (let x = 1; x < W - 1; x++) {
+          const i = y * W + x;
+          // Surface normal from finite differences
+          const nx = b[i + 1] - b[i - 1];
+          const ny = b[i + W] - b[i - W];
+          const len = Math.sqrt(nx * nx + ny * ny + NZ * NZ);
+          // Phong specular: N·L
+          const ndotl = (nx * LXN + ny * LYN + NZ * LZN) / len;
+          const spec = Math.max(0, ndotl);
+          // Power 5 = sharp caustic highlights
+          const bright = spec * spec * spec * spec * spec * 255 * 2.2;
+          const v = bright > 255 ? 255 : bright | 0;
+          const base = i * 4;
+          px[base] = v;
+          px[base + 1] = v;
+          px[base + 2] = v;
+          px[base + 3] = v;
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+      rafRef.current = requestAnimationFrame(tick);
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
-    rafRef.current = requestAnimationFrame(draw);
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(rafRef.current);
     };
@@ -153,7 +180,7 @@ export default function Hero() {
     <>
       <section className="relative h-screen bg-black overflow-hidden flex flex-col">
 
-        {/* Background */}
+        {/* Background — click anywhere to open */}
         <div
           className="absolute inset-0 z-0"
           onClick={() => setOpenSlug(current.slug)}
@@ -175,21 +202,26 @@ export default function Hero() {
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
-        {/* Water ripple canvas */}
+        {/* Water caustic canvas */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 z-[5] pointer-events-none"
-          style={{ width: "100%", height: "100%" }}
+          className="absolute inset-0 pointer-events-none z-[5]"
+          style={{
+            width: "100%",
+            height: "100%",
+            mixBlendMode: "screen",
+            opacity: 0.55,
+            filter: "blur(2px)",
+          }}
         />
 
-        {/* Foreground — pointer-events-none so clicks reach background */}
+        {/* Foreground */}
         <motion.div
           className="relative z-10 flex-1 flex flex-col pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: loaded ? 1 : 0 }}
           transition={{ duration: 1, delay: 0.3, ease: SOFT }}
         >
-          {/* Center — identity */}
           <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
             <motion.p
               className="label text-white"
@@ -222,22 +254,20 @@ export default function Hero() {
             </motion.p>
           </div>
 
-          {/* Bottom — project navigation */}
+          {/* Bottom nav */}
           <motion.div
             className="px-6 md:px-10 pb-8 grid grid-cols-3 items-end gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
           >
-            {/* Prev */}
             <button onClick={goPrev} className="flex items-center gap-3 group text-left pointer-events-auto">
-              <span className="block h-px bg-white transition-all duration-500 group-hover:opacity-80" style={{ width: 24, opacity: 0.3 }} />
-              <span className="label text-white hidden md:inline transition-opacity duration-300 group-hover:opacity-60" style={{ opacity: 0.3 }}>
+              <span className="block h-px bg-white group-hover:opacity-80 transition-all duration-500" style={{ width: 24, opacity: 0.3 }} />
+              <span className="label text-white hidden md:inline group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3 }}>
                 {FEATURED[(index - 1 + FEATURED.length) % FEATURED.length].title}
               </span>
             </button>
 
-            {/* Center */}
             <div className="flex flex-col items-center gap-2 pointer-events-auto">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -261,17 +291,16 @@ export default function Hero() {
               </Link>
             </div>
 
-            {/* Next */}
             <button onClick={goNext} className="flex items-center gap-3 justify-end group text-right pointer-events-auto">
-              <span className="label text-white hidden md:inline transition-opacity duration-300 group-hover:opacity-60" style={{ opacity: 0.3 }}>
+              <span className="label text-white hidden md:inline group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3 }}>
                 {FEATURED[(index + 1) % FEATURED.length].title}
               </span>
-              <span className="block h-px bg-white transition-all duration-500 group-hover:opacity-80" style={{ width: 24, opacity: 0.3 }} />
+              <span className="block h-px bg-white group-hover:opacity-80 transition-all duration-500" style={{ width: 24, opacity: 0.3 }} />
             </button>
           </motion.div>
         </motion.div>
 
-        {/* Vertical progress indicator */}
+        {/* Vertical progress */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-center pointer-events-none">
           {FEATURED.map((_, i) => (
             <div

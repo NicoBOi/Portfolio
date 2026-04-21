@@ -39,12 +39,15 @@ export default function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-white"
+      className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full"
       style={{
         width: 20,
         height: 20,
         opacity: 0,
-        mixBlendMode: "difference",
+        backgroundColor: hovered ? "#8a0000" : "white",
+        // difference blend only on idle — keeps the inversion effect when exploring
+        // hover drops to normal so the red reads cleanly as a REC indicator
+        mixBlendMode: hovered ? "normal" : "difference",
         willChange: "transform",
         animation: hovered ? "rec-blink 0.75s steps(1) infinite" : "none",
       }}
