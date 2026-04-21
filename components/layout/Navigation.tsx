@@ -5,25 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const NAV = [
-  { href: "/work", label: "Work" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
-
 export default function Navigation() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
+  const isHome = pathname === "/";
 
   useEffect(() => { setOpen(false); }, [pathname]);
-
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -31,35 +18,36 @@ export default function Navigation() {
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 md:px-8 h-14 transition-colors duration-300 ${
-          open ? "bg-black" : scrolled ? "bg-black border-b border-white/10" : "bg-transparent"
-        }`}
-      >
-        <Link href="/" className="label text-white opacity-60 hover:opacity-100 transition-opacity duration-300">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-14">
+        {/* Left */}
+        <Link
+          href="/"
+          className="label text-white transition-opacity duration-300 hover:opacity-60"
+          style={{ opacity: isHome ? 0.5 : 0.7 }}
+        >
           NS
         </Link>
 
-        {/* Desktop */}
+        {/* Right — desktop */}
         <div className="hidden md:flex items-center gap-8">
-          {NAV.map(({ href, label }) => (
+          {["/work", "/about", "/contact"].map((href) => (
             <Link
               key={href}
               href={href}
-              className={`label transition-opacity duration-300 hover:opacity-100 ${
-                pathname.startsWith(href) ? "text-white opacity-100" : "text-white opacity-35"
-              }`}
+              className="label text-white transition-opacity duration-300 hover:opacity-100"
+              style={{ opacity: pathname.startsWith(href) ? 1 : 0.4 }}
             >
-              {label}
+              {href.slice(1)}
             </Link>
           ))}
         </div>
 
-        {/* Mobile toggle */}
+        {/* Right — mobile toggle */}
         <button
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden label text-white opacity-60 hover:opacity-100 transition-opacity"
-          aria-label="Toggle menu"
+          className="md:hidden label text-white"
+          style={{ opacity: 0.6 }}
+          aria-label="Menu"
         >
           {open ? "Close" : "Menu"}
         </button>
@@ -69,34 +57,28 @@ export default function Navigation() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
-            exit={{ clipPath: "inset(0 0 100% 0)" }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-40 bg-black flex flex-col justify-center px-5 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-black/95 flex flex-col items-center justify-center gap-10 md:hidden"
           >
-            {NAV.map(({ href, label }, i) => (
+            {["/work", "/about", "/contact"].map((href, i) => (
               <motion.div
                 key={href}
-                initial={{ opacity: 0, x: -24 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: i * 0.07, ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
               >
-                <Link href={href} className="text-display text-white block py-1">
-                  {label}
+                <Link
+                  href={href}
+                  className="text-white font-light tracking-widest uppercase text-2xl hover:opacity-60 transition-opacity"
+                >
+                  {href.slice(1)}
                 </Link>
               </motion.div>
             ))}
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
-              transition={{ delay: 0.4 }}
-              className="absolute bottom-8 left-5"
-            >
-              <p className="label text-white">Bordeaux &mdash; Paris</p>
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

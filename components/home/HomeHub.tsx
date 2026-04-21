@@ -41,84 +41,53 @@ function ProjectThumb({
         href={`/work/${project.slug}`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="block group"
+        className="block"
         data-cursor={project.type === "video" ? "Play" : "View"}
       >
-        {/* Image container — no bg-white overlay, use filter instead */}
+        {/* Image */}
         <div
           className={`relative w-full ${s.aspect}`}
           style={{ backgroundColor: project.coverPlaceholder }}
         >
-          {/* Placeholder label */}
-          <div
-            className="absolute inset-0 flex items-center justify-center font-mono text-[9px] tracking-widest uppercase text-white/20"
-            style={{
-              filter: hovered ? "brightness(0.25)" : "brightness(1)",
-              transition: "filter 0.2s ease",
-            }}
-          >
-            Image
-          </div>
+          <div className="placeholder-img text-white h-full">Image</div>
 
-          {/* Dark overlay on hover — no white, no artifact */}
+          {/* Hover overlay — pure CSS, no motion div = no artifact */}
           <div
-            className="absolute inset-0 bg-black"
-            style={{
-              opacity: hovered ? 0.72 : 0,
-              transition: "opacity 0.2s ease",
-            }}
-          />
-
-          {/* Title reveals on hover */}
-          <div
-            className="absolute inset-0 flex flex-col justify-end p-5"
+            className="absolute inset-0 bg-black flex flex-col justify-end p-5"
             style={{
               opacity: hovered ? 1 : 0,
               transition: "opacity 0.2s ease",
             }}
           >
             <p
-              className="font-display font-bold text-white leading-none"
-              style={{
-                fontSize: "clamp(1.1rem, 2.2vw, 2rem)",
-                letterSpacing: "-0.02em",
-              }}
+              className="text-white font-light leading-tight"
+              style={{ fontSize: "clamp(1rem, 2vw, 1.75rem)", letterSpacing: "0.05em" }}
             >
               {project.title}
             </p>
-            <p className="label text-white mt-2" style={{ opacity: 0.45 }}>
+            <p className="label text-white mt-2" style={{ opacity: 0.4 }}>
               {project.role}
             </p>
           </div>
 
-          {/* Index — top left */}
+          {/* Index badge */}
           <span
             className="absolute top-3 left-3 label text-white"
-            style={{ opacity: hovered ? 0 : 0.3, transition: "opacity 0.2s ease" }}
+            style={{
+              opacity: hovered ? 0 : 0.35,
+              transition: "opacity 0.2s ease",
+            }}
           >
             [{num}]
           </span>
-
-          {/* Type — top right, only for non-photo */}
-          {project.type !== "photo" && (
-            <span
-              className="absolute top-3 right-3 label text-white"
-              style={{ opacity: hovered ? 0 : 0.25, transition: "opacity 0.2s ease" }}
-            >
-              {project.type === "video" ? "Video" : "Exp."}
-            </span>
-          )}
         </div>
 
-        {/* Meta row — catalog style */}
+        {/* Meta */}
         <div className="flex items-center justify-between pt-2.5 pb-1">
-          <span
-            className="label text-white"
-            style={{ opacity: 0.6 }}
-          >
+          <span className="label text-white" style={{ opacity: 0.55 }}>
             {project.title}
           </span>
-          <span className="label text-white" style={{ opacity: 0.35 }}>
+          <span className="label text-white" style={{ opacity: 0.3 }}>
             {project.year}
           </span>
         </div>
@@ -136,25 +105,22 @@ export default function HomeHub() {
       : projects.filter((p) => p.type === (filter as ProjectType));
 
   return (
-    <div className="bg-black min-h-screen">
-      {/* ── Identity strip ──────────────────────────── */}
-      <div className="px-5 md:px-8 pt-20 pb-6 border-b border-white/10 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+    <div className="bg-black min-h-screen pb-24">
+      {/* Identity */}
+      <div className="px-6 md:px-10 pt-20 pb-6 border-b border-white/10 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <h1
-          className="font-display font-bold text-white leading-none"
-          style={{
-            fontSize: "clamp(2rem, 5.5vw, 5.5rem)",
-            letterSpacing: "-0.03em",
-          }}
+          className="text-white font-light uppercase tracking-widest"
+          style={{ fontSize: "clamp(1.5rem, 4vw, 4rem)", letterSpacing: "0.2em" }}
         >
           Nicolas Sempere
         </h1>
-        <p className="label text-white pb-1" style={{ opacity: 0.45 }}>
-          Photographer &mdash; Filmmaker &mdash; Bordeaux&nbsp;/&nbsp;Paris
+        <p className="label text-white pb-1" style={{ opacity: 0.4 }}>
+          Photographer — Filmmaker — Bordeaux&nbsp;/&nbsp;Paris
         </p>
       </div>
 
-      {/* ── Filter bar ──────────────────────────────── */}
-      <div className="px-5 md:px-8 py-4 border-b border-white/10 flex items-center justify-between">
+      {/* Filters */}
+      <div className="px-6 md:px-10 py-4 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-6 md:gap-8 overflow-x-auto no-scrollbar">
           {FILTERS.map(({ value, label }) => (
             <button
@@ -166,7 +132,7 @@ export default function HomeHub() {
               {label}
               {filter === value && (
                 <motion.span
-                  layoutId="hub-filter"
+                  layoutId="filter-line"
                   className="absolute bottom-0 left-0 right-0 h-px bg-white"
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 />
@@ -174,13 +140,13 @@ export default function HomeHub() {
             </button>
           ))}
         </div>
-        <span className="label text-white shrink-0 hidden md:block" style={{ opacity: 0.3 }}>
-          {visible.length}&nbsp;projects
+        <span className="label text-white shrink-0 hidden md:block" style={{ opacity: 0.25 }}>
+          {visible.length} projects
         </span>
       </div>
 
-      {/* ── Grid ────────────────────────────────────── */}
-      <div className="px-5 md:px-8 pt-6 pb-16">
+      {/* Grid */}
+      <div className="px-6 md:px-10 pt-6">
         <div className="grid grid-cols-12 gap-x-3 md:gap-x-5 gap-y-10 md:gap-y-14">
           <AnimatePresence mode="popLayout">
             {visible.map((p, i) => (
@@ -197,31 +163,6 @@ export default function HomeHub() {
               </motion.div>
             ))}
           </AnimatePresence>
-        </div>
-      </div>
-
-      {/* ── Footer ──────────────────────────────────── */}
-      <div className="px-5 md:px-8 py-8 border-t border-white/10 flex items-center justify-between">
-        <span className="label text-white" style={{ opacity: 0.2 }}>
-          &copy; 2025 Nicolas Sempere
-        </span>
-        <div className="flex items-center gap-6">
-          <a
-            href="https://instagram.com/nicolas_Sempere"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="label text-white transition-opacity duration-300 hover:opacity-60"
-            style={{ opacity: 0.2 }}
-          >
-            Instagram
-          </a>
-          <a
-            href="mailto:nicosmp.pro@gmail.com"
-            className="label text-white transition-opacity duration-300 hover:opacity-60"
-            style={{ opacity: 0.2 }}
-          >
-            Email
-          </a>
         </div>
       </div>
     </div>

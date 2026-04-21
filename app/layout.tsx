@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { Syne, Space_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
 
-const syne = Syne({
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-syne",
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  variable: "--font-space-mono",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -26,11 +20,6 @@ export const metadata: Metadata = {
   },
   description:
     "Nicolas Sempere is a photographer and filmmaker based between Bordeaux and Paris.",
-  openGraph: {
-    title: "Nicolas Sempere",
-    description: "Photographer & Filmmaker — Bordeaux / Paris",
-    type: "website",
-  },
 };
 
 export default function RootLayout({
@@ -39,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${syne.variable} ${spaceMono.variable}`}>
+    <html lang="fr" className={poppins.variable}>
       <body>
         <CustomCursor />
         <Navigation />
