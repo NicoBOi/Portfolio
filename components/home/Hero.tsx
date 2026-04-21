@@ -8,6 +8,7 @@ import ProjectPanel from "./ProjectPanel";
 
 const FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const SCROLL_LOCK_MS = 850;
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
@@ -15,37 +16,77 @@ export default function Hero() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
+  const current = FEATURED[index];
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  // Auto-cycle pauses while panel is open
+  // Auto-cycle — pauses when panel is open
   useEffect(() => {
     if (openSlug) return;
     const t = setInterval(() => setIndex((i) => (i + 1) % FEATURED.length), 5000);
     return () => clearInterval(t);
   }, [openSlug]);
 
+  // Wheel navigation — non-passive so we can prevent page scroll
+  useEffect(() => {
+    if (openSlug) return;
+    let locked = false;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (locked || Math.abs(e.deltaY) < 8) return;
+      locked = true;
+      setIndex((i) =>
+        e.deltaY > 0
+          ? (i + 1) % FEATURED.length
+          : (i - 1 + FEATURED.length) % FEATURED.length
+      );
+      setTimeout(() => { locked = false; }, SCROLL_LOCK_MS);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [openSlug]);
+
+  // Touch / swipe navigation
+  useEffect(() => {
+    if (openSlug) return;
+    let startY = 0;
+    const onTouchStart = (e: TouchEvent) => { startY = e.touches[0].clientY; };
+    const onTouchEnd = (e: TouchEvent) => {
+      const delta = startY - e.changedTouches[0].clientY;
+      if (Math.abs(delta) < 50) return;
+      setIndex((i) =>
+        delta > 0
+          ? (i + 1) % FEATURED.length
+          : (i - 1 + FEATURED.length) % FEATURED.length
+      );
+    };
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [openSlug]);
+
   const goPrev = () => setIndex((i) => (i - 1 + FEATURED.length) % FEATURED.length);
   const goNext = () => setIndex((i) => (i + 1) % FEATURED.length);
-  const current = FEATURED[index];
 
-  const handleNavigate = useCallback((slug: string) => {
-    setOpenSlug(slug);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setOpenSlug(null);
-  }, []);
+  const handleNavigate = useCallback((slug: string) => setOpenSlug(slug), []);
+  const handleClose = useCallback(() => setOpenSlug(null), []);
 
   return (
     <>
-      <section className="relative min-h-screen bg-black overflow-hidden flex flex-col">
+      <section className="relative h-screen bg-black overflow-hidden flex flex-col">
 
-        {/* Background — featured project color/image */}
-        <div className="absolute inset-0 z-0">
+        {/* Background — click anywhere to open current project */}
+        <div
+          className="absolute inset-0 z-0 cursor-none"
+          onClick={() => setOpenSlug(current.slug)}
+          data-cursor="View"
+        >
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
@@ -62,9 +103,9 @@ export default function Hero() {
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
-        {/* Foreground */}
+        {/* Foreground — pointer-events-none so clicks pass to background */}
         <motion.div
-          className="relative z-10 flex-1 flex flex-col"
+          className="relative z-10 flex-1 flex flex-col pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: loaded ? 1 : 0 }}
           transition={{ duration: 1, delay: 0.3, ease: SOFT }}
@@ -109,10 +150,10 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
           >
-            {/* Prev featured */}
+            {/* Prev */}
             <button
               onClick={goPrev}
-              className="flex items-center gap-3 group text-left"
+              className="flex items-center gap-3 group text-left pointer-events-auto"
             >
               <span
                 className="block h-px bg-white transition-all duration-500 group-hover:opacity-80"
@@ -126,29 +167,27 @@ export default function Hero() {
               </span>
             </button>
 
-            {/* Center — current project, click to open panel */}
-            <div className="flex flex-col items-center gap-2">
+            {/* Center — current project info + All Works */}
+            <div className="flex flex-col items-center gap-2 pointer-events-auto">
               <AnimatePresence mode="wait">
-                <motion.button
+                <motion.div
                   key={current.slug}
-                  onClick={() => setOpenSlug(current.slug)}
-                  className="flex flex-col items-center gap-1 group"
+                  className="flex flex-col items-center gap-1"
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.35, ease: SOFT }}
-                  data-cursor="View"
                 >
                   <span
-                    className="text-white title group-hover:opacity-50 transition-opacity duration-300"
-                    style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.65 }}
+                    className="text-white title"
+                    style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.55 }}
                   >
                     {current.title}
                   </span>
-                  <span className="label text-white opacity-30 group-hover:opacity-60 transition-opacity duration-300">
-                    View ↑
+                  <span className="label text-white" style={{ opacity: 0.25 }}>
+                    {String(index + 1).padStart(2, "0")} / {String(FEATURED.length).padStart(2, "0")}
                   </span>
-                </motion.button>
+                </motion.div>
               </AnimatePresence>
 
               <Link
@@ -160,10 +199,10 @@ export default function Hero() {
               </Link>
             </div>
 
-            {/* Next featured */}
+            {/* Next */}
             <button
               onClick={goNext}
-              className="flex items-center gap-3 justify-end group text-right"
+              className="flex items-center gap-3 justify-end group text-right pointer-events-auto"
             >
               <span
                 className="label text-white hidden md:inline transition-opacity duration-300 group-hover:opacity-60"
@@ -178,9 +217,23 @@ export default function Hero() {
             </button>
           </motion.div>
         </motion.div>
+
+        {/* Vertical progress indicator */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-center pointer-events-none">
+          {FEATURED.map((_, i) => (
+            <div
+              key={i}
+              className="w-px rounded-full bg-white transition-all duration-500"
+              style={{
+                height: i === index ? 24 : 8,
+                opacity: i === index ? 0.65 : 0.2,
+              }}
+            />
+          ))}
+        </div>
       </section>
 
-      {/* Project Panel — slides up over hero, no route change */}
+      {/* Project Panel */}
       <ProjectPanel
         project={openProject}
         onClose={handleClose}
