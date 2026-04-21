@@ -24,7 +24,7 @@ export const projects: Project[] = [
     role: "Direction · DOP · Edit",
     type: "video",
     category: "Showreel",
-    coverPlaceholder: "#080808",
+    coverPlaceholder: "#1A1818",
     description:
       "An overview of work across documentary, commercial, and personal projects — 2022 to 2025. Shot on various formats, edited for atmosphere over sequence.",
     videoUrl: "https://vimeo.com/1175061669",
@@ -138,7 +138,7 @@ export const projects: Project[] = [
     coverPlaceholder: "#2A2A2A",
     description:
       "A 12-minute documentary following infrastructure maintenance workers through the underground networks of Bordeaux. Shot on 16mm and digital over four weeks. The city above never appears; everything happens in the dark, in the pipes, in the noise. Selected for Côté Court 2024.",
-    videoUrl: "#",
+    videoUrl: "https://vimeo.com/1175061669",
     featured: true,
     aspectRatio: "landscape",
   },
@@ -152,7 +152,7 @@ export const projects: Project[] = [
     coverPlaceholder: "#1C1C1C",
     description:
       "A winter campaign for a French outerwear brand. Six locations, seven days. The brief was silence and cold — two things that are actually the same thing photographed differently. The result is 90 seconds. It runs in-store across Europe.",
-    videoUrl: "#",
+    videoUrl: "https://vimeo.com/1175061669",
     featured: true,
     aspectRatio: "landscape",
   },
@@ -166,7 +166,7 @@ export const projects: Project[] = [
     coverPlaceholder: "#242424",
     description:
       "Single-take video essays on objects at rest. A table set for no one. A coat on a chair. Flowers past their point. The title is also the method — no cuts, no movement, only duration. Shown as a three-channel installation at La Base, Bordeaux.",
-    videoUrl: "#",
+    videoUrl: "https://vimeo.com/1175061669",
     aspectRatio: "landscape",
   },
   {
@@ -179,7 +179,7 @@ export const projects: Project[] = [
     coverPlaceholder: "#1A1A1A",
     description:
       "Do objects continue to exist when no one is looking? An editorial collaboration exploring the psychology of possession — rooms entered, objects examined, rooms left empty again. The camera as the last visitor.",
-    videoUrl: "#",
+    videoUrl: "https://vimeo.com/1175061669",
     aspectRatio: "landscape",
   },
   {
@@ -192,7 +192,7 @@ export const projects: Project[] = [
     coverPlaceholder: "#222222",
     description:
       "What the frame excludes defines what remains. A commercial that works by systematic absence — minimal on-screen presence, maximum atmospheric pressure. The product appears for four seconds across a two-minute film.",
-    videoUrl: "#",
+    videoUrl: "https://vimeo.com/1175061669",
     aspectRatio: "landscape",
   },
 
@@ -207,7 +207,7 @@ export const projects: Project[] = [
     coverPlaceholder: "#F5F5F5",
     description:
       "A 7-minute loop of static, interference, and white noise treated as image. Signal and failure as the same material. Made during a week without internet, using analogue feedback loops and degraded VHS transfers. The piece runs continuously; there is no beginning or end.",
-    videoUrl: "#",
+    videoUrl: "https://vimeo.com/1175061669",
     featured: true,
     aspectRatio: "landscape",
   },

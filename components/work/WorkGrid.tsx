@@ -7,17 +7,6 @@ import type { ProjectType } from "@/data/projects";
 import FilterBar, { type Filter } from "./FilterBar";
 import ProjectCard from "./ProjectCard";
 
-const PATTERN: { cols: string; aspect: string }[] = [
-  { cols: "col-span-12 md:col-span-8", aspect: "aspect-[16/9]" },
-  { cols: "col-span-12 md:col-span-4", aspect: "aspect-[3/4]" },
-  { cols: "col-span-12 md:col-span-5", aspect: "aspect-[4/5]" },
-  { cols: "col-span-12 md:col-span-7", aspect: "aspect-[16/9]" },
-  { cols: "col-span-12 md:col-span-6", aspect: "aspect-[3/4]" },
-  { cols: "col-span-12 md:col-span-6", aspect: "aspect-[16/9]" },
-  { cols: "col-span-12 md:col-span-4", aspect: "aspect-[3/4]" },
-  { cols: "col-span-12 md:col-span-8", aspect: "aspect-[16/9]" },
-];
-
 export default function WorkGrid() {
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -28,27 +17,23 @@ export default function WorkGrid() {
 
   return (
     <div>
-      <div className="px-5 md:px-8 mb-10 md:mb-14">
+      {/* Filter bar */}
+      <div className="px-6 md:px-10 pb-10 border-b border-white/10 flex items-center justify-between">
         <FilterBar active={filter} onChange={setFilter} />
+        <span className="label text-white hidden md:block" style={{ opacity: 0.2 }}>
+          {visible.length} projects
+        </span>
       </div>
 
-      <div className="px-5 md:px-8">
-        <motion.div layout className="grid grid-cols-12 gap-x-3 md:gap-x-5">
+      {/* Symmetric 2-col grid */}
+      <div className="px-6 md:px-10 pt-8 pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <AnimatePresence mode="popLayout">
-            {visible.map((project, i) => {
-              const pat = PATTERN[i % PATTERN.length];
-              return (
-                <ProjectCard
-                  key={project.slug}
-                  project={project}
-                  index={i}
-                  colSpan={pat.cols}
-                  aspectClass={pat.aspect}
-                />
-              );
-            })}
+            {visible.map((project, i) => (
+              <ProjectCard key={project.slug} project={project} index={i} />
+            ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         {visible.length === 0 && (
           <p className="label text-white opacity-20 py-32 text-center">No projects</p>

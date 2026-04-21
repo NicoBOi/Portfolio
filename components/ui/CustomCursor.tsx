@@ -44,12 +44,10 @@ export default function CustomCursor() {
         width: 20,
         height: 20,
         opacity: 0,
-        backgroundColor: hovered ? "#8a0000" : "white",
-        // difference blend only on idle — keeps the inversion effect when exploring
-        // hover drops to normal so the red reads cleanly as a REC indicator
+        backgroundColor: hovered ? "#cc1111" : "white",
         mixBlendMode: hovered ? "normal" : "difference",
         willChange: "transform",
-        animation: hovered ? "rec-blink 0.75s steps(1) infinite" : "none",
+        animation: hovered ? "rec-blink 0.45s ease-in-out infinite alternate" : "none",
       }}
     />
   );

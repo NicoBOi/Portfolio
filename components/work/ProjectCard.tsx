@@ -5,26 +5,29 @@ import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import type { Project } from "@/data/projects";
 
-interface Props {
-  project: Project;
-  index: number;
-  colSpan: string;
-  aspectClass: string;
+const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+function aspectClass(p: Project): string {
+  if (p.type === "video") return "aspect-[16/9]";
+  if (p.aspectRatio === "portrait") return "aspect-[3/4]";
+  if (p.aspectRatio === "landscape") return "aspect-[4/3]";
+  return "aspect-[4/5]";
 }
 
-export default function ProjectCard({ project, index, colSpan, aspectClass }: Props) {
+export default function ProjectCard({ project, index }: { project: Project; index: number }) {
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-8%" });
+  const inView = useInView(ref, { once: true, margin: "-6%" });
   const num = String(index + 1).padStart(2, "0");
 
   return (
     <motion.div
       ref={ref}
-      className={colSpan}
-      initial={{ opacity: 0 }}
-      animate={inView ? { opacity: 1 } : {}}
-      transition={{ duration: 0.6, delay: (index % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      exit={{ opacity: 0 }}
+      layout
+      transition={{ duration: 0.55, delay: (index % 2) * 0.08, ease: SOFT }}
     >
       <Link
         href={`/work/${project.slug}`}
@@ -35,52 +38,67 @@ export default function ProjectCard({ project, index, colSpan, aspectClass }: Pr
       >
         {/* Thumbnail */}
         <div
-          className={`relative w-full ${aspectClass} overflow-hidden`}
-          style={{ backgroundColor: project.coverPlaceholder }}
+          className={`relative w-full ${aspectClass(project)} overflow-hidden`}
+          style={{
+            backgroundColor: project.coverPlaceholder,
+            // Subtle ring so dark-colored cards don't vanish on black bg
+            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
+          }}
         >
-          <div className="placeholder-img text-white h-full">Image</div>
-
-          {/* Hover: brutal white overlay with title */}
-          <motion.div
-            className="absolute inset-0 bg-white flex flex-col justify-end p-4 md:p-5"
-            animate={{ opacity: hovered ? 1 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <p className="text-heading text-black leading-none">{project.title}</p>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="label text-black opacity-50">{project.year}</span>
-              <span className="label text-black opacity-30">/</span>
-              <span className="label text-black opacity-50">{project.role}</span>
-            </div>
-          </motion.div>
-
-          {/* Index — top left */}
-          <div className="absolute top-3 left-3 z-10 pointer-events-none">
-            <motion.span
-              className="label text-white"
-              animate={{ opacity: hovered ? 0 : 0.3 }}
-            >
-              [{num}]
-            </motion.span>
+          <div className="placeholder-img text-white h-full">
+            {project.type === "video" ? "Video" : "Image"}
           </div>
 
-          {/* Type — top right */}
-          {project.type !== "photo" && (
-            <div className="absolute top-3 right-3 z-10 pointer-events-none">
-              <motion.span
-                className="label text-white"
-                animate={{ opacity: hovered ? 0 : 0.3 }}
-              >
-                {project.type === "video" ? "Video" : "Exp."}
-              </motion.span>
+          {/* Dark hover overlay — consistent with overall aesthetic */}
+          <div
+            className="absolute inset-0 bg-black flex flex-col justify-end p-5"
+            style={{
+              opacity: hovered ? 1 : 0,
+              transition: "opacity 0.22s ease",
+            }}
+          >
+            <p
+              className="text-white title leading-none"
+              style={{ fontSize: "clamp(1.1rem, 2.2vw, 1.8rem)" }}
+            >
+              {project.title}
+            </p>
+            <div className="flex items-center gap-3 mt-3">
+              <span className="label text-white" style={{ opacity: 0.45 }}>{project.year}</span>
+              <span className="label text-white" style={{ opacity: 0.2 }}>/</span>
+              <span className="label text-white" style={{ opacity: 0.45 }}>{project.role}</span>
             </div>
+          </div>
+
+          {/* Index badge */}
+          <span
+            className="absolute top-3 left-3 label text-white z-10"
+            style={{
+              opacity: hovered ? 0 : 0.28,
+              transition: "opacity 0.2s ease",
+            }}
+          >
+            [{num}]
+          </span>
+
+          {/* Type badge */}
+          {project.type !== "photo" && (
+            <span
+              className="absolute top-3 right-3 label text-white z-10"
+              style={{
+                opacity: hovered ? 0 : 0.28,
+                transition: "opacity 0.2s ease",
+              }}
+            >
+              {project.type === "video" ? "Video" : "Exp."}
+            </span>
           )}
         </div>
 
         {/* Below card */}
-        <div className="flex items-baseline justify-between pt-2 pb-5">
-          <p className="label text-white opacity-40">{project.title}</p>
-          <p className="label text-white opacity-20">{project.year}</p>
+        <div className="flex items-baseline justify-between pt-2.5 pb-6">
+          <p className="label text-white" style={{ opacity: 0.38 }}>{project.title}</p>
+          <p className="label text-white" style={{ opacity: 0.18 }}>{project.year}</p>
         </div>
       </Link>
     </motion.div>
