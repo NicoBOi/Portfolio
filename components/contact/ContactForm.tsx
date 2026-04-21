@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
 export default function ContactForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,66 +22,76 @@ export default function ContactForm() {
           key="sent"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, ease: SOFT }}
+          className="flex flex-col gap-3"
         >
-          <p className="text-title text-white">Done.</p>
-          <p className="label text-white opacity-30 mt-3">I&apos;ll be in touch.</p>
+          <p
+            className="text-white title"
+            style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+          >
+            Envoyé.
+          </p>
+          <p className="label text-white" style={{ opacity: 0.3 }}>Je reviens vers vous rapidement.</p>
         </motion.div>
       ) : (
         <motion.form
           key="form"
           onSubmit={handleSubmit}
-          className="flex flex-col gap-7"
+          className="flex flex-col gap-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
         >
           {[
-            { name: "name", label: "Name", type: "text", placeholder: "Your name" },
-            { name: "email", label: "Email", type: "email", placeholder: "your@email.com" },
+            { name: "name", label: "Nom", type: "text", placeholder: "Votre nom" },
+            { name: "email", label: "Email", type: "email", placeholder: "votre@email.com" },
           ].map(({ name, label, type, placeholder }) => (
-            <div key={name} className="flex flex-col gap-2">
-              <label className="label text-white opacity-30">{label}</label>
+            <div key={name} className="flex flex-col gap-2.5">
+              <label className="label text-white" style={{ opacity: 0.28 }}>{label}</label>
               <input
                 type={type}
                 name={name}
                 required
                 placeholder={placeholder}
-                className="w-full border-b border-white/15 pb-2.5 bg-transparent outline-none font-mono text-sm text-white placeholder:text-white/20 focus:border-white/50 transition-colors duration-300"
+                className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18 focus:border-white/40 transition-colors duration-300"
+                style={{ letterSpacing: "0.02em" }}
               />
             </div>
           ))}
 
-          <div className="flex flex-col gap-2">
-            <label className="label text-white opacity-30">Project type</label>
+          <div className="flex flex-col gap-2.5">
+            <label className="label text-white" style={{ opacity: 0.28 }}>Type de projet</label>
             <select
               name="type"
-              className="w-full border-b border-white/15 pb-2.5 bg-transparent outline-none font-mono text-sm text-white/60 focus:border-white/50 transition-colors duration-300 appearance-none"
+              className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white/50 font-light focus:border-white/40 transition-colors duration-300 appearance-none"
             >
-              <option value="" className="bg-black">Select...</option>
-              {["Editorial", "Commercial", "Film / Video", "Personal", "Other"].map((v) => (
+              <option value="" className="bg-black">Sélectionner…</option>
+              {["Éditorial", "Commercial", "Film / Vidéo", "Personnel", "Autre"].map((v) => (
                 <option key={v} value={v} className="bg-black">{v}</option>
               ))}
             </select>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="label text-white opacity-30">Message</label>
+          <div className="flex flex-col gap-2.5">
+            <label className="label text-white" style={{ opacity: 0.28 }}>Message</label>
             <textarea
               name="message"
               required
               rows={4}
-              placeholder="Tell me about the project..."
-              className="w-full border-b border-white/15 pb-2.5 bg-transparent outline-none font-mono text-sm text-white placeholder:text-white/20 focus:border-white/50 transition-colors duration-300 resize-none"
+              placeholder="Parlez-moi du projet…"
+              className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18 focus:border-white/40 transition-colors duration-300 resize-none"
+              style={{ letterSpacing: "0.02em" }}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="self-start label text-white opacity-60 hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 disabled:opacity-30"
+            className="self-start label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-5 disabled:opacity-25 mt-2"
+            style={{ opacity: 0.55 }}
           >
-            {loading ? "Sending..." : "Send"}
-            <span className="w-6 h-px bg-white" />
+            {loading ? "Envoi…" : "Envoyer"}
+            <span className="block w-8 h-px bg-white" />
           </button>
         </motion.form>
       )}

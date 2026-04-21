@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "About" };
 
@@ -18,70 +19,87 @@ const PRESS = [
 
 export default function AboutPage() {
   return (
-    <div className="bg-black min-h-screen pt-28 pb-28 px-5 md:px-8">
+    <div className="bg-black min-h-screen px-6 md:px-10">
+      {/* Back */}
+      <div className="pt-20 pb-0">
+        <Link
+          href="/"
+          className="label text-white hover:opacity-60 transition-opacity duration-300 flex items-center gap-3"
+          style={{ opacity: 0.3 }}
+        >
+          <span className="block w-5 h-px bg-white" />
+          Home
+        </Link>
+      </div>
+
       {/* Header */}
-      <div className="mb-14 md:mb-20">
-        <p className="label text-white opacity-25 mb-4">[03] About</p>
-        <h1 className="text-display text-white">Nicolas Sempere</h1>
+      <div className="pt-14 pb-12 border-b border-white/10">
+        <p className="label text-white mb-5" style={{ opacity: 0.22 }}>About</p>
+        <h1
+          className="text-white title"
+          style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
+        >
+          Nicolas Sempere
+        </h1>
       </div>
 
       {/* Two col */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 py-14">
         {/* Portrait */}
-        <div className="md:col-span-5">
+        <div className="md:col-span-4">
           <div
-            className="w-full aspect-[4/5] overflow-hidden"
-            style={{ backgroundColor: "#1A1A1A", maxWidth: 480 }}
+            className="w-full overflow-hidden"
+            style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 400 }}
           >
             <div className="placeholder-img text-white h-full">Portrait</div>
           </div>
-          <p className="label text-white opacity-20 mt-3">Bordeaux &mdash; Paris</p>
+          <p className="label text-white mt-3" style={{ opacity: 0.2 }}>Bordeaux — Paris</p>
         </div>
 
         {/* Text */}
-        <div className="md:col-span-7 flex flex-col gap-8">
-          <div className="flex flex-col gap-4">
-            <p className="font-mono text-sm text-white/60 leading-relaxed">
-              Photographer and filmmaker. I work at the intersection of silence
-              and tension &mdash; constructing images that refuse to be passive.
-              Based between Bordeaux and Paris, available everywhere.
+        <div className="md:col-span-8 flex flex-col gap-10">
+          <div className="flex flex-col gap-5 max-w-xl">
+            <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.6, lineHeight: 1.9 }}>
+              Photographe et réalisateur. Je travaille à l&apos;intersection du silence et de la tension —
+              construisant des images qui refusent d&apos;être passives.
+              Basé entre Bordeaux et Paris, disponible partout.
             </p>
-            <p className="font-mono text-sm text-white/40 leading-relaxed">
-              Each frame is an argument. Each edit, a position. I don&apos;t
-              document situations &mdash; I build them from scratch, working with
-              subjects until the image becomes inevitable.
+            <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}>
+              Chaque cadre est un argument. Chaque montage, une position. Je ne documente pas les situations —
+              je les construis de toutes pièces, en travaillant avec les sujets jusqu&apos;à ce que l&apos;image devienne inévitable.
             </p>
-            <p className="font-mono text-sm text-white/40 leading-relaxed">
-              Available for editorial, commercial, and long-form personal
-              projects. Collaborations are selective. Quality is not negotiable.
+            <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}>
+              Disponible pour des projets éditoriaux, commerciaux et longs-métrages personnels.
+              Les collaborations sont sélectives. La qualité n&apos;est pas négociable.
             </p>
 
-            <a
-              href="mailto:nicosmp.pro@gmail.com"
-              className="label text-white opacity-50 hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-2"
+            <Link
+              href="/contact"
+              className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-2"
+              style={{ opacity: 0.45 }}
             >
               Contact
-              <span className="w-6 h-px bg-white opacity-50" />
-            </a>
+              <span className="block w-6 h-px bg-white" style={{ opacity: 0.5 }} />
+            </Link>
           </div>
 
           {/* Clients + Press */}
-          <div className="border-t border-white/10 pt-8 grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
+          <div className="border-t border-white/10 pt-10 grid grid-cols-1 sm:grid-cols-2 gap-10 md:gap-16">
             <div>
-              <p className="label text-white opacity-25 mb-5">Clients</p>
-              <ul className="flex flex-col gap-2">
+              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>Clients</p>
+              <ul className="flex flex-col gap-2.5">
                 {CLIENTS.map((c) => (
-                  <li key={c} className="font-mono text-xs text-white/50">{c}</li>
+                  <li key={c} className="text-white font-light" style={{ fontSize: "0.8rem", opacity: 0.45, letterSpacing: "0.03em" }}>{c}</li>
                 ))}
               </ul>
             </div>
             <div>
-              <p className="label text-white opacity-25 mb-5">Press</p>
+              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>Press</p>
               <ul className="flex flex-col gap-3">
                 {PRESS.map(({ pub, year }) => (
                   <li key={pub} className="flex items-baseline justify-between gap-4">
-                    <span className="font-mono text-xs text-white/50">{pub}</span>
-                    <span className="label text-white opacity-20">{year}</span>
+                    <span className="text-white font-light" style={{ fontSize: "0.8rem", opacity: 0.45, letterSpacing: "0.03em" }}>{pub}</span>
+                    <span className="label text-white" style={{ opacity: 0.2 }}>{year}</span>
                   </li>
                 ))}
               </ul>

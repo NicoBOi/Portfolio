@@ -9,22 +9,31 @@ export default function ProjectNav({
   next: Project | null;
 }) {
   return (
-    <div className="px-5 md:px-8 py-8 border-t border-white/10 grid grid-cols-3 items-center gap-4">
+    <div className="px-6 md:px-10 py-8 border-t border-white/10 grid grid-cols-3 items-center gap-4">
       <div>
         {prev && (
           <Link href={`/work/${prev.slug}`} className="group flex items-center gap-3">
-            <span className="w-5 h-px bg-white opacity-40 transition-all duration-400 group-hover:w-10 group-hover:opacity-80" />
+            <span className="block w-5 h-px bg-white opacity-35 group-hover:w-10 group-hover:opacity-80 transition-all duration-400" />
             <div>
-              <p className="label text-white opacity-25 mb-1">Prev</p>
-              <p className="text-heading text-white leading-none">{prev.title}</p>
+              <p className="label text-white mb-1" style={{ opacity: 0.25 }}>Prev</p>
+              <p
+                className="text-white title"
+                style={{ fontSize: "clamp(0.85rem, 1.5vw, 1.1rem)" }}
+              >
+                {prev.title}
+              </p>
             </div>
           </Link>
         )}
       </div>
 
       <div className="flex justify-center">
-        <Link href="/work" className="label text-white opacity-25 hover:opacity-70 transition-opacity duration-300">
-          All Work
+        <Link
+          href="/work"
+          className="label text-white hover:opacity-70 transition-opacity duration-300"
+          style={{ opacity: 0.25 }}
+        >
+          ← All Work
         </Link>
       </div>
 
@@ -32,10 +41,15 @@ export default function ProjectNav({
         {next && (
           <Link href={`/work/${next.slug}`} className="group flex items-center gap-3 text-right">
             <div>
-              <p className="label text-white opacity-25 mb-1">Next</p>
-              <p className="text-heading text-white leading-none">{next.title}</p>
+              <p className="label text-white mb-1" style={{ opacity: 0.25 }}>Next</p>
+              <p
+                className="text-white title"
+                style={{ fontSize: "clamp(0.85rem, 1.5vw, 1.1rem)" }}
+              >
+                {next.title}
+              </p>
             </div>
-            <span className="w-5 h-px bg-white opacity-40 transition-all duration-400 group-hover:w-10 group-hover:opacity-80" />
+            <span className="block w-5 h-px bg-white opacity-35 group-hover:w-10 group-hover:opacity-80 transition-all duration-400" />
           </Link>
         )}
       </div>

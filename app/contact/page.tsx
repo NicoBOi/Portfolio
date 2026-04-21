@@ -1,51 +1,86 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ContactForm from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = { title: "Contact" };
 
 export default function ContactPage() {
   return (
-    <div className="bg-black min-h-screen pt-28 pb-28 px-5 md:px-8 flex flex-col">
-      {/* Header */}
-      <div className="mb-14 md:mb-20">
-        <p className="label text-white opacity-25 mb-4">[04] Contact</p>
-        <h1 className="text-display text-white">
-          Talk<br />to me.
-        </h1>
+    <div className="bg-black min-h-screen flex flex-col">
+      {/* Back */}
+      <div className="px-6 md:px-10 pt-20 pb-0">
+        <Link
+          href="/"
+          className="label text-white hover:opacity-60 transition-opacity duration-300 flex items-center gap-3"
+          style={{ opacity: 0.3 }}
+        >
+          <span className="block w-5 h-px bg-white" />
+          Home
+        </Link>
       </div>
 
-      {/* Direct */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-14 pb-14 border-b border-white/10">
-        <div>
-          <p className="label text-white opacity-25 mb-2">Email</p>
-          <a
-            href="mailto:nicosmp.pro@gmail.com"
-            className="font-mono text-sm text-white/60 hover:text-white transition-colors duration-300"
-          >
-            nicosmp.pro@gmail.com
-          </a>
-        </div>
-        <div>
-          <p className="label text-white opacity-25 mb-2">Instagram</p>
-          <a
-            href="https://instagram.com/nicolas_Sempere"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-sm text-white/60 hover:text-white transition-colors duration-300"
-          >
-            @nicolas_Sempere
-          </a>
-        </div>
-        <div>
-          <p className="label text-white opacity-25 mb-2">Location</p>
-          <p className="font-mono text-sm text-white/40">Bordeaux &mdash; Paris</p>
-        </div>
-      </div>
+      {/* Main — two columns */}
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 px-6 md:px-10 pt-14 pb-24 gap-16 md:gap-24">
 
-      {/* Form */}
-      <div className="max-w-md">
-        <p className="label text-white opacity-25 mb-8">Or send a message</p>
-        <ContactForm />
+        {/* Left — identity */}
+        <div className="flex flex-col justify-between gap-12">
+          <div>
+            <p className="label text-white mb-6" style={{ opacity: 0.25 }}>Contact</p>
+            <h1
+              className="text-white title"
+              style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
+            >
+              Parlons-en.
+            </h1>
+            <p
+              className="text-white font-light mt-8 leading-relaxed max-w-sm"
+              style={{ fontSize: "0.875rem", opacity: 0.45, lineHeight: 1.9 }}
+            >
+              Disponible pour des projets éditoriaux, commerciaux et cinématographiques.
+              Les collaborations sont sélectives — la qualité n&apos;est pas négociable.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div>
+              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Email</p>
+              <a
+                href="mailto:nicosmp.pro@gmail.com"
+                className="text-white font-light hover:opacity-50 transition-opacity duration-300"
+                style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.8, letterSpacing: "0.02em" }}
+              >
+                nicosmp.pro@gmail.com
+              </a>
+            </div>
+            <div>
+              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Instagram</p>
+              <a
+                href="https://instagram.com/nicolas_Sempere"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white font-light hover:opacity-50 transition-opacity duration-300"
+                style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.8, letterSpacing: "0.02em" }}
+              >
+                @nicolas_Sempere
+              </a>
+            </div>
+            <div>
+              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Based</p>
+              <p
+                className="text-white font-light"
+                style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.4, letterSpacing: "0.02em" }}
+              >
+                Bordeaux — Paris
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right — form */}
+        <div className="flex flex-col justify-center">
+          <p className="label text-white mb-10" style={{ opacity: 0.22 }}>Envoyer un message</p>
+          <ContactForm />
+        </div>
       </div>
     </div>
   );
