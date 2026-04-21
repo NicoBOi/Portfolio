@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",

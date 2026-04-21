@@ -34,6 +34,15 @@ body {
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); }
 
+/* ── Title (Cormorant Garamond) ──────────────────────────── */
+.title {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+}
+
 /* ── Label ───────────────────────────────────────────────── */
 .label {
   font-family: var(--font-poppins), system-ui, sans-serif;
