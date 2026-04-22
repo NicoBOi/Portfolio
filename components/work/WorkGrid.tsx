@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -14,8 +14,6 @@ export default function WorkGrid() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState(0);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [isTilting, setIsTilting] = useState(false);
 
   const visible =
     filter === "all"
@@ -86,25 +84,6 @@ export default function WorkGrid() {
     };
   }, [visible.length]);
 
-  const tiltRafRef = useRef<number | null>(null);
-  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-    if (tiltRafRef.current !== null) return;
-    tiltRafRef.current = requestAnimationFrame(() => {
-      tiltRafRef.current = null;
-      const x = ((clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;
-      const y = ((clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 5;
-      setTilt({ x, y });
-    });
-  };
-
-  const resetTilt = () => {
-    setIsTilting(false);
-    setTilt({ x: 0, y: 0 });
-  };
-
   const current = visible[active];
 
   return (
@@ -121,14 +100,10 @@ export default function WorkGrid() {
         <p className="label text-white opacity-20 py-32 text-center">Aucun projet</p>
       ) : (
         <>
-          {/* 3D Carousel Stage */}
+          {/* Horizontal glide carousel */}
           <div
             className="relative overflow-hidden"
-            style={{
-              height: "clamp(260px, 60vh, 640px)",
-              perspective: "1400px",
-              perspectiveOrigin: "50% 50%",
-            }}
+            style={{ height: "clamp(260px, 60vh, 640px)" }}
           >
             {visible.map((project, i) => {
               const offset = i - active;
@@ -136,11 +111,9 @@ export default function WorkGrid() {
               if (absOffset > 2) return null;
 
               const isActive = absOffset === 0;
-              const scale = isActive ? 1 : absOffset === 1 ? 0.82 : 0.62;
-              const opacity = isActive ? 1 : absOffset === 1 ? 0.5 : 0.18;
-              const tx = isActive ? 0 : offset * 38; // vw
-              const rotX = isActive ? tilt.x : 0;
-              const rotY = isActive ? tilt.y : offset * -28;
+              const scale = isActive ? 1 : 0.85;
+              const opacity = isActive ? 1 : absOffset === 1 ? 0.45 : 0.15;
+              const tx = offset * 60; // vw — side cards sit fully off-frame
 
               return (
                 <motion.div
@@ -150,25 +123,17 @@ export default function WorkGrid() {
                   animate={{
                     x: `calc(-50% + ${tx}vw)`,
                     y: "-50%",
-                    rotateX: rotX,
-                    rotateY: rotY,
                     scale,
                     opacity,
                   }}
-                  transition={
-                    isActive && isTilting
-                      ? { type: "tween", duration: 0.08, ease: "linear" }
-                      : { type: "spring", stiffness: 140, damping: 26, mass: 0.9 }
-                  }
+                  transition={{ type: "spring", stiffness: 140, damping: 26, mass: 0.9 }}
                   style={{
-                    width: "clamp(280px, 52vw, 820px)",
+                    width: "clamp(280px, 56vw, 880px)",
                     zIndex: 20 - absOffset,
                     cursor: "pointer",
                     willChange: "transform, opacity",
                   }}
                   onClick={() => isActive ? router.push(`/work/${project.slug}`) : setActive(i)}
-                  onMouseMove={isActive ? (e) => { setIsTilting(true); handleTiltMove(e); } : undefined}
-                  onMouseLeave={isActive ? resetTilt : undefined}
                   data-cursor={
                     isActive
                       ? (project.type === "video" ? "Lire" : "Voir")
