@@ -53,7 +53,7 @@ export default function VideoProject({ project, prev, next }: Props) {
           style={{ opacity: 0.3 }}
         >
           <span aria-hidden="true">←</span>
-          Travaux
+          Projets
         </Link>
       </div>
 

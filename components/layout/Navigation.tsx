@@ -34,7 +34,7 @@ export default function Navigation() {
         {/* Right — desktop */}
         <div className="hidden md:flex items-center gap-8">
           {[
-            { href: "/work", label: "Travaux" },
+            { href: "/work", label: "Projets" },
             { href: "/about", label: "À propos" },
             { href: "/contact", label: "Contact" },
           ].map(({ href, label }) => (
@@ -71,7 +71,7 @@ export default function Navigation() {
             className="fixed inset-0 z-40 bg-black/95 flex flex-col items-center justify-center gap-10 md:hidden"
           >
             {[
-              { href: "/work", label: "Travaux" },
+              { href: "/work", label: "Projets" },
               { href: "/about", label: "À propos" },
               { href: "/contact", label: "Contact" },
             ].map(({ href, label }, i) => (

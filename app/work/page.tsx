@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import WorkGrid from "@/components/work/WorkGrid";
 
-export const metadata: Metadata = { title: "Travaux" };
+export const metadata: Metadata = { title: "Projets" };
 
 export default function WorkPage() {
   return (
@@ -24,7 +24,7 @@ export default function WorkPage() {
           className="text-white title"
           style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
         >
-          Travaux
+          Projets
         </h1>
       </div>
 

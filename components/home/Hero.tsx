@@ -242,9 +242,6 @@ export default function Hero() {
                   </span>
                 </motion.div>
               </AnimatePresence>
-              <Link href="/work" className="label text-white hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.18, marginTop: 4 }}>
-                Voir tous les projets
-              </Link>
             </div>
 
             <button onClick={goNext} className="flex items-center gap-3 justify-end group text-right pointer-events-auto">
