@@ -26,6 +26,7 @@ export default function CustomCursor() {
     let pendingX = 0;
     let pendingY = 0;
     let visible = false;
+    let moved = false;
 
     const flush = () => {
       rafId = null;
@@ -36,13 +37,14 @@ export default function CustomCursor() {
       }
     };
 
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: PointerEvent | MouseEvent) => {
+      if (!moved) moved = true;
       pendingX = e.clientX;
       pendingY = e.clientY;
       if (rafId === null) rafId = requestAnimationFrame(flush);
     };
 
-    const onOver = (e: MouseEvent) => {
+    const onOver = (e: PointerEvent | MouseEvent) => {
       const target = e.target as HTMLElement;
       const label = readCursorLabel(target);
       const isInteractive = !!target.closest("a, button") || !!label;
@@ -53,12 +55,34 @@ export default function CustomCursor() {
       );
     };
 
-    window.addEventListener("mousemove", onMove, { passive: true });
-    document.addEventListener("mouseover", onOver, { passive: true });
+    const onLeave = () => {
+      el.style.opacity = "0";
+      visible = false;
+    };
+
+    // Fallback: if pointer events aren't firing (some Mac configs), give up on the custom cursor
+    const fallbackTimer = window.setTimeout(() => {
+      if (!moved) document.documentElement.classList.add("cursor-fallback");
+    }, 2000);
+
+    // Prefer PointerEvent (broader device + browser coverage), fall back to mouse
+    const hasPointer = typeof window !== "undefined" && "PointerEvent" in window;
+    const moveEvent = hasPointer ? "pointermove" : "mousemove";
+    const overEvent = hasPointer ? "pointerover" : "mouseover";
+    const leaveEvent = hasPointer ? "pointerleave" : "mouseleave";
+
+    window.addEventListener(moveEvent, onMove as EventListener, { passive: true });
+    document.addEventListener(overEvent, onOver as EventListener, { passive: true });
+    window.addEventListener(leaveEvent, onLeave, { passive: true });
+    window.addEventListener("blur", onLeave, { passive: true });
+
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId);
-      window.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseover", onOver);
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener(moveEvent, onMove as EventListener);
+      document.removeEventListener(overEvent, onOver as EventListener);
+      window.removeEventListener(leaveEvent, onLeave);
+      window.removeEventListener("blur", onLeave);
     };
   }, []);
 

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
+import Lightbox from "./Lightbox";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -32,6 +34,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
   const bg = project.coverPlaceholder;
   const cover = files[0];
   const rest = files.slice(1);
+  const [lightbox, setLightbox] = useState<number | null>(null);
 
   return (
     <article className="bg-black min-h-screen">
@@ -61,14 +64,22 @@ export default function PhotoProject({ project, prev, next }: Props) {
           transition={{ duration: 1, ease: SOFT }}
         >
           {cover ? (
-            <img
-              src={`/projects/${project.slug}/${cover}`}
-              alt={project.title}
-              className="w-full h-full object-cover"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-            />
+            <button
+              type="button"
+              onClick={() => setLightbox(0)}
+              className="w-full h-full block"
+              data-cursor="Agrandir"
+              aria-label="Agrandir"
+            >
+              <img
+                src={`/projects/${project.slug}/${cover}`}
+                alt={project.title}
+                className="w-full h-full object-cover"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+              />
+            </button>
           ) : (
             <div className="placeholder-img text-white h-full">[01]</div>
           )}
@@ -122,7 +133,14 @@ export default function PhotoProject({ project, prev, next }: Props) {
                 viewport={{ once: true, margin: "-8%" }}
                 transition={{ duration: 0.9, ease: SOFT }}
               >
-                <div style={{ backgroundColor: bg + "66" }}>
+                <button
+                  type="button"
+                  onClick={() => setLightbox(i + 1)}
+                  className="w-full block"
+                  style={{ backgroundColor: bg + "66" }}
+                  data-cursor="Agrandir"
+                  aria-label="Agrandir"
+                >
                   <img
                     src={`/projects/${project.slug}/${f}`}
                     alt=""
@@ -130,7 +148,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
                     loading="lazy"
                     decoding="async"
                   />
-                </div>
+                </button>
               </motion.figure>
             );
           })}
@@ -138,6 +156,14 @@ export default function PhotoProject({ project, prev, next }: Props) {
       </div>
 
       <ProjectNav prev={prev} next={next} />
+
+      <Lightbox
+        slug={project.slug}
+        files={files}
+        index={lightbox}
+        onClose={() => setLightbox(null)}
+        onChange={setLightbox}
+      />
     </article>
   );
 }

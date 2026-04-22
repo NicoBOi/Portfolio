@@ -26,6 +26,16 @@
   }
 }
 
+/* Fallback when the custom cursor fails to track (some macOS configs) */
+html.cursor-fallback *,
+html.cursor-fallback *::before,
+html.cursor-fallback *::after {
+  cursor: auto !important;
+}
+html.cursor-fallback .custom-cursor {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;

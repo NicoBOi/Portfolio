@@ -1,4 +1,4 @@
-export type ProjectType = "photo" | "video" | "experimental";
+export type ProjectType = "photo" | "video";
 
 export interface Project {
   slug: string;

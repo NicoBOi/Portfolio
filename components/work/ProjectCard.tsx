@@ -92,12 +92,12 @@ export default function ProjectCard({ project, index, size = "half" }: Props) {
           </span>
 
           {/* Type badge */}
-          {project.type !== "photo" && (
+          {project.type === "video" && (
             <span
               className="absolute top-3 right-3 label text-white z-10"
               style={{ opacity: 0.3 }}
             >
-              {project.type === "video" ? "▶" : "Exp."}
+              ▶
             </span>
           )}
         </div>
