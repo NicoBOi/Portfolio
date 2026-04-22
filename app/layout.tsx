@@ -6,11 +6,11 @@ import CustomCursor from "@/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
-    default: "Nicolas Sempere — Photographer & Filmmaker",
+    default: "Nicolas Sempere — Photographe & Réalisateur",
     template: "%s — Nicolas Sempere",
   },
   description:
-    "Nicolas Sempere is a photographer and filmmaker based between Bordeaux and Paris.",
+    "Nicolas Sempere, photographe et réalisateur basé entre Bordeaux et Paris.",
 };
 
 export default function RootLayout({

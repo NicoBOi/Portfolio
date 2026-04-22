@@ -72,12 +72,12 @@ export default function WorkGrid() {
       <div className="px-6 md:px-10 pb-10 border-b border-white/10 flex items-center justify-between">
         <FilterBar active={filter} onChange={setFilter} />
         <span className="label text-white hidden md:block" style={{ opacity: 0.2 }}>
-          {visible.length} projects
+          {visible.length} projets
         </span>
       </div>
 
       {visible.length === 0 ? (
-        <p className="label text-white opacity-20 py-32 text-center">No projects</p>
+        <p className="label text-white opacity-20 py-32 text-center">Aucun projet</p>
       ) : (
         <>
           {/* 3D Carousel Stage */}
@@ -124,7 +124,13 @@ export default function WorkGrid() {
                   onClick={() => isActive ? router.push(`/work/${project.slug}`) : setActive(i)}
                   onMouseMove={isActive ? (e) => { setIsTilting(true); handleTiltMove(e); } : undefined}
                   onMouseLeave={isActive ? resetTilt : undefined}
-                  data-cursor={isActive ? (project.type === "video" ? "Play" : "View") : undefined}
+                  data-cursor={
+                    isActive
+                      ? (project.type === "video" ? "Lire" : "Voir")
+                      : offset < 0
+                        ? "← Précédent"
+                        : "Suivant →"
+                  }
                 >
                   <div
                     className="relative aspect-video overflow-hidden"
@@ -177,7 +183,7 @@ export default function WorkGrid() {
               className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-30 group flex items-center gap-3"
               style={{ opacity: hasPrev ? 1 : 0, pointerEvents: hasPrev ? "auto" : "none", transition: "opacity 0.4s" }}
               onClick={() => setActive((i) => Math.max(0, i - 1))}
-              aria-label="Previous"
+              aria-label="Précédent"
             >
               <svg width="32" height="12" viewBox="0 0 32 12" fill="none" className="group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.45 }}>
                 <line x1="32" y1="6" x2="0" y2="6" stroke="white" strokeWidth="0.8" />
@@ -192,7 +198,7 @@ export default function WorkGrid() {
               className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 z-30 group flex items-center gap-3"
               style={{ opacity: hasNext ? 1 : 0, pointerEvents: hasNext ? "auto" : "none", transition: "opacity 0.4s" }}
               onClick={() => setActive((i) => Math.min(visible.length - 1, i + 1))}
-              aria-label="Next"
+              aria-label="Suivant"
             >
               <span className="label text-white hidden md:block group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3, maxWidth: "14ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {visible[active + 1]?.title}
@@ -230,10 +236,10 @@ export default function WorkGrid() {
                   href={`/work/${current.slug}`}
                   className="label text-white inline-flex items-center gap-4 hover:opacity-80 transition-opacity duration-300"
                   style={{ opacity: 0.45 }}
-                  data-cursor={current.type === "video" ? "Play" : "View"}
+                  data-cursor={current.type === "video" ? "Lire" : "Voir"}
                 >
                   <span className="block h-px bg-white" style={{ width: 24, opacity: 0.6 }} />
-                  {current.type === "video" ? "Watch Film" : "View Series"}
+                  {current.type === "video" ? "Voir le film" : "Voir la série"}
                   <span className="block h-px bg-white" style={{ width: 24, opacity: 0.6 }} />
                 </Link>
               </motion.div>
@@ -248,7 +254,7 @@ export default function WorkGrid() {
                 onClick={() => setActive(i)}
                 className="rounded-full bg-white transition-all duration-500"
                 style={{ width: i === active ? 20 : 5, height: 2, opacity: i === active ? 0.55 : 0.18 }}
-                aria-label={`Project ${i + 1}`}
+                aria-label={`Projet ${i + 1}`}
               />
             ))}
           </div>

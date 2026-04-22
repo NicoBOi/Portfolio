@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 export type Filter = "all" | "photo" | "video" | "experimental";
 
 const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
+  { value: "all", label: "Tout" },
   { value: "photo", label: "Photo" },
-  { value: "video", label: "Video" },
+  { value: "video", label: "Vidéo" },
   { value: "experimental", label: "Exp." },
 ];
 

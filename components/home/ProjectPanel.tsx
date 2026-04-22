@@ -97,21 +97,21 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
                   className="label text-white hover:opacity-80 transition-opacity duration-300"
                   style={{ opacity: prev ? 0.4 : 0.12 }}
                   disabled={!prev}
-                  aria-label="Previous"
+                  aria-label="Précédent"
                 >←</button>
                 <button
                   onClick={() => next && onNavigate(next.slug)}
                   className="label text-white hover:opacity-80 transition-opacity duration-300"
                   style={{ opacity: next ? 0.4 : 0.12 }}
                   disabled={!next}
-                  aria-label="Next"
+                  aria-label="Suivant"
                 >→</button>
               </div>
               <button
                 onClick={handleClose}
                 className="label text-white hover:opacity-100 transition-opacity duration-300"
                 style={{ opacity: 0.45 }}
-              >Close</button>
+              >Fermer</button>
             </div>
           </div>
 

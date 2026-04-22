@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "About" };
+export const metadata: Metadata = { title: "À propos" };
 
 const CLIENTS = [
   "Vogue France", "Maison Margiela", "Dior Beauty", "Saint Laurent",
@@ -28,13 +28,13 @@ export default function AboutPage() {
           style={{ opacity: 0.3 }}
         >
           <span className="block w-5 h-px bg-white" />
-          Home
+          Accueil
         </Link>
       </div>
 
       {/* Header */}
       <div className="pt-14 pb-12 border-b border-white/10">
-        <p className="label text-white mb-5" style={{ opacity: 0.22 }}>About</p>
+        <p className="label text-white mb-5" style={{ opacity: 0.22 }}>À propos</p>
         <h1
           className="text-white title"
           style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
@@ -94,7 +94,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <div>
-              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>Press</p>
+              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>Presse</p>
               <ul className="flex flex-col gap-3">
                 {PRESS.map(({ pub, year }) => (
                   <li key={pub} className="flex items-baseline justify-between gap-4">

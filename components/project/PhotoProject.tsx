@@ -43,7 +43,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
           style={{ opacity: 0.3 }}
         >
           <span className="block w-5 h-px bg-white" />
-          Work
+          Travaux
         </Link>
       </div>
 

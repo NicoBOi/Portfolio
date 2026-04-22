@@ -30,14 +30,18 @@ export default function Navigation() {
 
         {/* Right — desktop */}
         <div className="hidden md:flex items-center gap-8">
-          {["/work", "/about", "/contact"].map((href) => (
+          {[
+            { href: "/work", label: "Travaux" },
+            { href: "/about", label: "À propos" },
+            { href: "/contact", label: "Contact" },
+          ].map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               className="label text-white transition-opacity duration-300 hover:opacity-100"
               style={{ opacity: pathname.startsWith(href) ? 1 : 0.4 }}
             >
-              {href.slice(1)}
+              {label}
             </Link>
           ))}
         </div>
@@ -49,7 +53,7 @@ export default function Navigation() {
           style={{ opacity: 0.6 }}
           aria-label="Menu"
         >
-          {open ? "Close" : "Menu"}
+          {open ? "Fermer" : "Menu"}
         </button>
       </nav>
 
@@ -63,7 +67,11 @@ export default function Navigation() {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 bg-black/95 flex flex-col items-center justify-center gap-10 md:hidden"
           >
-            {["/work", "/about", "/contact"].map((href, i) => (
+            {[
+              { href: "/work", label: "Travaux" },
+              { href: "/about", label: "À propos" },
+              { href: "/contact", label: "Contact" },
+            ].map(({ href, label }, i) => (
               <motion.div
                 key={href}
                 initial={{ opacity: 0, y: 16 }}
@@ -75,7 +83,7 @@ export default function Navigation() {
                   href={href}
                   className="text-white font-light tracking-widest uppercase text-2xl hover:opacity-60 transition-opacity"
                 >
-                  {href.slice(1)}
+                  {label}
                 </Link>
               </motion.div>
             ))}

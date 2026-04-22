@@ -28,8 +28,8 @@ export default function CustomCursor() {
 
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const isInteractive = !!target.closest("a, button");
       const label = readCursorLabel(target);
+      const isInteractive = !!target.closest("a, button") || !!label;
       setState({ hovered: isInteractive, label });
     };
 

@@ -18,7 +18,7 @@ export async function generateMetadata({
   if (!project) return {};
   return {
     title: project.title,
-    description: `${project.title} — ${project.role}, ${project.year}. By Nicolas Sempere.`,
+    description: `${project.title} — ${project.role}, ${project.year}. Par Nicolas Sempere.`,
   };
 }
 

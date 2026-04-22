@@ -15,7 +15,7 @@ export default function ContactPage() {
           style={{ opacity: 0.3 }}
         >
           <span className="block w-5 h-px bg-white" />
-          Home
+          Accueil
         </Link>
       </div>
 
@@ -65,7 +65,7 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Based</p>
+              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Basé à</p>
               <p
                 className="text-white font-light"
                 style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.4, letterSpacing: "0.02em" }}

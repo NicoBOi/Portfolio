@@ -98,14 +98,14 @@ export default function Hero() {
         className="relative h-screen bg-black overflow-hidden flex flex-col"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        data-cursor="Scroll"
+        data-cursor="Défiler"
       >
 
         {/* Background */}
         <div
           className="absolute inset-0 z-0"
           onClick={() => setOpenSlug(current.slug)}
-          data-cursor="Open"
+          data-cursor="Ouvrir"
         >
           <AnimatePresence mode="sync">
             <motion.div
@@ -162,7 +162,7 @@ export default function Hero() {
               animate={{ opacity: 0.4, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: SOFT }}
             >
-              Photographer — Filmmaker
+              Photographe — Réalisateur
             </motion.p>
 
             {/* Magnetic title */}
@@ -231,7 +231,7 @@ export default function Hero() {
                 </motion.div>
               </AnimatePresence>
               <Link href="/work" className="label text-white hover:opacity-50 transition-opacity duration-300" style={{ opacity: 0.18, marginTop: 4 }}>
-                All Works
+                Voir tous les projets
               </Link>
             </div>
 

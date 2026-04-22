@@ -32,7 +32,7 @@ export default function ProjectCard({ project, index, size = "half" }: Props) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className="block"
-        data-cursor={project.type === "video" ? "Play" : "View"}
+        data-cursor={project.type === "video" ? "Lire" : "Voir"}
       >
         {/* Thumbnail — always 16:9 */}
         <div
@@ -64,7 +64,7 @@ export default function ProjectCard({ project, index, size = "half" }: Props) {
               />
             ) : (
               <div className="placeholder-img text-white h-full">
-                {project.type === "video" ? "Video" : "Image"}
+                {project.type === "video" ? "Vidéo" : "Image"}
               </div>
             )}
           </div>

@@ -53,7 +53,7 @@ export default function VideoProject({ project, prev, next }: Props) {
           style={{ opacity: 0.3 }}
         >
           <span className="block w-5 h-px bg-white" />
-          Work
+          Travaux
         </Link>
       </div>
 
@@ -80,7 +80,7 @@ export default function VideoProject({ project, prev, next }: Props) {
                   <path d="M1 1L15 9L1 17V1Z" fill="white" />
                 </svg>
               </div>
-              <span className="label text-white" style={{ opacity: 0.4 }}>Coming soon</span>
+              <span className="label text-white" style={{ opacity: 0.4 }}>Bientôt disponible</span>
             </div>
           </div>
           <motion.div
