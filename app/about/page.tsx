@@ -48,7 +48,14 @@ export default function AboutPage() {
             className="w-full overflow-hidden"
             style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 400 }}
           >
-            <div className="placeholder-img text-white h-full">Portrait</div>
+            <img
+              src="/about/portrait.avif"
+              alt="Nicolas Sempere"
+              className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+            />
           </div>
           <p className="label text-white mt-3" style={{ opacity: 0.2 }}>
             Bordeaux — Paris
