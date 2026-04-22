@@ -44,10 +44,10 @@ export default function CustomCursor() {
         width: 20,
         height: 20,
         opacity: 0,
-        backgroundColor: hovered ? "#cc1111" : "white",
+        backgroundColor: hovered ? "#aa0000" : "white",
         mixBlendMode: hovered ? "normal" : "difference",
         willChange: "transform",
-        animation: hovered ? "rec-blink 0.45s ease-in-out infinite alternate" : "none",
+        animation: hovered ? "rec-blink 0.28s ease-in-out infinite alternate" : "none",
       }}
     />
   );

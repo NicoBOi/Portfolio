@@ -13,12 +13,12 @@ const SCROLL_LOCK_MS = 850;
 // ── Water simulation constants ──────────────────────────────────
 const W = 320;
 const H = 180;
-const DAMP = 0.987;
+const DAMP = 0.993;
 // Light direction (upper-left) — normalised once
 const _lx = -0.25, _ly = -0.6, _lz = 2.8;
 const _ll = Math.sqrt(_lx * _lx + _ly * _ly + _lz * _lz);
 const LXN = _lx / _ll, LYN = _ly / _ll, LZN = _lz / _ll;
-const NZ = 4.0; // controls how "flat" the water surface appears
+const NZ = 5.5; // higher = flatter surface, less refraction
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
@@ -100,14 +100,14 @@ export default function Hero() {
     const disturb = (screenX: number, screenY: number) => {
       const sx = Math.floor((screenX / window.innerWidth) * W);
       const sy = Math.floor((screenY / window.innerHeight) * H);
-      const r = 7, r2 = r * r;
+      const r = 5, r2 = r * r;
       for (let dy = -r; dy <= r; dy++) {
         for (let dx = -r; dx <= r; dx++) {
           const d2 = dx * dx + dy * dy;
           if (d2 > r2) continue;
           const px2 = sx + dx, py = sy + dy;
           if (px2 < 1 || px2 >= W - 1 || py < 1 || py >= H - 1) continue;
-          water.buf1[py * W + px2] += -280 * (1 - d2 / r2);
+          water.buf1[py * W + px2] += -90 * (1 - d2 / r2);
         }
       }
     };
@@ -116,7 +116,7 @@ export default function Hero() {
     const onMove = (e: MouseEvent) => {
       const now = performance.now();
       const dx = e.clientX - prevX, dy = e.clientY - prevY;
-      if (dx * dx + dy * dy > 600 && now - prevT > 40) {
+      if (dx * dx + dy * dy > 1400 && now - prevT > 55) {
         disturb(e.clientX, e.clientY);
         prevX = e.clientX; prevY = e.clientY; prevT = now;
       }
@@ -148,8 +148,8 @@ export default function Hero() {
           // Phong specular: N·L
           const ndotl = (nx * LXN + ny * LYN + NZ * LZN) / len;
           const spec = Math.max(0, ndotl);
-          // Power 5 = sharp caustic highlights
-          const bright = spec * spec * spec * spec * spec * 255 * 2.2;
+          // Power 6 = subtle, tight highlights
+          const bright = spec * spec * spec * spec * spec * spec * 255 * 1.4;
           const v = bright > 255 ? 255 : bright | 0;
           const base = i * 4;
           px[base] = v;
@@ -184,7 +184,6 @@ export default function Hero() {
         <div
           className="absolute inset-0 z-0"
           onClick={() => setOpenSlug(current.slug)}
-          data-cursor="View"
         >
           <AnimatePresence mode="sync">
             <motion.div
@@ -210,8 +209,8 @@ export default function Hero() {
             width: "100%",
             height: "100%",
             mixBlendMode: "screen",
-            opacity: 0.55,
-            filter: "blur(2px)",
+            opacity: 0.28,
+            filter: "blur(4px)",
           }}
         />
 

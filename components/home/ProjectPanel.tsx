@@ -190,12 +190,12 @@ function VideoContent({ project }: { project: Project }) {
   const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 md:px-10 pt-12 pb-16">
-      {/* Video */}
-      <div className="w-full aspect-video mb-10" style={{ backgroundColor: project.coverPlaceholder }}>
+    <div>
+      {/* Video — full width */}
+      <div className="w-full" style={{ aspectRatio: "16/9", maxHeight: "80vh", backgroundColor: project.coverPlaceholder }}>
         {vimeoId ? (
           <iframe
-            src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
+            src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1&autoplay=1`}
             className="w-full h-full"
             style={{ border: 0 }}
             allow="autoplay; fullscreen; picture-in-picture"
@@ -214,34 +214,36 @@ function VideoContent({ project }: { project: Project }) {
       </div>
 
       {/* Title + description */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-12 pb-12 border-b border-white/10">
-        <div>
-          <h3 className="text-white title" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1 }}>
-            {project.title}
-          </h3>
-          <p className="label text-white mt-4" style={{ opacity: 0.28 }}>
-            {project.category}&nbsp;—&nbsp;{project.year}
-          </p>
-          <p className="label text-white mt-1" style={{ opacity: 0.2 }}>{project.role}</p>
-        </div>
-        {project.description && (
-          <p className="text-white font-light leading-relaxed self-center" style={{ fontSize: "0.875rem", opacity: 0.5, lineHeight: 1.9 }}>
-            {project.description}
-          </p>
-        )}
-      </div>
-
-      {/* Stills — equal 2-col */}
-      <div className="grid grid-cols-2 gap-4 md:gap-6">
-        {[0, 1].map((i) => (
-          <div
-            key={i}
-            className="aspect-video"
-            style={{ backgroundColor: project.coverPlaceholder + "55" }}
-          >
-            <div className="placeholder-img text-white h-full">Still {i + 1}</div>
+      <div className="max-w-5xl mx-auto px-6 md:px-10 pt-10 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-12 pb-12 border-b border-white/10">
+          <div>
+            <h3 className="text-white title" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1 }}>
+              {project.title}
+            </h3>
+            <p className="label text-white mt-4" style={{ opacity: 0.28 }}>
+              {project.category}&nbsp;—&nbsp;{project.year}
+            </p>
+            <p className="label text-white mt-1" style={{ opacity: 0.2 }}>{project.role}</p>
           </div>
-        ))}
+          {project.description && (
+            <p className="text-white font-light leading-relaxed self-center" style={{ fontSize: "0.875rem", opacity: 0.5, lineHeight: 1.9 }}>
+              {project.description}
+            </p>
+          )}
+        </div>
+
+        {/* Stills — equal 2-col */}
+        <div className="grid grid-cols-2 gap-4 md:gap-6">
+          {[0, 1].map((i) => (
+            <div
+              key={i}
+              className="aspect-video"
+              style={{ backgroundColor: project.coverPlaceholder + "55" }}
+            >
+              <div className="placeholder-img text-white h-full">Still {i + 1}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
