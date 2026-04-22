@@ -98,7 +98,7 @@ export default function Hero() {
         className="relative h-screen bg-black overflow-hidden flex flex-col"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        data-cursor="Défiler"
+        data-cursor="Scroll"
       >
 
         {/* Background */}

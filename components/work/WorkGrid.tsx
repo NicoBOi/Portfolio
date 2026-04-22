@@ -50,33 +50,6 @@ export default function WorkGrid() {
     };
   }, [visible.length]);
 
-  // Wheel: once the user has scrolled to the bottom of the page, hijack scroll to advance the carousel
-  useEffect(() => {
-    let locked = false;
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) < 8) return;
-      const doc = document.documentElement;
-      const atBottom = window.scrollY + window.innerHeight >= doc.scrollHeight - 2;
-      const atTop = window.scrollY <= 1;
-
-      if (e.deltaY > 0 && atBottom) {
-        e.preventDefault();
-        if (locked) return;
-        locked = true;
-        setActive((i) => Math.min(visible.length - 1, i + 1));
-        setTimeout(() => { locked = false; }, 700);
-      } else if (e.deltaY < 0 && atTop) {
-        e.preventDefault();
-        if (locked) return;
-        locked = true;
-        setActive((i) => Math.max(0, i - 1));
-        setTimeout(() => { locked = false; }, 700);
-      }
-    };
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
-  }, [visible.length]);
-
   const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;
@@ -90,8 +63,6 @@ export default function WorkGrid() {
   };
 
   const current = visible[active];
-  const hasPrev = active > 0;
-  const hasNext = active < visible.length - 1;
 
   return (
     <div>
@@ -205,36 +176,6 @@ export default function WorkGrid() {
               );
             })}
 
-            {/* Side nav — minimal editorial arrows */}
-            <button
-              className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-30 group flex items-center gap-3"
-              style={{ opacity: hasPrev ? 1 : 0, pointerEvents: hasPrev ? "auto" : "none", transition: "opacity 0.4s" }}
-              onClick={() => setActive((i) => Math.max(0, i - 1))}
-              aria-label="Précédent"
-            >
-              <svg width="32" height="12" viewBox="0 0 32 12" fill="none" className="group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.45 }}>
-                <line x1="32" y1="6" x2="0" y2="6" stroke="white" strokeWidth="0.8" />
-                <polyline points="8,1 1,6 8,11" stroke="white" strokeWidth="0.8" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-              </svg>
-              <span className="label text-white hidden md:block group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3, maxWidth: "14ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {visible[active - 1]?.title}
-              </span>
-            </button>
-
-            <button
-              className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 z-30 group flex items-center gap-3"
-              style={{ opacity: hasNext ? 1 : 0, pointerEvents: hasNext ? "auto" : "none", transition: "opacity 0.4s" }}
-              onClick={() => setActive((i) => Math.min(visible.length - 1, i + 1))}
-              aria-label="Suivant"
-            >
-              <span className="label text-white hidden md:block group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3, maxWidth: "14ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {visible[active + 1]?.title}
-              </span>
-              <svg width="32" height="12" viewBox="0 0 32 12" fill="none" className="group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.45 }}>
-                <line x1="0" y1="6" x2="32" y2="6" stroke="white" strokeWidth="0.8" />
-                <polyline points="24,1 31,6 24,11" stroke="white" strokeWidth="0.8" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-              </svg>
-            </button>
           </div>
 
           {/* Active card info */}
