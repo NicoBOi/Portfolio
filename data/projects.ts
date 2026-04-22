@@ -29,8 +29,8 @@ export const projects: Project[] = [
     description:
       "Portraits where the face becomes landscape — skin, petal, shadow. A series on softness and exposure, shot in diffused natural light. Each frame holds long enough to feel uncomfortable.",
     imageFiles: [
-      "DSCF7125_AVIF.avif",
       "DSCF7145-Modifier_AVIF.avif",
+      "DSCF7125_AVIF.avif",
       "DSCF7253_AVIF.avif",
       "DSCF7469_AVIF.avif",
       "DSCF7503_AVIF.avif",
@@ -95,11 +95,11 @@ export const projects: Project[] = [
     description:
       "A repetition — the same park, different days, different weather, different people. A meditation on the ordinary, and on how looking at something three times is already different from looking at it once.",
     imageFiles: [
+      "DSCF1302_AVIF.avif",
       "DSCF0221_AVIF.avif",
       "DSCF0864_AVIF.avif",
       "DSCF1050_AVIF.avif",
       "DSCF1083_AVIF.avif",
-      "DSCF1302_AVIF.avif",
       "DSCF1425_AVIF.avif",
       "DSCF1448_AVIF.avif",
     ],
@@ -117,12 +117,12 @@ export const projects: Project[] = [
     description:
       "A study of rope, tension, and skin. Shibari as geometry — the body held in controlled intervals, the line drawn tight then released. Shot in low, available light. The photographs refuse to explain; they watch.",
     imageFiles: [
+      "14_AVIF.avif",
       "3_AVIF.avif",
       "4_AVIF.avif",
       "6_AVIF.avif",
       "7_AVIF.avif",
       "10_AVIF.avif",
-      "14_AVIF.avif",
       "21_AVIF.avif",
       "23_AVIF.avif",
     ],
@@ -139,9 +139,9 @@ export const projects: Project[] = [
     description:
       "Pink, pressed, plastic. A short fashion-editorial series using a single colour as premise. Play pushed until it reads as tension.",
     imageFiles: [
+      "DSCF0493_AVIF.avif",
       "DSCF0129_AVIF.avif",
       "DSCF0263_AVIF.avif",
-      "DSCF0493_AVIF.avif",
       "DSCF0537_AVIF.avif",
       "DSCF0676_AVIF.avif",
     ],
@@ -158,9 +158,9 @@ export const projects: Project[] = [
     description:
       "An interior taken seriously. Textiles, angles, the choreography of a made bed. A small series about how a room performs when nobody is in it.",
     imageFiles: [
+      "P1001688-2_AVIF.avif",
       "P1001662_AVIF.avif",
       "P1001664-2_AVIF.avif",
-      "P1001688-2_AVIF.avif",
       "P1001699-2_AVIF.avif",
       "P1001732_AVIF.avif",
     ],
@@ -177,8 +177,8 @@ export const projects: Project[] = [
     description:
       "A figure between states — neither emerging nor disappearing. Three frames. A whole story doesn't always require more.",
     imageFiles: [
-      "DSCF6082_AVIF.avif",
       "DSCF6154_AVIF.avif",
+      "DSCF6082_AVIF.avif",
       "DSCF6207_AVIF.avif",
     ],
     aspectRatio: "portrait",
@@ -194,8 +194,8 @@ export const projects: Project[] = [
     description:
       "Black and broken white. A study in contrast pushed until everything in between collapses. Three images that learned to stop apologising.",
     imageFiles: [
-      "P1001913-3_AVIF.avif",
       "P1002222_AVIF.avif",
+      "P1001913-3_AVIF.avif",
       "P1002247_AVIF.avif",
     ],
     aspectRatio: "landscape",
@@ -211,9 +211,9 @@ export const projects: Project[] = [
     description:
       "Late summer, long light. Images made with the feeling of a memory already forming. Nothing happens; something has happened.",
     imageFiles: [
+      "P1002259-2_AVIF.avif",
       "P1002225_AVIF.avif",
       "P1002226_AVIF.avif",
-      "P1002259-2_AVIF.avif",
     ],
     aspectRatio: "landscape",
   },
