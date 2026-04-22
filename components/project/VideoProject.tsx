@@ -32,8 +32,9 @@ interface Props {
 }
 
 export default function VideoProject({ project, prev, next }: Props) {
-  const youtubeId = project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null);
-  const vimeoId = !youtubeId && project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  // Prefer Vimeo URL when present (youtubeId may only be a thumbnail placeholder)
+  const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const youtubeId = vimeoId ? null : (project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null));
 
   return (
     <article className="bg-black min-h-screen">

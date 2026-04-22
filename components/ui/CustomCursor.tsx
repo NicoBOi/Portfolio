@@ -21,7 +21,7 @@ export default function CustomCursor() {
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
+        cursorRef.current.style.transform = `translate(${e.clientX - 5}px, ${e.clientY - 5}px)`;
         cursorRef.current.style.opacity = "1";
       }
     };
@@ -53,8 +53,8 @@ export default function CustomCursor() {
       <div
         className="rounded-full"
         style={{
-          width: 20,
-          height: 20,
+          width: 10,
+          height: 10,
           backgroundColor: hovered ? "#aa0000" : "white",
           mixBlendMode: hovered ? "normal" : "difference",
           animation: hovered ? "rec-blink 0.28s ease-in-out infinite alternate" : "none",
@@ -65,12 +65,12 @@ export default function CustomCursor() {
         <div
           className="absolute label text-white"
           style={{
-            top: 1,
-            left: 28,
+            top: -1,
+            left: 16,
             whiteSpace: "nowrap",
             opacity: 0.65,
             mixBlendMode: "difference",
-            lineHeight: "18px",
+            lineHeight: "12px",
             pointerEvents: "none",
           }}
         >

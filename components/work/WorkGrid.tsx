@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { projects } from "@/data/projects";
@@ -10,6 +11,7 @@ import FilterBar, { type Filter } from "./FilterBar";
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export default function WorkGrid() {
+  const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -116,12 +118,13 @@ export default function WorkGrid() {
                     transform,
                     opacity,
                     transition,
-                    cursor: !isActive ? "pointer" : "default",
+                    cursor: "pointer",
                     willChange: isActive ? "transform" : "auto",
                   }}
-                  onClick={() => !isActive && setActive(i)}
+                  onClick={() => isActive ? router.push(`/work/${project.slug}`) : setActive(i)}
                   onMouseMove={isActive ? (e) => { setIsTilting(true); handleTiltMove(e); } : undefined}
                   onMouseLeave={isActive ? resetTilt : undefined}
+                  data-cursor={isActive ? (project.type === "video" ? "Play" : "View") : undefined}
                 >
                   <div
                     className="relative aspect-video overflow-hidden"
@@ -159,41 +162,39 @@ export default function WorkGrid() {
               );
             })}
 
-            {/* Full-height side navigation zones */}
+            {/* Side nav buttons — always visible */}
             <button
-              className="absolute left-0 top-0 bottom-0 z-30 flex items-center pl-4 md:pl-8 group"
-              style={{
-                width: "14%",
-                opacity: hasPrev ? 1 : 0,
-                pointerEvents: hasPrev ? "auto" : "none",
-              }}
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 group flex flex-col items-center gap-3"
+              style={{ opacity: hasPrev ? 1 : 0, pointerEvents: hasPrev ? "auto" : "none", transition: "opacity 0.4s" }}
               onClick={() => setActive((i) => Math.max(0, i - 1))}
               aria-label="Previous"
             >
-              <div className="flex flex-col items-start gap-2 transition-opacity duration-300" style={{ opacity: 0.28 }}>
-                <span className="label text-white group-hover:opacity-80 transition-opacity duration-300" style={{ opacity: 0.6, fontSize: 16 }}>←</span>
-                <span className="label text-white group-hover:opacity-70 transition-opacity duration-300 hidden md:block" style={{ opacity: 0.35, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {visible[active - 1]?.title}
-                </span>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                style={{ border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.06)" }}
+              >
+                <span className="text-white" style={{ fontSize: 14, lineHeight: 1 }}>←</span>
               </div>
+              <span className="label text-white hidden md:block" style={{ opacity: 0.35, maxWidth: "10ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
+                {visible[active - 1]?.title}
+              </span>
             </button>
 
             <button
-              className="absolute right-0 top-0 bottom-0 z-30 flex items-center justify-end pr-4 md:pr-8 group"
-              style={{
-                width: "14%",
-                opacity: hasNext ? 1 : 0,
-                pointerEvents: hasNext ? "auto" : "none",
-              }}
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 group flex flex-col items-center gap-3"
+              style={{ opacity: hasNext ? 1 : 0, pointerEvents: hasNext ? "auto" : "none", transition: "opacity 0.4s" }}
               onClick={() => setActive((i) => Math.min(visible.length - 1, i + 1))}
               aria-label="Next"
             >
-              <div className="flex flex-col items-end gap-2 transition-opacity duration-300" style={{ opacity: 0.28 }}>
-                <span className="label text-white group-hover:opacity-80 transition-opacity duration-300" style={{ opacity: 0.6, fontSize: 16 }}>→</span>
-                <span className="label text-white group-hover:opacity-70 transition-opacity duration-300 hidden md:block" style={{ opacity: 0.35, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {visible[active + 1]?.title}
-                </span>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                style={{ border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.06)" }}
+              >
+                <span className="text-white" style={{ fontSize: 14, lineHeight: 1 }}>→</span>
               </div>
+              <span className="label text-white hidden md:block" style={{ opacity: 0.35, maxWidth: "10ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
+                {visible[active + 1]?.title}
+              </span>
             </button>
           </div>
 
