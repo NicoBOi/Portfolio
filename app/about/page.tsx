@@ -4,18 +4,16 @@ import Link from "next/link";
 export const metadata: Metadata = { title: "À propos" };
 
 const CLIENTS = [
-  "Vogue France", "Maison Margiela", "Dior Beauty", "Saint Laurent",
-  "LVMH", "Le Monde", "Wallpaper*", "Hypebeast", "Acne Studios", "Kering",
+  "A Better Feeling",
+  "Philips",
+  "Sephora",
+  "Showroom Privé",
+  "Double Salto",
+  "Felkin",
+  "Made in Paris",
 ];
 
-const PRESS = [
-  { pub: "Vogue France", year: "2024" },
-  { pub: "Wallpaper*", year: "2023" },
-  { pub: "AnOther Magazine", year: "2023" },
-  { pub: "Le Monde Culture", year: "2023" },
-  { pub: "Hypebeast", year: "2022" },
-  { pub: "i-D France", year: "2022" },
-];
+const INFLUENCES = ["Lars von Trier", "Harmony Korine", "Zdzisław Beksiński"];
 
 export default function AboutPage() {
   return (
@@ -52,54 +50,76 @@ export default function AboutPage() {
           >
             <div className="placeholder-img text-white h-full">Portrait</div>
           </div>
-          <p className="label text-white mt-3" style={{ opacity: 0.2 }}>Bordeaux — Paris</p>
+          <p className="label text-white mt-3" style={{ opacity: 0.2 }}>
+            Bordeaux — Paris
+          </p>
         </div>
 
         {/* Text */}
         <div className="md:col-span-8 flex flex-col gap-10">
           <div className="flex flex-col gap-5 max-w-xl">
-            <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.6, lineHeight: 1.9 }}>
-              Je ne photographie pas ce qui est. Je fabrique ce qui manque.
-              Chaque image naît d&apos;un silence qu&apos;il a fallu tenir pour le capter.
-              Basé entre Bordeaux et Paris.
+            <p
+              className="text-white font-light leading-relaxed"
+              style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
+            >
+              28 ans. Bordeaux. Photo depuis mes 15 ans, vidéo depuis 5.
+              Autodidacte d&apos;abord ; MJM Graphic Design ensuite — webdesign puis motion.
             </p>
-            <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}>
-              Je travaille par obsession. Le décor, le geste, la lumière —
-              jusqu&apos;à ce que l&apos;image cesse d&apos;être un choix et devienne la seule possible.
-              Rien n&apos;est documenté ; tout est construit.
+            <p
+              className="text-white font-light leading-relaxed"
+              style={{ fontSize: "0.95rem", opacity: 0.55, lineHeight: 1.9 }}
+            >
+              Je ne montre pas. Je déplace.
+              Brutal, minimal, spectaculaire — juste ce qu&apos;il faut pour que ça reste.
             </p>
-            <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}>
-              Éditorial, commercial, projets personnels. Peu de collaborations —
-              mais choisies. Celles qui méritent le temps qu&apos;elles demandent.
+            <p
+              className="text-white font-light leading-relaxed"
+              style={{ fontSize: "0.95rem", opacity: 0.45, lineHeight: 1.9 }}
+            >
+              Seul ou avec une équipe, selon le projet.
+              L&apos;art, la mode, les marques qui veulent sortir du rang. Pas la santé.
             </p>
 
             <Link
               href="/contact"
               className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-2"
-              style={{ opacity: 0.45 }}
+              style={{ opacity: 0.55 }}
             >
-              Contact
-              <span className="block w-6 h-px bg-white" style={{ opacity: 0.5 }} />
+              Écris-moi
+              <span aria-hidden="true">→</span>
             </Link>
           </div>
 
-          {/* Clients + Press */}
+          {/* Clients + Influences */}
           <div className="border-t border-white/10 pt-10 grid grid-cols-1 sm:grid-cols-2 gap-10 md:gap-16">
             <div>
-              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>Clients</p>
+              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>
+                Clients
+              </p>
               <ul className="flex flex-col gap-2.5">
                 {CLIENTS.map((c) => (
-                  <li key={c} className="text-white font-light" style={{ fontSize: "0.8rem", opacity: 0.45, letterSpacing: "0.03em" }}>{c}</li>
+                  <li
+                    key={c}
+                    className="text-white font-light"
+                    style={{ fontSize: "0.85rem", opacity: 0.55, letterSpacing: "0.02em" }}
+                  >
+                    {c}
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
-              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>Presse</p>
-              <ul className="flex flex-col gap-3">
-                {PRESS.map(({ pub, year }) => (
-                  <li key={pub} className="flex items-baseline justify-between gap-4">
-                    <span className="text-white font-light" style={{ fontSize: "0.8rem", opacity: 0.45, letterSpacing: "0.03em" }}>{pub}</span>
-                    <span className="label text-white" style={{ opacity: 0.2 }}>{year}</span>
+              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>
+                Influences
+              </p>
+              <ul className="flex flex-col gap-2.5">
+                {INFLUENCES.map((i) => (
+                  <li
+                    key={i}
+                    className="text-white font-light"
+                    style={{ fontSize: "0.85rem", opacity: 0.55, letterSpacing: "0.02em" }}
+                  >
+                    {i}
                   </li>
                 ))}
               </ul>

@@ -33,11 +33,17 @@ export default function ContactPage() {
             </h1>
             <p
               className="text-white font-light mt-8 leading-relaxed max-w-sm"
-              style={{ fontSize: "0.875rem", opacity: 0.45, lineHeight: 1.9 }}
+              style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
             >
-              Une idée qui demande du silence et du temps ?
-              Écrivez — je lis tout. Je réponds à ce qui m&apos;intrigue.
-              Les meilleurs projets commencent par un mail précis.
+              Écris-moi. Insta ou mail — comme tu préfères.
+              Réponse en 24h.
+            </p>
+            <p
+              className="text-white font-light mt-2 leading-relaxed max-w-sm"
+              style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}
+            >
+              Trois choses qui m&apos;aident à répondre vite : budget, date, référence.
+              Le reste, on verra ensemble.
             </p>
           </div>
 
@@ -78,7 +84,7 @@ export default function ContactPage() {
 
         {/* Right — form */}
         <div className="flex flex-col justify-center">
-          <p className="label text-white mb-10" style={{ opacity: 0.22 }}>Envoyer un message</p>
+          <p className="label text-white mb-10" style={{ opacity: 0.22 }}>Brief</p>
           <ContactForm />
         </div>
       </div>

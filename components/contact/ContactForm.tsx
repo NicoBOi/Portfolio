@@ -31,7 +31,7 @@ export default function ContactForm() {
           >
             Reçu.
           </p>
-          <p className="label text-white" style={{ opacity: 0.3 }}>Je reviens vers vous sous 48 heures.</p>
+          <p className="label text-white" style={{ opacity: 0.3 }}>Je te réponds sous 24h.</p>
         </motion.div>
       ) : (
         <motion.form
@@ -43,8 +43,8 @@ export default function ContactForm() {
           transition={{ duration: 0.4 }}
         >
           {[
-            { name: "name", label: "Nom", type: "text", placeholder: "Votre nom" },
-            { name: "email", label: "Email", type: "email", placeholder: "votre@email.com" },
+            { name: "name", label: "Nom", type: "text", placeholder: "Ton nom" },
+            { name: "email", label: "Email", type: "email", placeholder: "ton@email.com" },
           ].map(({ name, label, type, placeholder }) => (
             <div key={name} className="flex flex-col gap-2.5">
               <label className="label text-white" style={{ opacity: 0.28 }}>{label}</label>
@@ -78,7 +78,7 @@ export default function ContactForm() {
               name="message"
               required
               rows={4}
-              placeholder="Parlez-moi du projet…"
+              placeholder="Budget. Date. Référence. Le reste, on verra."
               className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18 focus:border-white/40 transition-colors duration-300 resize-none"
               style={{ letterSpacing: "0.02em" }}
             />
