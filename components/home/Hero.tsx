@@ -216,7 +216,7 @@ export default function Hero() {
           >
             <button onClick={goPrev} className="flex items-center gap-3 group text-left pointer-events-auto">
               <span className="block h-px bg-white group-hover:opacity-80 transition-all duration-500" style={{ width: 24, opacity: 0.3 }} />
-              <span className="label text-white hidden md:inline group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3 }}>
+              <span className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.3 }}>
                 {FEATURED[(index - 1 + FEATURED.length) % FEATURED.length].title}
               </span>
             </button>
@@ -239,13 +239,13 @@ export default function Hero() {
                   </span>
                 </motion.div>
               </AnimatePresence>
-              <Link href="/work" className="label text-white hover:opacity-50 transition-opacity duration-300" style={{ opacity: 0.18, marginTop: 4 }}>
+              <Link href="/work" className="label text-white hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.18, marginTop: 4 }}>
                 Voir tous les projets
               </Link>
             </div>
 
             <button onClick={goNext} className="flex items-center gap-3 justify-end group text-right pointer-events-auto">
-              <span className="label text-white hidden md:inline group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3 }}>
+              <span className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.3 }}>
                 {FEATURED[(index + 1) % FEATURED.length].title}
               </span>
               <span className="block h-px bg-white group-hover:opacity-80 transition-all duration-500" style={{ width: 24, opacity: 0.3 }} />

@@ -11,7 +11,7 @@ export default function ContactPage() {
       <div className="px-6 md:px-10 pt-20 pb-0">
         <Link
           href="/"
-          className="label text-white hover:opacity-60 transition-opacity duration-300 flex items-center gap-3"
+          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-3"
           style={{ opacity: 0.3 }}
         >
           <span className="block w-5 h-px bg-white" />
@@ -47,7 +47,7 @@ export default function ContactPage() {
               <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Email</p>
               <a
                 href="mailto:nicosmp.pro@gmail.com"
-                className="text-white font-light hover:opacity-50 transition-opacity duration-300"
+                className="text-white font-light hover:opacity-100 transition-opacity duration-300"
                 style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.8, letterSpacing: "0.02em" }}
               >
                 nicosmp.pro@gmail.com
@@ -59,7 +59,7 @@ export default function ContactPage() {
                 href="https://instagram.com/nicolas_Sempere"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white font-light hover:opacity-50 transition-opacity duration-300"
+                className="text-white font-light hover:opacity-100 transition-opacity duration-300"
                 style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.8, letterSpacing: "0.02em" }}
               >
                 @nicolas_Sempere

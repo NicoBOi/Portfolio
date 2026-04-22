@@ -212,7 +212,7 @@ export default function WorkGrid() {
                 </div>
                 <Link
                   href={`/work/${current.slug}`}
-                  className="label text-white inline-flex items-center gap-4 hover:opacity-80 transition-opacity duration-300"
+                  className="label text-white inline-flex items-center gap-4 hover:opacity-100 transition-opacity duration-300"
                   style={{ opacity: 0.45 }}
                   data-cursor={current.type === "video" ? "Lire" : "Voir"}
                 >

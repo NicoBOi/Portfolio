@@ -94,14 +94,14 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => prev && onNavigate(prev.slug)}
-                  className="label text-white hover:opacity-80 transition-opacity duration-300"
+                  className="label text-white hover:opacity-100 transition-opacity duration-300"
                   style={{ opacity: prev ? 0.4 : 0.12 }}
                   disabled={!prev}
                   aria-label="Précédent"
                 >←</button>
                 <button
                   onClick={() => next && onNavigate(next.slug)}
-                  className="label text-white hover:opacity-80 transition-opacity duration-300"
+                  className="label text-white hover:opacity-100 transition-opacity duration-300"
                   style={{ opacity: next ? 0.4 : 0.12 }}
                   disabled={!next}
                   aria-label="Suivant"
@@ -141,7 +141,7 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
               className="group"
               style={{ opacity: prev ? 1 : 0, pointerEvents: prev ? "auto" : "none" }}
             >
-              <span className="label text-white opacity-35 group-hover:opacity-80 transition-opacity duration-300">
+              <span className="label text-white opacity-35 group-hover:opacity-100 transition-opacity duration-300">
                 ← {prev?.title}
               </span>
             </button>
@@ -150,7 +150,7 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
               className="group"
               style={{ opacity: next ? 1 : 0, pointerEvents: next ? "auto" : "none" }}
             >
-              <span className="label text-white opacity-35 group-hover:opacity-80 transition-opacity duration-300">
+              <span className="label text-white opacity-35 group-hover:opacity-100 transition-opacity duration-300">
                 {next?.title} →
               </span>
             </button>

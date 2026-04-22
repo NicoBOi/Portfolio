@@ -11,7 +11,7 @@
 *,
 *::before,
 *::after {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'/>") 8 8, none !important;
+  cursor: none !important;
 }
 
 /* Re-enable native cursor behavior on touch devices (no mouse) and hide the custom one */

@@ -22,7 +22,7 @@ export default function Navigation() {
         {/* Left */}
         <Link
           href="/"
-          className="label text-white transition-opacity duration-300 hover:opacity-60"
+          className="label text-white transition-opacity duration-300 hover:opacity-100"
           style={{ opacity: isHome ? 0.5 : 0.7 }}
         >
           NS
@@ -81,7 +81,7 @@ export default function Navigation() {
               >
                 <Link
                   href={href}
-                  className="text-white font-light tracking-widest uppercase text-2xl hover:opacity-60 transition-opacity"
+                  className="text-white font-light tracking-widest uppercase text-2xl hover:opacity-100 transition-opacity"
                 >
                   {label}
                 </Link>

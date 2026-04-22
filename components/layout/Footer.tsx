@@ -9,14 +9,14 @@ export default function Footer() {
           href="https://instagram.com/nicolas_Sempere"
           target="_blank"
           rel="noopener noreferrer"
-          className="label text-white hover:opacity-60 transition-opacity duration-300"
+          className="label text-white hover:opacity-100 transition-opacity duration-300"
           style={{ opacity: 0.2 }}
         >
           Instagram
         </a>
         <a
           href="mailto:nicosmp.pro@gmail.com"
-          className="label text-white hover:opacity-60 transition-opacity duration-300"
+          className="label text-white hover:opacity-100 transition-opacity duration-300"
           style={{ opacity: 0.2 }}
         >
           Email

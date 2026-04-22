@@ -30,7 +30,7 @@ export default function ProjectNav({
       <div className="flex justify-center">
         <Link
           href="/work"
-          className="label text-white hover:opacity-70 transition-opacity duration-300"
+          className="label text-white hover:opacity-100 transition-opacity duration-300"
           style={{ opacity: 0.25 }}
         >
           ← Tous les projets

@@ -42,7 +42,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
       <div className="px-6 md:px-10 pt-20 pb-0">
         <Link
           href="/work"
-          className="label text-white hover:opacity-60 transition-opacity duration-300 flex items-center gap-3"
+          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-3"
           style={{ opacity: 0.3 }}
         >
           <span className="block w-5 h-px bg-white" />
