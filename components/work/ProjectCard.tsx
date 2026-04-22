@@ -50,7 +50,13 @@ export default function ProjectCard({ project, index, size = "half" }: Props) {
               transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            {project.youtubeId ? (
+            {project.imageFiles && project.imageFiles.length > 0 ? (
+              <img
+                src={`/projects/${project.slug}/${project.imageFiles[0]}`}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            ) : project.youtubeId ? (
               <img
                 src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
                 alt=""

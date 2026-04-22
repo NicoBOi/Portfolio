@@ -10,6 +10,7 @@ export interface Project {
   coverPlaceholder: string;
   description?: string;
   images?: number;
+  imageFiles?: string[];
   videoUrl?: string;
   youtubeId?: string;
   featured?: boolean;
@@ -35,6 +36,28 @@ export const projects: Project[] = [
   },
 
   // ── PHOTO ────────────────────────────────────────────
+  {
+    slug: "shibari",
+    title: "Shibari",
+    year: 2024,
+    role: "Photography",
+    type: "photo",
+    category: "Personal",
+    coverPlaceholder: "#1A1414",
+    description:
+      "A study of rope, tension, and skin. Shibari as geometry — the body held in controlled intervals, the line drawn tight then released. Shot in low, available light over several sessions. The photographs refuse to explain; they watch.",
+    imageFiles: [
+      "3_AVIF.avif",
+      "4_AVIF.avif",
+      "6_AVIF.avif",
+      "7_AVIF.avif",
+      "10_AVIF.avif",
+      "14_AVIF.avif",
+      "21_AVIF.avif",
+      "23_AVIF.avif",
+    ],
+    aspectRatio: "portrait",
+  },
   {
     slug: "silence-study-i",
     title: "Silence Study I",

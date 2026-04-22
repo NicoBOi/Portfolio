@@ -16,6 +16,9 @@ interface Props {
 export default function PhotoProject({ project, prev, next }: Props) {
   const isPortrait = project.aspectRatio === "portrait";
   const bg = project.coverPlaceholder;
+  const files = project.imageFiles;
+  const src = (i: number) =>
+    files && files[i] ? `/projects/${project.slug}/${files[i]}` : null;
 
   return (
     <article className="bg-black min-h-screen">
@@ -43,7 +46,11 @@ export default function PhotoProject({ project, prev, next }: Props) {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-        <div className="placeholder-img text-white h-full">[01]</div>
+        {src(0) ? (
+          <img src={src(0)!} alt={project.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="placeholder-img text-white h-full">[01]</div>
+        )}
       </motion.div>
 
       {/* Metadata */}
@@ -72,16 +79,20 @@ export default function PhotoProject({ project, prev, next }: Props) {
 
         {/* Row 1: tight pair */}
         <div className="grid grid-cols-2 gap-px">
-          {[2, 3].map((num, i) => (
+          {[1, 2].map((idx, i) => (
             <motion.div
-              key={num}
+              key={idx}
               style={{ aspectRatio: isPortrait ? "3/4" : "4/3", backgroundColor: bg + "cc" }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-4%" }}
               transition={{ duration: 0.7, delay: i * 0.06, ease: SOFT }}
             >
-              <div className="placeholder-img text-white h-full">[{String(num).padStart(2, "0")}]</div>
+              {src(idx) ? (
+                <img src={src(idx)!} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="placeholder-img text-white h-full">[{String(idx + 1).padStart(2, "0")}]</div>
+              )}
             </motion.div>
           ))}
         </div>
@@ -97,7 +108,11 @@ export default function PhotoProject({ project, prev, next }: Props) {
           viewport={{ once: true, margin: "-4%" }}
           transition={{ duration: 0.8, ease: SOFT }}
         >
-          <div className="placeholder-img text-white h-full">[04]</div>
+          {src(3) ? (
+            <img src={src(3)!} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="placeholder-img text-white h-full">[04]</div>
+          )}
         </motion.div>
 
         {/* Row 3: offset — left-heavy or right-heavy alternating */}
@@ -110,11 +125,37 @@ export default function PhotoProject({ project, prev, next }: Props) {
             viewport={{ once: true, margin: "-4%" }}
             transition={{ duration: 0.7, ease: SOFT }}
           >
-            <div className="placeholder-img text-white h-full">[05]</div>
+            {src(4) ? (
+              <img src={src(4)!} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="placeholder-img text-white h-full">[05]</div>
+            )}
           </motion.div>
           {/* empty cell — intentional negative space */}
           <div style={{ backgroundColor: "#000" }} />
         </div>
+
+        {/* Extra images — flow in pairs */}
+        {files && files.length > 5 && (
+          <div className="grid grid-cols-2 gap-px">
+            {files.slice(5).map((f, i) => (
+              <motion.div
+                key={f}
+                style={{ aspectRatio: isPortrait ? "3/4" : "4/3", backgroundColor: bg + "cc" }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-4%" }}
+                transition={{ duration: 0.7, delay: (i % 2) * 0.06, ease: SOFT }}
+              >
+                <img
+                  src={`/projects/${project.slug}/${f}`}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            ))}
+          </div>
+        )}
 
       </div>
 
