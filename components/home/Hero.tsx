@@ -139,6 +139,12 @@ export default function Hero() {
                   }}
                   allow="autoplay; encrypted-media"
                 />
+              ) : current.imageFiles && current.imageFiles.length > 0 ? (
+                <img
+                  src={`/projects/${current.slug}/${current.imageFiles[0]}`}
+                  alt={current.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
               ) : (
                 <div className="placeholder-img text-white h-full">Image</div>
               )}

@@ -135,7 +135,17 @@ export default function WorkGrid() {
                         : "0 20px 60px rgba(0,0,0,0.5)",
                     }}
                   >
-                    {project.youtubeId ? (
+                    {project.imageFiles && project.imageFiles.length > 0 ? (
+                      <img
+                        src={`/projects/${project.slug}/${project.imageFiles[0]}`}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                        style={{
+                          filter: !isActive ? "brightness(0.35)" : "none",
+                          transition: "filter 0.75s ease",
+                        }}
+                      />
+                    ) : project.youtubeId ? (
                       <img
                         src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
                         alt={project.title}

@@ -162,20 +162,30 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
 }
 
 function PhotoContent({ project }: { project: Project }) {
-  const count = project.images ?? 4;
   const isPortrait = project.aspectRatio === "portrait";
+  const files = project.imageFiles ?? [];
+  const cover = files[0];
+  const rest = files.slice(1);
 
   return (
     <div className="max-w-5xl mx-auto px-6 md:px-10 pt-12 pb-16">
       {/* Cover */}
       <div
-        className="w-full mb-10"
+        className="w-full mb-10 overflow-hidden"
         style={{
           aspectRatio: isPortrait ? "3/4" : "16/10",
           backgroundColor: project.coverPlaceholder,
         }}
       >
-        <div className="placeholder-img text-white h-full">Cover</div>
+        {cover ? (
+          <img
+            src={`/projects/${project.slug}/${cover}`}
+            alt={project.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="placeholder-img text-white h-full">Cover</div>
+        )}
       </div>
 
       {/* Title + description */}
@@ -196,20 +206,24 @@ function PhotoContent({ project }: { project: Project }) {
         )}
       </div>
 
-      {/* Symmetric image grid — equal 2-col pairs */}
-      <div className="grid grid-cols-2 gap-4 md:gap-6">
-        {Array.from({ length: count - 1 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              aspectRatio: isPortrait ? "3/4" : "4/3",
-              backgroundColor: project.coverPlaceholder + "aa",
-            }}
-          >
-            <div className="placeholder-img text-white h-full">Image {i + 2}</div>
-          </div>
-        ))}
-      </div>
+      {/* Image grid */}
+      {rest.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 md:gap-6">
+          {rest.map((f) => (
+            <div
+              key={f}
+              className="overflow-hidden"
+              style={{ backgroundColor: project.coverPlaceholder + "aa" }}
+            >
+              <img
+                src={`/projects/${project.slug}/${f}`}
+                alt=""
+                className="w-full h-auto object-cover block"
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
