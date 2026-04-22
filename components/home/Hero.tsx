@@ -14,6 +14,8 @@ export default function Hero() {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [showHint, setShowHint] = useState(false);
   const rafRef = useRef<number | null>(null);
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
@@ -25,7 +27,7 @@ export default function Hero() {
     return () => clearTimeout(t);
   }, []);
 
-  // Animate feTurbulence via RAF (SMIL <animate> doesn't work in React)
+  // Animate feTurbulence via RAF
   useEffect(() => {
     let t = 0;
     const animate = () => {
@@ -88,9 +90,14 @@ export default function Hero() {
 
   return (
     <>
-      <section className="relative h-screen bg-black overflow-hidden flex flex-col">
+      <section
+        className="relative h-screen bg-black overflow-hidden flex flex-col"
+        onMouseMove={(e) => setCursorPos({ x: e.clientX, y: e.clientY })}
+        onMouseEnter={() => setShowHint(true)}
+        onMouseLeave={() => setShowHint(false)}
+      >
 
-        {/* SVG distortion filter — animated via RAF */}
+        {/* SVG distortion filter */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none z-[5]"
           style={{ mixBlendMode: "soft-light", opacity: 0.55 }}
@@ -122,7 +129,7 @@ export default function Hero() {
           <rect width="100%" height="100%" fill="url(#hero-glow)" filter="url(#hero-warp)" />
         </svg>
 
-        {/* Background — click anywhere to open */}
+        {/* Background */}
         <div
           className="absolute inset-0 z-0"
           onClick={() => setOpenSlug(current.slug)}
@@ -158,8 +165,20 @@ export default function Hero() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Dark overlay — just enough to read text */}
           <div className="absolute inset-0 bg-black/50" />
+        </div>
+
+        {/* Cursor hint — "Open" */}
+        <div
+          className="fixed pointer-events-none z-[15] label text-white"
+          style={{
+            left: cursorPos.x + 18,
+            top: cursorPos.y + 14,
+            opacity: showHint && !openSlug ? 0.4 : 0,
+            transition: "opacity 0.25s ease",
+          }}
+        >
+          Open
         </div>
 
         {/* Foreground */}

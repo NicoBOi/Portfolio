@@ -12,6 +12,8 @@ const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export default function WorkGrid() {
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState(0);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isTilting, setIsTilting] = useState(false);
 
   const visible =
     filter === "all"
@@ -45,6 +47,18 @@ export default function WorkGrid() {
       window.removeEventListener("touchend", onEnd);
     };
   }, [visible.length]);
+
+  const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;
+    const y = ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 5;
+    setTilt({ x, y });
+  };
+
+  const resetTilt = () => {
+    setIsTilting(false);
+    setTilt({ x: 0, y: 0 });
+  };
 
   const current = visible[active];
 
@@ -82,6 +96,14 @@ export default function WorkGrid() {
               const rotateY = offset * -28;
               const tx = offset * 55;
 
+              const transform = isActive
+                ? `translate(-50%, -50%) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
+                : `translate(-50%, -50%) translateX(${tx}vw) rotateY(${rotateY}deg) scale(${scale})`;
+
+              const transition = isActive && isTilting
+                ? "transform 0.08s linear, opacity 0.75s cubic-bezier(0.16,1,0.3,1)"
+                : "transform 0.75s cubic-bezier(0.16,1,0.3,1), opacity 0.75s cubic-bezier(0.16,1,0.3,1)";
+
               return (
                 <div
                   key={project.slug}
@@ -89,13 +111,15 @@ export default function WorkGrid() {
                   style={{
                     width: "clamp(280px, 58vw, 900px)",
                     zIndex: 20 - absOffset,
-                    transform: `translate(-50%, -50%) translateX(${tx}vw) rotateY(${rotateY}deg) scale(${scale})`,
+                    transform,
                     opacity,
-                    transition:
-                      "transform 0.75s cubic-bezier(0.16,1,0.3,1), opacity 0.75s cubic-bezier(0.16,1,0.3,1)",
+                    transition,
                     cursor: !isActive ? "pointer" : "default",
+                    willChange: isActive ? "transform" : "auto",
                   }}
                   onClick={() => !isActive && setActive(i)}
+                  onMouseMove={isActive ? (e) => { setIsTilting(true); handleTiltMove(e); } : undefined}
+                  onMouseLeave={isActive ? resetTilt : undefined}
                 >
                   <div
                     className="relative aspect-video overflow-hidden"
