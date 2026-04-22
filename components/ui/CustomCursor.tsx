@@ -2,9 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 
+function readCursorLabel(el: HTMLElement | null): string | null {
+  let node = el;
+  while (node) {
+    if (node.dataset?.cursor) return node.dataset.cursor;
+    node = node.parentElement as HTMLElement | null;
+  }
+  return null;
+}
+
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const [hovered, setHovered] = useState(false);
+  const [state, setState] = useState<{ hovered: boolean; label: string | null }>({
+    hovered: false,
+    label: null,
+  });
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -15,40 +27,56 @@ export default function CustomCursor() {
     };
 
     const onOver = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest("a, button, [data-cursor]")) {
-        setHovered(true);
-      }
-    };
-    const onOut = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest("a, button, [data-cursor]")) {
-        setHovered(false);
-      }
+      const target = e.target as HTMLElement;
+      const isInteractive = !!target.closest("a, button");
+      const label = readCursorLabel(target);
+      setState({ hovered: isInteractive, label });
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseover", onOver);
-    document.addEventListener("mouseout", onOut);
-
     return () => {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseover", onOver);
-      document.removeEventListener("mouseout", onOut);
     };
   }, []);
+
+  const { hovered, label } = state;
 
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full"
-      style={{
-        width: 20,
-        height: 20,
-        opacity: 0,
-        backgroundColor: hovered ? "#aa0000" : "white",
-        mixBlendMode: hovered ? "normal" : "difference",
-        willChange: "transform",
-        animation: hovered ? "rec-blink 0.28s ease-in-out infinite alternate" : "none",
-      }}
-    />
+      className="fixed top-0 left-0 pointer-events-none z-[9999]"
+      style={{ opacity: 0, willChange: "transform" }}
+    >
+      {/* Dot */}
+      <div
+        className="rounded-full"
+        style={{
+          width: 20,
+          height: 20,
+          backgroundColor: hovered ? "#aa0000" : "white",
+          mixBlendMode: hovered ? "normal" : "difference",
+          animation: hovered ? "rec-blink 0.28s ease-in-out infinite alternate" : "none",
+        }}
+      />
+      {/* Label */}
+      {label && (
+        <div
+          className="absolute label text-white"
+          style={{
+            top: 1,
+            left: 28,
+            whiteSpace: "nowrap",
+            opacity: 0.65,
+            mixBlendMode: "difference",
+            lineHeight: "18px",
+            pointerEvents: "none",
+          }}
+        >
+          {label}
+        </div>
+      )}
+    </div>
   );
 }

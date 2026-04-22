@@ -170,9 +170,9 @@ export default function WorkGrid() {
               onClick={() => setActive((i) => Math.max(0, i - 1))}
               aria-label="Previous"
             >
-              <div className="flex flex-col items-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="block h-px bg-white w-6" style={{ opacity: 0.5 }} />
-                <span className="label text-white" style={{ opacity: 0.4, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div className="flex flex-col items-start gap-2 transition-opacity duration-300" style={{ opacity: 0.28 }}>
+                <span className="label text-white group-hover:opacity-80 transition-opacity duration-300" style={{ opacity: 0.6, fontSize: 16 }}>←</span>
+                <span className="label text-white group-hover:opacity-70 transition-opacity duration-300 hidden md:block" style={{ opacity: 0.35, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {visible[active - 1]?.title}
                 </span>
               </div>
@@ -188,9 +188,9 @@ export default function WorkGrid() {
               onClick={() => setActive((i) => Math.min(visible.length - 1, i + 1))}
               aria-label="Next"
             >
-              <div className="flex flex-col items-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="block h-px bg-white w-6" style={{ opacity: 0.5 }} />
-                <span className="label text-white" style={{ opacity: 0.4, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div className="flex flex-col items-end gap-2 transition-opacity duration-300" style={{ opacity: 0.28 }}>
+                <span className="label text-white group-hover:opacity-80 transition-opacity duration-300" style={{ opacity: 0.6, fontSize: 16 }}>→</span>
+                <span className="label text-white group-hover:opacity-70 transition-opacity duration-300 hidden md:block" style={{ opacity: 0.35, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {visible[active + 1]?.title}
                 </span>
               </div>

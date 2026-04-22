@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects, type Project } from "@/data/projects";
 
@@ -25,17 +25,41 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
   const idx = project ? projects.findIndex((p) => p.slug === project.slug) : -1;
   const prev = idx > 0 ? projects[idx - 1] : null;
   const next = idx < projects.length - 1 ? projects[idx + 1] : null;
+  const historyPushed = useRef(false);
+
+  // Push history state when panel opens so browser back closes it
+  useEffect(() => {
+    if (!project) return;
+    history.pushState({ panel: true }, "");
+    historyPushed.current = true;
+    const onPop = () => {
+      historyPushed.current = false;
+      onClose();
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project !== null]);
+
+  const handleClose = useCallback(() => {
+    if (historyPushed.current) {
+      historyPushed.current = false;
+      history.back(); // triggers popstate → onClose
+    } else {
+      onClose();
+    }
+  }, [onClose]);
 
   useEffect(() => {
     if (!project) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
       if (e.key === "ArrowRight" && next) onNavigate(next.slug);
       if (e.key === "ArrowLeft" && prev) onNavigate(prev.slug);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [project, prev, next, onClose, onNavigate]);
+  }, [project, prev, next, handleClose, onNavigate]);
 
   useEffect(() => {
     document.body.style.overflow = project ? "hidden" : "";
@@ -84,7 +108,7 @@ export default function ProjectPanel({ project, onClose, onNavigate }: Props) {
                 >→</button>
               </div>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="label text-white hover:opacity-100 transition-opacity duration-300"
                 style={{ opacity: 0.45 }}
               >Close</button>
