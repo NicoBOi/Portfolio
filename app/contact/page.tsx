@@ -11,10 +11,10 @@ export default function ContactPage() {
       <div className="px-6 md:px-10 pt-20 pb-0">
         <Link
           href="/"
-          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-3"
+          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
           style={{ opacity: 0.3 }}
         >
-          <span className="block w-5 h-px bg-white" />
+          <span aria-hidden="true">←</span>
           Accueil
         </Link>
       </div>

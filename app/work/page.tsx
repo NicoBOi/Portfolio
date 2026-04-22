@@ -11,21 +11,20 @@ export default function WorkPage() {
       <div className="px-6 md:px-10 pt-20">
         <Link
           href="/"
-          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-3"
+          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
           style={{ opacity: 0.3 }}
         >
-          <span className="block w-5 h-px bg-white" />
+          <span aria-hidden="true">←</span>
           Accueil
         </Link>
       </div>
 
       <div className="px-6 md:px-10 pt-12 pb-6">
-        <p className="label text-white mb-5" style={{ opacity: 0.22 }}>Travaux</p>
         <h1
           className="text-white title"
           style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
         >
-          Sélection
+          Travaux
         </h1>
       </div>
 
