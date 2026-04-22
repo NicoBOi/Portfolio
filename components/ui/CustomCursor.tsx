@@ -2,14 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 
-function readCursorInfo(el: HTMLElement | null): { label: string | null; suppress: boolean } {
+function readCursorInfo(el: HTMLElement | null): {
+  label: string | null;
+  suppress: boolean;
+  silent: boolean;
+} {
   let node = el;
+  let silent = false;
   while (node) {
-    if (node.dataset?.cursor) return { label: node.dataset.cursor, suppress: false };
-    if (node.dataset?.cursorSuppress !== undefined) return { label: null, suppress: true };
+    if (node.dataset?.cursorSilent !== undefined) silent = true;
+    if (node.dataset?.cursor) return { label: node.dataset.cursor, suppress: false, silent };
+    if (node.dataset?.cursorSuppress !== undefined)
+      return { label: null, suppress: true, silent };
     node = node.parentElement as HTMLElement | null;
   }
-  return { label: null, suppress: false };
+  return { label: null, suppress: false, silent };
 }
 
 function closestInteractive(el: HTMLElement | null): HTMLElement | null {
@@ -51,18 +58,17 @@ export default function CustomCursor() {
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const interactive = closestInteractive(target);
-      const { label: explicit, suppress } = readCursorInfo(target);
+      const { label: explicit, suppress, silent } = readCursorInfo(target);
       let label = explicit;
       if (!label && !suppress && interactive) {
         // Default label: the element's own text, trimmed and compact
         const text = (interactive.innerText || "").trim().split("\n")[0];
         label = text && text.length <= 24 ? text : "→";
       }
-      const isInteractive = !!interactive || !!label;
+      // `silent` shows the label but never flips the red/blink state
+      const hovered = silent ? false : !!interactive || !!label;
       setState((prev) =>
-        prev.hovered === isInteractive && prev.label === label
-          ? prev
-          : { hovered: isInteractive, label }
+        prev.hovered === hovered && prev.label === label ? prev : { hovered, label }
       );
     };
 

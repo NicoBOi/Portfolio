@@ -51,20 +51,39 @@ export default function WorkGrid() {
   }, [visible.length]);
 
   // Horizontal scroll (trackpad swipe, shift+wheel) advances the carousel
-  // without fighting the vertical page scroll
+  // without fighting the vertical page scroll. Accumulate deltaX so a gentle
+  // trackpad swipe advances exactly one card instead of several.
   useEffect(() => {
-    let locked = false;
+    let acc = 0;
+    let resetId: number | null = null;
+    const STEP = 90;
+    const COOLDOWN_AFTER_ADVANCE = 1050;
+    let lockedUntil = 0;
+
     const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 10) return;
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
-      if (locked) return;
-      locked = true;
-      if (e.deltaX > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
-      else setActive((i) => Math.max(0, i - 1));
-      window.setTimeout(() => { locked = false; }, 600);
+
+      const now = performance.now();
+      if (now < lockedUntil) return;
+
+      acc += e.deltaX;
+
+      if (resetId !== null) window.clearTimeout(resetId);
+      resetId = window.setTimeout(() => { acc = 0; resetId = null; }, 180);
+
+      if (Math.abs(acc) >= STEP) {
+        if (acc > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
+        else setActive((i) => Math.max(0, i - 1));
+        acc = 0;
+        lockedUntil = now + COOLDOWN_AFTER_ADVANCE;
+      }
     };
     window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      if (resetId !== null) window.clearTimeout(resetId);
+    };
   }, [visible.length]);
 
   const tiltRafRef = useRef<number | null>(null);
@@ -127,8 +146,8 @@ export default function WorkGrid() {
                 : `translate(-50%, -50%) translateX(${tx}vw) rotateY(${rotateY}deg) scale(${scale})`;
 
               const transition = isActive && isTilting
-                ? "transform 0.08s linear, opacity 0.75s cubic-bezier(0.16,1,0.3,1)"
-                : "transform 0.75s cubic-bezier(0.16,1,0.3,1), opacity 0.75s cubic-bezier(0.16,1,0.3,1)";
+                ? "transform 0.08s linear, opacity 1s cubic-bezier(0.22,0.61,0.36,1)"
+                : "transform 1s cubic-bezier(0.22,0.61,0.36,1), opacity 1s cubic-bezier(0.22,0.61,0.36,1)";
 
               return (
                 <div

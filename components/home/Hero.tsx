@@ -114,6 +114,7 @@ export default function Hero() {
           className="absolute inset-0 z-0"
           onClick={() => setOpenSlug(current.slug)}
           data-cursor="Ouvrir"
+          data-cursor-silent
         >
           <AnimatePresence mode="sync">
             <motion.div
