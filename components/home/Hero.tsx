@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 import ProjectPanel from "./ProjectPanel";
@@ -9,14 +9,15 @@ import ProjectPanel from "./ProjectPanel";
 const FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCROLL_LOCK_MS = 850;
+const TITLE = "Nicolas Sempere";
+const REPEL_RADIUS = 110;
+const REPEL_STRENGTH = 50;
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
-  const [mouse, setMouse] = useState({ x: 50, y: 50 });
-  const [showHint, setShowHint] = useState(false);
-  const [cursorPx, setCursorPx] = useState({ x: 0, y: 0 });
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
   const current = FEATURED[index];
@@ -66,27 +67,44 @@ export default function Hero() {
     return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
   }, [openSlug]);
 
+  // Magnetic letter repulsion — direct DOM manipulation, no re-render
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    letterRefs.current.forEach((el) => {
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const lx = rect.left + rect.width / 2;
+      const ly = rect.top + rect.height / 2;
+      const dx = e.clientX - lx;
+      const dy = e.clientY - ly;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < REPEL_RADIUS && dist > 0) {
+        const force = (1 - dist / REPEL_RADIUS);
+        const ox = -(dx / dist) * force * REPEL_STRENGTH;
+        const oy = -(dy / dist) * force * (REPEL_STRENGTH * 0.55);
+        el.style.transform = `translate(${ox}px, ${oy}px)`;
+      } else {
+        el.style.transform = "translate(0px, 0px)";
+      }
+    });
+  };
+
+  const handleMouseLeave = () => {
+    letterRefs.current.forEach((el) => {
+      if (el) el.style.transform = "translate(0px, 0px)";
+    });
+  };
+
   const goPrev = () => setIndex((i) => (i - 1 + FEATURED.length) % FEATURED.length);
   const goNext = () => setIndex((i) => (i + 1) % FEATURED.length);
   const handleNavigate = useCallback((slug: string) => setOpenSlug(slug), []);
   const handleClose = useCallback(() => setOpenSlug(null), []);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMouse({
-      x: ((e.clientX - rect.left) / rect.width) * 100,
-      y: ((e.clientY - rect.top) / rect.height) * 100,
-    });
-    setCursorPx({ x: e.clientX, y: e.clientY });
-  };
 
   return (
     <>
       <section
         className="relative h-screen bg-black overflow-hidden flex flex-col"
         onMouseMove={handleMouseMove}
-        onMouseEnter={() => setShowHint(true)}
-        onMouseLeave={() => setShowHint(false)}
+        onMouseLeave={handleMouseLeave}
       >
 
         {/* Background */}
@@ -128,30 +146,6 @@ export default function Hero() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
-        {/* Spotlight — radial gradient following cursor */}
-        <div
-          className="absolute inset-0 z-[5] pointer-events-none"
-          style={{
-            background: `radial-gradient(circle 38vw at ${mouse.x}% ${mouse.y}%, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)`,
-            opacity: showHint ? 1 : 0,
-            transition: "opacity 0.6s ease",
-            mixBlendMode: "screen",
-          }}
-        />
-
-        {/* Cursor hint */}
-        <div
-          className="fixed pointer-events-none z-[15] label text-white"
-          style={{
-            left: cursorPx.x + 18,
-            top: cursorPx.y + 14,
-            opacity: showHint && !openSlug ? 0.4 : 0,
-            transition: "opacity 0.25s ease",
-          }}
-        >
-          Open
-        </div>
-
         {/* Foreground */}
         <motion.div
           className="relative z-10 flex-1 flex flex-col pointer-events-none"
@@ -170,6 +164,7 @@ export default function Hero() {
               Photographer — Filmmaker
             </motion.p>
 
+            {/* Magnetic title */}
             <motion.h1
               className="text-white title"
               style={{ fontSize: "clamp(2.5rem, 9vw, 11rem)" }}
@@ -177,7 +172,18 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.62, ease: SOFT }}
             >
-              Nicolas Sempere
+              {TITLE.split("").map((char, i) => (
+                <span
+                  key={i}
+                  ref={(el) => { letterRefs.current[i] = el; }}
+                  style={{
+                    display: char === " " ? "inline" : "inline-block",
+                    transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  {char === " " ? " " : char}
+                </span>
+              ))}
             </motion.h1>
 
             <motion.p

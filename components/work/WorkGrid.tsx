@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { projects } from "@/data/projects";
@@ -14,7 +14,6 @@ export default function WorkGrid() {
   const [active, setActive] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isTilting, setIsTilting] = useState(false);
-  const stageRef = useRef<HTMLDivElement>(null);
 
   const visible =
     filter === "all"
@@ -23,7 +22,6 @@ export default function WorkGrid() {
 
   useEffect(() => { setActive(0); }, [filter]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") setActive((i) => Math.max(0, i - 1));
@@ -33,24 +31,6 @@ export default function WorkGrid() {
     return () => window.removeEventListener("keydown", handler);
   }, [visible.length]);
 
-  // Wheel navigation on the stage (non-passive to prevent page scroll)
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    let locked = false;
-    const handler = (e: WheelEvent) => {
-      e.preventDefault();
-      if (locked) return;
-      locked = true;
-      if (e.deltaY > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
-      else setActive((i) => Math.max(0, i - 1));
-      setTimeout(() => { locked = false; }, 600);
-    };
-    el.addEventListener("wheel", handler, { passive: false });
-    return () => el.removeEventListener("wheel", handler);
-  }, [visible.length]);
-
-  // Touch swipe
   useEffect(() => {
     let sx = 0;
     const onStart = (e: TouchEvent) => { sx = e.touches[0].clientX; };
@@ -81,6 +61,8 @@ export default function WorkGrid() {
   };
 
   const current = visible[active];
+  const hasPrev = active > 0;
+  const hasNext = active < visible.length - 1;
 
   return (
     <div>
@@ -98,7 +80,6 @@ export default function WorkGrid() {
         <>
           {/* 3D Carousel Stage */}
           <div
-            ref={stageRef}
             className="relative overflow-hidden"
             style={{
               height: "clamp(260px, 60vh, 640px)",
@@ -115,7 +96,7 @@ export default function WorkGrid() {
               const scale = isActive ? 1 : absOffset === 1 ? 0.82 : 0.62;
               const opacity = isActive ? 1 : absOffset === 1 ? 0.5 : 0.18;
               const rotateY = offset * -28;
-              const tx = offset * 55;
+              const tx = offset * 38; // tighter — side cards peek in
 
               const transform = isActive
                 ? `translate(-50%, -50%) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
@@ -130,7 +111,7 @@ export default function WorkGrid() {
                   key={project.slug}
                   className="absolute top-1/2 left-1/2"
                   style={{
-                    width: "clamp(280px, 58vw, 900px)",
+                    width: "clamp(280px, 52vw, 820px)",
                     zIndex: 20 - absOffset,
                     transform,
                     opacity,
@@ -171,31 +152,49 @@ export default function WorkGrid() {
                     )}
 
                     {isActive && project.type === "video" && (
-                      <span
-                        className="absolute top-4 right-4 label text-white z-10"
-                        style={{ opacity: 0.4 }}
-                      >▶</span>
+                      <span className="absolute top-4 right-4 label text-white z-10" style={{ opacity: 0.4 }}>▶</span>
                     )}
                   </div>
                 </div>
               );
             })}
 
-            {/* Arrows */}
+            {/* Full-height side navigation zones */}
             <button
+              className="absolute left-0 top-0 bottom-0 z-30 flex items-center pl-4 md:pl-8 group"
+              style={{
+                width: "14%",
+                opacity: hasPrev ? 1 : 0,
+                pointerEvents: hasPrev ? "auto" : "none",
+              }}
               onClick={() => setActive((i) => Math.max(0, i - 1))}
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 flex items-center justify-center label text-white hover:opacity-80 transition-opacity duration-300"
-              style={{ opacity: active > 0 ? 0.35 : 0.1 }}
-              disabled={active === 0}
               aria-label="Previous"
-            >←</button>
+            >
+              <div className="flex flex-col items-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="block h-px bg-white w-6" style={{ opacity: 0.5 }} />
+                <span className="label text-white" style={{ opacity: 0.4, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {visible[active - 1]?.title}
+                </span>
+              </div>
+            </button>
+
             <button
+              className="absolute right-0 top-0 bottom-0 z-30 flex items-center justify-end pr-4 md:pr-8 group"
+              style={{
+                width: "14%",
+                opacity: hasNext ? 1 : 0,
+                pointerEvents: hasNext ? "auto" : "none",
+              }}
               onClick={() => setActive((i) => Math.min(visible.length - 1, i + 1))}
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 flex items-center justify-center label text-white hover:opacity-80 transition-opacity duration-300"
-              style={{ opacity: active < visible.length - 1 ? 0.35 : 0.1 }}
-              disabled={active === visible.length - 1}
               aria-label="Next"
-            >→</button>
+            >
+              <div className="flex flex-col items-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="block h-px bg-white w-6" style={{ opacity: 0.5 }} />
+                <span className="label text-white" style={{ opacity: 0.4, maxWidth: "12ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {visible[active + 1]?.title}
+                </span>
+              </div>
+            </button>
           </div>
 
           {/* Active card info */}
@@ -212,10 +211,7 @@ export default function WorkGrid() {
                 <p className="label text-white mb-4" style={{ opacity: 0.22 }}>
                   {String(active + 1).padStart(2, "0")} / {String(visible.length).padStart(2, "0")}
                 </p>
-                <h3
-                  className="text-white title mb-4"
-                  style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", lineHeight: 1 }}
-                >
+                <h3 className="text-white title mb-4" style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)", lineHeight: 1 }}>
                   {current.title}
                 </h3>
                 <div className="flex items-center justify-center gap-4 mb-8">
@@ -244,11 +240,7 @@ export default function WorkGrid() {
                 key={i}
                 onClick={() => setActive(i)}
                 className="rounded-full bg-white transition-all duration-500"
-                style={{
-                  width: i === active ? 20 : 5,
-                  height: 2,
-                  opacity: i === active ? 0.55 : 0.18,
-                }}
+                style={{ width: i === active ? 20 : 5, height: 2, opacity: i === active ? 0.55 : 0.18 }}
                 aria-label={`Project ${i + 1}`}
               />
             ))}
