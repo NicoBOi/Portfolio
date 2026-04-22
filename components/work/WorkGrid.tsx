@@ -50,6 +50,33 @@ export default function WorkGrid() {
     };
   }, [visible.length]);
 
+  // Wheel: once the user has scrolled to the bottom of the page, hijack scroll to advance the carousel
+  useEffect(() => {
+    let locked = false;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 8) return;
+      const doc = document.documentElement;
+      const atBottom = window.scrollY + window.innerHeight >= doc.scrollHeight - 2;
+      const atTop = window.scrollY <= 1;
+
+      if (e.deltaY > 0 && atBottom) {
+        e.preventDefault();
+        if (locked) return;
+        locked = true;
+        setActive((i) => Math.min(visible.length - 1, i + 1));
+        setTimeout(() => { locked = false; }, 700);
+      } else if (e.deltaY < 0 && atTop) {
+        e.preventDefault();
+        if (locked) return;
+        locked = true;
+        setActive((i) => Math.max(0, i - 1));
+        setTimeout(() => { locked = false; }, 700);
+      }
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [visible.length]);
+
   const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;

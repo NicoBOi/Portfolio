@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 import ProjectPanel from "./ProjectPanel";
 
-const FEATURED = projects.filter((p) => p.featured);
+const FEATURED = projects;
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCROLL_LOCK_MS = 850;
 const TITLE = "Nicolas Sempere";
