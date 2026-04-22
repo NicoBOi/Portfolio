@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 import ProjectPanel from "./ProjectPanel";
@@ -14,6 +14,7 @@ export default function Hero() {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
   const current = FEATURED[index];
@@ -22,6 +23,23 @@ export default function Hero() {
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
+  }, []);
+
+  // Animate feTurbulence via RAF (SMIL <animate> doesn't work in React)
+  useEffect(() => {
+    let t = 0;
+    const animate = () => {
+      const el = document.getElementById("hero-turb") as SVGFETurbulenceElement | null;
+      if (el) {
+        t += 0.00018;
+        const f1 = (0.014 + Math.sin(t) * 0.005).toFixed(4);
+        const f2 = (0.009 + Math.cos(t * 1.4) * 0.006).toFixed(4);
+        el.setAttribute("baseFrequency", `${f1} ${f2}`);
+      }
+      rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, []);
 
   // Auto-cycle
@@ -72,7 +90,7 @@ export default function Hero() {
     <>
       <section className="relative h-screen bg-black overflow-hidden flex flex-col">
 
-        {/* SVG distortion filter — GPU-accelerated, full-screen */}
+        {/* SVG distortion filter — animated via RAF */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none z-[5]"
           style={{ mixBlendMode: "soft-light", opacity: 0.55 }}
@@ -80,19 +98,13 @@ export default function Hero() {
           <defs>
             <filter id="hero-warp" x="-8%" y="-8%" width="116%" height="116%">
               <feTurbulence
+                id="hero-turb"
                 type="fractalNoise"
                 baseFrequency="0.014 0.009"
                 numOctaves="2"
                 seed="5"
                 result="noise"
-              >
-                <animate
-                  attributeName="baseFrequency"
-                  values="0.014 0.009;0.009 0.015;0.014 0.009"
-                  dur="16s"
-                  repeatCount="indefinite"
-                />
-              </feTurbulence>
+              />
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="noise"
@@ -127,7 +139,7 @@ export default function Hero() {
             >
               {current.youtubeId ? (
                 <iframe
-                  src={`https://www.youtube.com/embed/${current.youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&playlist=${current.youtubeId}`}
+                  src={`https://www.youtube.com/embed/${current.youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&vq=hd1080&playlist=${current.youtubeId}`}
                   className="absolute border-0 pointer-events-none"
                   style={{
                     top: "50%",

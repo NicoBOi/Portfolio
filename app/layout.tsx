@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
-import { Poppins, Abril_Fatface } from "next/font/google";
+import { Libre_Baskerville } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import CustomCursor from "@/components/ui/CustomCursor";
 
-const poppins = Poppins({
+const baskerville = Libre_Baskerville({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "700"],
   style: ["normal", "italic"],
-  variable: "--font-poppins",
-  display: "swap",
-});
-
-const abril = Abril_Fatface({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-abril",
+  variable: "--font-baskerville",
   display: "swap",
 });
 
@@ -35,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${poppins.variable} ${abril.variable}`}>
+    <html lang="fr" className={baskerville.variable}>
       <body>
         <CustomCursor />
         <Navigation />

@@ -46,6 +46,7 @@ export const projects: Project[] = [
     description:
       "A series exploring absence — the weight of empty rooms, skin that seems to hold its breath. Shot over six weeks in abandoned farmhouses outside Bordeaux, working with natural light only. The silence here is not peaceful; it is the silence of things that have stopped waiting.",
     images: 5,
+    youtubeId: "7wtfhZwyrcc",
     featured: true,
     aspectRatio: "portrait",
   },
@@ -60,6 +61,7 @@ export const projects: Project[] = [
     description:
       "A study in physical form and editorial restraint. Commissioned for a Paris-based fashion house, the series treats the body as architecture — load-bearing, structural, indifferent to the garments it carries. Shot on medium format over three days in a Pigalle studio.",
     images: 5,
+    youtubeId: "pRpeEdMmmQ0",
     featured: true,
     aspectRatio: "landscape",
   },
@@ -74,6 +76,7 @@ export const projects: Project[] = [
     description:
       "Moulting architecture — buildings caught mid-transformation. Urban demolition and construction sites across Bordeaux and its banlieues, photographed at the precise moment between what a structure was and what it will become. Nothing here is finished.",
     images: 5,
+    youtubeId: "OPf0YbXqDm0",
     aspectRatio: "portrait",
   },
   {
@@ -87,6 +90,7 @@ export const projects: Project[] = [
     description:
       "Threshold spaces for a luxury brand campaign. The brief demanded ambiguity — spaces that could be an arrival or a departure. The result was a set of images that refuse to commit to either. Corridors, lobbies, doorways. Stillness as a proposition.",
     images: 5,
+    youtubeId: "nfWlot6h_JM",
     aspectRatio: "landscape",
   },
   {
@@ -100,6 +104,7 @@ export const projects: Project[] = [
     description:
       "Images built from what is missing. A portrait series where the subject refuses to fully appear — out of frame, out of focus, turned away. Shot on medium format with long exposures in natural light. Published in AnOther Magazine, issue 45.",
     images: 5,
+    youtubeId: "2vjPBrBU-TM",
     aspectRatio: "portrait",
   },
   {
@@ -113,6 +118,7 @@ export const projects: Project[] = [
     description:
       "Commercial work that refuses to look commercial. A collaboration that deliberately places the product in the periphery while the space asserts itself. The object becomes evidence of an environment, not its purpose.",
     images: 5,
+    youtubeId: "M7lc1UVf-VE",
     aspectRatio: "landscape",
   },
   {
@@ -126,6 +132,7 @@ export const projects: Project[] = [
     description:
       "Made on the road between Bordeaux and Paris — exit ramps, rest areas, industrial parks, the overlooked periphery of movement. A first personal project. The highway as a place people pass through but never photograph. Shot over eight months on a compact.",
     images: 5,
+    youtubeId: "LXb3EKWsInQ",
     aspectRatio: "portrait",
   },
 
@@ -230,6 +237,7 @@ export const projects: Project[] = [
     description:
       "Photographs taken over a full year of the same windowsill — the same light, the same angle, different states of accumulation and decay. Dust, dead plants, forgotten objects, seasons. A slow project about the objects that stay when people leave.",
     images: 5,
+    youtubeId: "aqz-KE-bpKQ",
     aspectRatio: "portrait",
   },
 ];
