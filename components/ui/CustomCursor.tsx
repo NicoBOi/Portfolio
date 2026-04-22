@@ -11,6 +11,10 @@ function readCursorLabel(el: HTMLElement | null): string | null {
   return null;
 }
 
+function closestInteractive(el: HTMLElement | null): HTMLElement | null {
+  return el ? (el.closest("a, button") as HTMLElement | null) : null;
+}
+
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<{ hovered: boolean; label: string | null }>({
@@ -25,7 +29,7 @@ export default function CustomCursor() {
     let visible = false;
     let moved = false;
 
-    const apply = (x: number, y: number) => {
+    const show = (x: number, y: number) => {
       el.style.transform = `translate3d(${x - 5}px, ${y - 5}px, 0)`;
       if (!visible) {
         el.style.opacity = "1";
@@ -33,15 +37,26 @@ export default function CustomCursor() {
       }
     };
 
+    const hide = () => {
+      el.style.opacity = "0";
+      visible = false;
+    };
+
     const onMove = (e: MouseEvent) => {
       if (!moved) moved = true;
-      apply(e.clientX, e.clientY);
+      show(e.clientX, e.clientY);
     };
 
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const label = readCursorLabel(target);
-      const isInteractive = !!target.closest("a, button") || !!label;
+      const interactive = closestInteractive(target);
+      let label = readCursorLabel(target);
+      if (!label && interactive) {
+        // Default label: the element's own text, trimmed and compact
+        const text = (interactive.innerText || "").trim().split("\n")[0];
+        label = text && text.length <= 24 ? text : "→";
+      }
+      const isInteractive = !!interactive || !!label;
       setState((prev) =>
         prev.hovered === isInteractive && prev.label === label
           ? prev
@@ -49,21 +64,29 @@ export default function CustomCursor() {
       );
     };
 
-    // Fallback: if the cursor never receives a move event in 2s (some macOS configs),
-    // restore the native cursor and hide the custom one
+    // Hide when pointer leaves the viewport so the custom cursor doesn't linger
+    // next to the native one if macOS surfaces it near screen edges (Dock, etc.)
+    const onWindowOut = (e: MouseEvent) => {
+      if (e.relatedTarget === null) hide();
+    };
+    const onDocLeave = () => hide();
+
+    // Fallback: if no move received in 2s, bail out of the custom cursor entirely
     const fallbackTimer = window.setTimeout(() => {
       if (!moved) document.documentElement.classList.add("cursor-fallback");
     }, 2000);
 
-    // Listen at document with capture so no child can stop propagation before us.
-    // mousemove works on every mouse-driven setup; we keep it as the single source of truth.
     document.addEventListener("mousemove", onMove, { passive: true, capture: true });
     document.addEventListener("mouseover", onOver, { passive: true, capture: true });
+    document.addEventListener("mouseout", onWindowOut, { passive: true });
+    document.documentElement.addEventListener("mouseleave", onDocLeave, { passive: true });
 
     return () => {
       window.clearTimeout(fallbackTimer);
       document.removeEventListener("mousemove", onMove, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
+      document.removeEventListener("mouseout", onWindowOut);
+      document.documentElement.removeEventListener("mouseleave", onDocLeave);
     };
   }, []);
 

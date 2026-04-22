@@ -14,6 +14,18 @@
   cursor: none !important;
 }
 
+html, body {
+  cursor: none !important;
+}
+
+/* Full white on hover for every interactive element (beats inline opacity) */
+a:hover,
+a:hover *,
+button:hover,
+button:hover * {
+  opacity: 1 !important;
+}
+
 /* Re-enable native cursor behavior on touch devices (no mouse) and hide the custom one */
 @media (hover: none), (pointer: coarse) {
   *,
