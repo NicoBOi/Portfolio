@@ -11,6 +11,10 @@ function getVimeoId(url: string): string | null {
   return url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null;
 }
 
+function getYoutubeId(url: string): string | null {
+  return url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ?? null;
+}
+
 interface Props {
   project: Project;
   prev: Project | null;
@@ -18,7 +22,13 @@ interface Props {
 }
 
 export default function VideoProject({ project, prev, next }: Props) {
-  const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const youtubeId = project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null);
+  const vimeoId = !youtubeId && project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const embedSrc = youtubeId
+    ? `https://www.youtube.com/embed/${youtubeId}?rel=0`
+    : vimeoId
+      ? `https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`
+      : null;
 
   return (
     <article className="bg-black min-h-screen">
@@ -36,9 +46,9 @@ export default function VideoProject({ project, prev, next }: Props) {
 
       {/* Player */}
       <div className="w-full mt-8" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
-        {vimeoId ? (
+        {embedSrc ? (
           <iframe
-            src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
+            src={embedSrc}
             className="w-full h-full"
             style={{ border: 0 }}
             allow="autoplay; fullscreen; picture-in-picture"

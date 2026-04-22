@@ -11,6 +11,7 @@ export interface Project {
   description?: string;
   images?: number;
   videoUrl?: string;
+  youtubeId?: string;
   featured?: boolean;
   aspectRatio?: "landscape" | "portrait" | "square";
 }
@@ -28,6 +29,7 @@ export const projects: Project[] = [
     description:
       "An overview of work across documentary, commercial, and personal projects — 2022 to 2025. Shot on various formats, edited for atmosphere over sequence.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "dQw4w9WgXcQ",
     featured: true,
     aspectRatio: "landscape",
   },
@@ -139,6 +141,7 @@ export const projects: Project[] = [
     description:
       "A 12-minute documentary following infrastructure maintenance workers through the underground networks of Bordeaux. Shot on 16mm and digital over four weeks. The city above never appears; everything happens in the dark, in the pipes, in the noise. Selected for Côté Court 2024.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "9bZkp7q19f0",
     featured: true,
     aspectRatio: "landscape",
   },
@@ -153,6 +156,7 @@ export const projects: Project[] = [
     description:
       "A winter campaign for a French outerwear brand. Six locations, seven days. The brief was silence and cold — two things that are actually the same thing photographed differently. The result is 90 seconds. It runs in-store across Europe.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "kJQP7kiw5Fk",
     featured: true,
     aspectRatio: "landscape",
   },
@@ -167,6 +171,7 @@ export const projects: Project[] = [
     description:
       "Single-take video essays on objects at rest. A table set for no one. A coat on a chair. Flowers past their point. The title is also the method — no cuts, no movement, only duration. Shown as a three-channel installation at La Base, Bordeaux.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "JGwWNGJdvx8",
     aspectRatio: "landscape",
   },
   {
@@ -180,6 +185,7 @@ export const projects: Project[] = [
     description:
       "Do objects continue to exist when no one is looking? An editorial collaboration exploring the psychology of possession — rooms entered, objects examined, rooms left empty again. The camera as the last visitor.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "hT_nvWreIhg",
     aspectRatio: "landscape",
   },
   {
@@ -193,6 +199,7 @@ export const projects: Project[] = [
     description:
       "What the frame excludes defines what remains. A commercial that works by systematic absence — minimal on-screen presence, maximum atmospheric pressure. The product appears for four seconds across a two-minute film.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "fRh_vgS2dFE",
     aspectRatio: "landscape",
   },
 
@@ -208,6 +215,7 @@ export const projects: Project[] = [
     description:
       "A 7-minute loop of static, interference, and white noise treated as image. Signal and failure as the same material. Made during a week without internet, using analogue feedback loops and degraded VHS transfers. The piece runs continuously; there is no beginning or end.",
     videoUrl: "https://vimeo.com/1175061669",
+    youtubeId: "kXYiU_JCYtU",
     featured: true,
     aspectRatio: "landscape",
   },

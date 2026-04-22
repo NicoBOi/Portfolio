@@ -7,14 +7,13 @@ import type { Project } from "@/data/projects";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-function aspectClass(p: Project): string {
-  if (p.type === "video") return "aspect-[16/9]";
-  if (p.aspectRatio === "portrait") return "aspect-[3/4]";
-  if (p.aspectRatio === "landscape") return "aspect-[4/3]";
-  return "aspect-[4/5]";
+interface Props {
+  project: Project;
+  index: number;
+  size?: "full" | "half";
 }
 
-export default function ProjectCard({ project, index }: { project: Project; index: number }) {
+export default function ProjectCard({ project, index, size = "half" }: Props) {
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-6%" });
@@ -23,11 +22,10 @@ export default function ProjectCard({ project, index }: { project: Project; inde
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      exit={{ opacity: 0 }}
       layout
-      transition={{ duration: 0.55, delay: (index % 2) * 0.08, ease: SOFT }}
+      transition={{ duration: 0.55, delay: (index % 3) * 0.06, ease: SOFT }}
     >
       <Link
         href={`/work/${project.slug}`}
@@ -36,47 +34,49 @@ export default function ProjectCard({ project, index }: { project: Project; inde
         className="block"
         data-cursor={project.type === "video" ? "Play" : "View"}
       >
-        {/* Thumbnail */}
+        {/* Thumbnail — always 16:9 */}
         <div
-          className={`relative w-full ${aspectClass(project)} overflow-hidden`}
+          className="relative w-full aspect-video overflow-hidden"
           style={{
             backgroundColor: project.coverPlaceholder,
-            // Subtle ring so dark-colored cards don't vanish on black bg
             boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
           }}
         >
-          <div className="placeholder-img text-white h-full">
-            {project.type === "video" ? "Video" : "Image"}
-          </div>
-
-          {/* Dark hover overlay — consistent with overall aesthetic */}
+          {/* Scalable content layer */}
           <div
-            className="absolute inset-0 bg-black flex flex-col justify-end p-5"
+            className="absolute inset-0"
             style={{
-              opacity: hovered ? 1 : 0,
-              transition: "opacity 0.22s ease",
+              transform: hovered ? "scale(1.04)" : "scale(1)",
+              transition: "transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
-            <p
-              className="text-white title leading-none"
-              style={{ fontSize: "clamp(1.1rem, 2.2vw, 1.8rem)" }}
-            >
-              {project.title}
-            </p>
-            <div className="flex items-center gap-3 mt-3">
-              <span className="label text-white" style={{ opacity: 0.45 }}>{project.year}</span>
-              <span className="label text-white" style={{ opacity: 0.2 }}>/</span>
-              <span className="label text-white" style={{ opacity: 0.45 }}>{project.role}</span>
-            </div>
+            {project.youtubeId ? (
+              <img
+                src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="placeholder-img text-white h-full">
+                {project.type === "video" ? "Video" : "Image"}
+              </div>
+            )}
           </div>
+
+          {/* Hover dim */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "rgba(0,0,0,0.28)",
+              opacity: hovered ? 1 : 0,
+              transition: "opacity 0.35s ease",
+            }}
+          />
 
           {/* Index badge */}
           <span
             className="absolute top-3 left-3 label text-white z-10"
-            style={{
-              opacity: hovered ? 0 : 0.28,
-              transition: "opacity 0.2s ease",
-            }}
+            style={{ opacity: 0.3 }}
           >
             [{num}]
           </span>
@@ -85,20 +85,36 @@ export default function ProjectCard({ project, index }: { project: Project; inde
           {project.type !== "photo" && (
             <span
               className="absolute top-3 right-3 label text-white z-10"
-              style={{
-                opacity: hovered ? 0 : 0.28,
-                transition: "opacity 0.2s ease",
-              }}
+              style={{ opacity: 0.3 }}
             >
-              {project.type === "video" ? "Video" : "Exp."}
+              {project.type === "video" ? "▶" : "Exp."}
             </span>
           )}
         </div>
 
-        {/* Below card */}
-        <div className="flex items-baseline justify-between pt-2.5 pb-6">
-          <p className="label text-white" style={{ opacity: 0.38 }}>{project.title}</p>
-          <p className="label text-white" style={{ opacity: 0.18 }}>{project.year}</p>
+        {/* Below card — editorial metadata */}
+        <div
+          className="flex items-baseline justify-between pt-3 pb-8"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+        >
+          <div className="flex items-baseline gap-4 min-w-0">
+            <span className="label text-white shrink-0" style={{ opacity: 0.2 }}>{num}</span>
+            <h3
+              className="text-white title leading-none truncate"
+              style={{
+                fontSize: size === "full"
+                  ? "clamp(1.3rem, 2.6vw, 2.4rem)"
+                  : "clamp(0.95rem, 1.5vw, 1.35rem)",
+              }}
+            >
+              {project.title}
+            </h3>
+          </div>
+          <div className="flex items-baseline gap-3 ml-4 shrink-0">
+            <span className="label text-white" style={{ opacity: 0.18 }}>{project.category}</span>
+            <span className="label text-white" style={{ opacity: 0.14 }}>·</span>
+            <span className="label text-white" style={{ opacity: 0.18 }}>{project.year}</span>
+          </div>
         </div>
       </Link>
     </motion.div>

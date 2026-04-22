@@ -8,6 +8,10 @@ function getVimeoId(url: string): string | null {
   return url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null;
 }
 
+function getYoutubeId(url: string): string | null {
+  return url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ?? null;
+}
+
 const EASE: [number, number, number, number] = [0.76, 0, 0.24, 1];
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -187,15 +191,20 @@ function PhotoContent({ project }: { project: Project }) {
 }
 
 function VideoContent({ project }: { project: Project }) {
-  const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const youtubeId = project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null);
+  const vimeoId = !youtubeId && project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const embedSrc = youtubeId
+    ? `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`
+    : vimeoId
+      ? `https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1&autoplay=1`
+      : null;
 
   return (
     <div>
-      {/* Video — full width */}
       <div className="w-full" style={{ aspectRatio: "16/9", maxHeight: "80vh", backgroundColor: project.coverPlaceholder }}>
-        {vimeoId ? (
+        {embedSrc ? (
           <iframe
-            src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1&autoplay=1`}
+            src={embedSrc}
             className="w-full h-full"
             style={{ border: 0 }}
             allow="autoplay; fullscreen; picture-in-picture"
@@ -213,7 +222,6 @@ function VideoContent({ project }: { project: Project }) {
         )}
       </div>
 
-      {/* Title + description */}
       <div className="max-w-5xl mx-auto px-6 md:px-10 pt-10 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-12 pb-12 border-b border-white/10">
           <div>
@@ -231,15 +239,9 @@ function VideoContent({ project }: { project: Project }) {
             </p>
           )}
         </div>
-
-        {/* Stills — equal 2-col */}
         <div className="grid grid-cols-2 gap-4 md:gap-6">
           {[0, 1].map((i) => (
-            <div
-              key={i}
-              className="aspect-video"
-              style={{ backgroundColor: project.coverPlaceholder + "55" }}
-            >
+            <div key={i} className="aspect-video" style={{ backgroundColor: project.coverPlaceholder + "55" }}>
               <div className="placeholder-img text-white h-full">Still {i + 1}</div>
             </div>
           ))}

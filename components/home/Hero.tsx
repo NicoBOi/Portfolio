@@ -131,6 +131,8 @@ export default function Hero() {
           const i = y * W + x;
           buf2[i] = (buf1[i - 1] + buf1[i + 1] + buf1[i - W] + buf1[i + W]) * 0.5 - buf2[i];
           buf2[i] *= DAMP;
+          const edge = Math.min(x, W - 1 - x, y, H - 1 - y);
+          if (edge < 18) buf2[i] *= (edge / 18) * (edge / 18);
         }
       }
       water.buf1 = buf2;
@@ -195,7 +197,15 @@ export default function Hero() {
               exit={{ opacity: 0 }}
               transition={{ duration: 1.4, ease: SOFT }}
             >
-              <div className="placeholder-img text-white h-full">Image</div>
+              {current.youtubeId ? (
+                <img
+                  src={`https://img.youtube.com/vi/${current.youtubeId}/maxresdefault.jpg`}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="placeholder-img text-white h-full">Image</div>
+              )}
             </motion.div>
           </AnimatePresence>
           <div className="absolute inset-0 bg-black/60" />
