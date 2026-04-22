@@ -28,13 +28,6 @@ export default function Hero() {
     return () => clearTimeout(t);
   }, []);
 
-  // Auto-cycle — restarts when index changes (so manual scroll resets the timer)
-  useEffect(() => {
-    if (openSlug) return;
-    const t = setTimeout(() => setIndex((i) => (i + 1) % FEATURED.length), 5000);
-    return () => clearTimeout(t);
-  }, [openSlug, index]);
-
   // Wheel
   useEffect(() => {
     if (openSlug) return;
