@@ -65,6 +65,9 @@ export default function PhotoProject({ project, prev, next }: Props) {
               src={`/projects/${project.slug}/${cover}`}
               alt={project.title}
               className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
             />
           ) : (
             <div className="placeholder-img text-white h-full">[01]</div>
@@ -113,6 +116,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
               <motion.figure
                 key={f}
                 className={className}
+                style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-8%" }}
@@ -123,6 +127,8 @@ export default function PhotoProject({ project, prev, next }: Props) {
                     src={`/projects/${project.slug}/${f}`}
                     alt=""
                     className="w-full h-auto object-cover block"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               </motion.figure>

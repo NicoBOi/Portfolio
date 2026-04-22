@@ -60,24 +60,32 @@ export default function Hero() {
     return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
   }, [openSlug]);
 
-  // Magnetic letter repulsion — direct DOM manipulation, no re-render
+  // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
+  const rafRef = useRef<number | null>(null);
+  const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    letterRefs.current.forEach((el) => {
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const lx = rect.left + rect.width / 2;
-      const ly = rect.top + rect.height / 2;
-      const dx = e.clientX - lx;
-      const dy = e.clientY - ly;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < REPEL_RADIUS && dist > 0) {
-        const force = (1 - dist / REPEL_RADIUS);
-        const ox = -(dx / dist) * force * REPEL_STRENGTH;
-        const oy = -(dy / dist) * force * (REPEL_STRENGTH * 0.55);
-        el.style.transform = `translate(${ox}px, ${oy}px)`;
-      } else {
-        el.style.transform = "translate(0px, 0px)";
-      }
+    mouseRef.current = { x: e.clientX, y: e.clientY };
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const { x, y } = mouseRef.current;
+      letterRefs.current.forEach((el) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const lx = rect.left + rect.width / 2;
+        const ly = rect.top + rect.height / 2;
+        const dx = x - lx;
+        const dy = y - ly;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REPEL_RADIUS && dist > 0) {
+          const force = 1 - dist / REPEL_RADIUS;
+          const ox = -(dx / dist) * force * REPEL_STRENGTH;
+          const oy = -(dy / dist) * force * (REPEL_STRENGTH * 0.55);
+          el.style.transform = `translate(${ox}px, ${oy}px)`;
+        } else {
+          el.style.transform = "translate(0px, 0px)";
+        }
+      });
     });
   };
 
@@ -137,6 +145,9 @@ export default function Hero() {
                   src={`/projects/${current.slug}/${current.imageFiles[0]}`}
                   alt={current.title}
                   className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               ) : (
                 <div className="placeholder-img text-white h-full">Image</div>

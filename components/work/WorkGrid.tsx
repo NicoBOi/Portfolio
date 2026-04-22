@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -50,11 +50,18 @@ export default function WorkGrid() {
     };
   }, [visible.length]);
 
+  const tiltRafRef = useRef<number | null>(null);
   const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;
-    const y = ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 5;
-    setTilt({ x, y });
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    if (tiltRafRef.current !== null) return;
+    tiltRafRef.current = requestAnimationFrame(() => {
+      tiltRafRef.current = null;
+      const x = ((clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;
+      const y = ((clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 5;
+      setTilt({ x, y });
+    });
   };
 
   const resetTilt = () => {
@@ -144,6 +151,9 @@ export default function WorkGrid() {
                         src={`/projects/${project.slug}/${project.imageFiles[0]}`}
                         alt={project.title}
                         className="w-full h-full object-cover"
+                        loading={absOffset <= 1 ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={isActive ? "high" : "low"}
                         style={{
                           filter: !isActive ? "brightness(0.35)" : "none",
                           transition: "filter 0.75s ease",

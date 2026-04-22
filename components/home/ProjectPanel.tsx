@@ -182,6 +182,8 @@ function PhotoContent({ project }: { project: Project }) {
             src={`/projects/${project.slug}/${cover}`}
             alt={project.title}
             className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
           />
         ) : (
           <div className="placeholder-img text-white h-full">Cover</div>
@@ -213,12 +215,18 @@ function PhotoContent({ project }: { project: Project }) {
             <div
               key={f}
               className="overflow-hidden"
-              style={{ backgroundColor: project.coverPlaceholder + "aa" }}
+              style={{
+                backgroundColor: project.coverPlaceholder + "aa",
+                contentVisibility: "auto",
+                containIntrinsicSize: "600px",
+              }}
             >
               <img
                 src={`/projects/${project.slug}/${f}`}
                 alt=""
                 className="w-full h-auto object-cover block"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           ))}

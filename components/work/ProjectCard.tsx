@@ -55,12 +55,16 @@ export default function ProjectCard({ project, index, size = "half" }: Props) {
                 src={`/projects/${project.slug}/${project.imageFiles[0]}`}
                 alt=""
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             ) : project.youtubeId ? (
               <img
                 src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
                 alt=""
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             ) : (
               <div className="placeholder-img text-white h-full">
