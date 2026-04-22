@@ -57,7 +57,7 @@ export default function WorkGrid() {
     let acc = 0;
     let resetId: number | null = null;
     const STEP = 90;
-    const COOLDOWN_AFTER_ADVANCE = 1050;
+    const COOLDOWN_AFTER_ADVANCE = 550;
     let lockedUntil = 0;
 
     const onWheel = (e: WheelEvent) => {
@@ -142,26 +142,29 @@ export default function WorkGrid() {
               const rotX = isActive ? tilt.x : 0;
               const rotY = isActive ? tilt.y : offset * -28;
 
-              // Same transform signature (same functions, same order) on every
-              // state so the browser interpolates values instead of snapping.
-              const transform = `translate(-50%, -50%) translate3d(${tx}vw, 0, 0) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
-
-              const transition = isActive && isTilting
-                ? "transform 0.08s linear, opacity 1s cubic-bezier(0.22,0.61,0.36,1)"
-                : "transform 1s cubic-bezier(0.22,0.61,0.36,1), opacity 1s cubic-bezier(0.22,0.61,0.36,1)";
-
               return (
-                <div
+                <motion.div
                   key={project.slug}
                   className="absolute top-1/2 left-1/2"
+                  initial={false}
+                  animate={{
+                    x: `calc(-50% + ${tx}vw)`,
+                    y: "-50%",
+                    rotateX: rotX,
+                    rotateY: rotY,
+                    scale,
+                    opacity,
+                  }}
+                  transition={
+                    isActive && isTilting
+                      ? { type: "tween", duration: 0.08, ease: "linear" }
+                      : { type: "spring", stiffness: 140, damping: 26, mass: 0.9 }
+                  }
                   style={{
                     width: "clamp(280px, 52vw, 820px)",
                     zIndex: 20 - absOffset,
-                    transform,
-                    opacity,
-                    transition,
                     cursor: "pointer",
-                    willChange: isActive ? "transform" : "auto",
+                    willChange: "transform, opacity",
                   }}
                   onClick={() => isActive ? router.push(`/work/${project.slug}`) : setActive(i)}
                   onMouseMove={isActive ? (e) => { setIsTilting(true); handleTiltMove(e); } : undefined}
@@ -219,7 +222,7 @@ export default function WorkGrid() {
                       <span className="absolute top-4 right-4 label text-white z-10" style={{ opacity: 0.4 }}>▶</span>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
 
