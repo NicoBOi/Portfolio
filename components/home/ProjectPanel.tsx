@@ -215,8 +215,8 @@ function PhotoContent({ project }: { project: Project }) {
 }
 
 function VideoContent({ project }: { project: Project }) {
-  const youtubeId = project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null);
-  const vimeoId = !youtubeId && project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
+  const youtubeId = vimeoId ? null : (project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null));
   const embedSrc = youtubeId
     ? `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0&vq=hd1080`
     : vimeoId

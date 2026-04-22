@@ -162,39 +162,35 @@ export default function WorkGrid() {
               );
             })}
 
-            {/* Side nav buttons — always visible */}
+            {/* Side nav — minimal editorial arrows */}
             <button
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 group flex flex-col items-center gap-3"
+              className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-30 group flex items-center gap-3"
               style={{ opacity: hasPrev ? 1 : 0, pointerEvents: hasPrev ? "auto" : "none", transition: "opacity 0.4s" }}
               onClick={() => setActive((i) => Math.max(0, i - 1))}
               aria-label="Previous"
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                style={{ border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.06)" }}
-              >
-                <span className="text-white" style={{ fontSize: 14, lineHeight: 1 }}>←</span>
-              </div>
-              <span className="label text-white hidden md:block" style={{ opacity: 0.35, maxWidth: "10ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
+              <svg width="32" height="12" viewBox="0 0 32 12" fill="none" className="group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.45 }}>
+                <line x1="32" y1="6" x2="0" y2="6" stroke="white" strokeWidth="0.8" />
+                <polyline points="8,1 1,6 8,11" stroke="white" strokeWidth="0.8" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+              </svg>
+              <span className="label text-white hidden md:block group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3, maxWidth: "14ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {visible[active - 1]?.title}
               </span>
             </button>
 
             <button
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 group flex flex-col items-center gap-3"
+              className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 z-30 group flex items-center gap-3"
               style={{ opacity: hasNext ? 1 : 0, pointerEvents: hasNext ? "auto" : "none", transition: "opacity 0.4s" }}
               onClick={() => setActive((i) => Math.min(visible.length - 1, i + 1))}
               aria-label="Next"
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                style={{ border: "1px solid rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.06)" }}
-              >
-                <span className="text-white" style={{ fontSize: 14, lineHeight: 1 }}>→</span>
-              </div>
-              <span className="label text-white hidden md:block" style={{ opacity: 0.35, maxWidth: "10ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
+              <span className="label text-white hidden md:block group-hover:opacity-60 transition-opacity duration-300" style={{ opacity: 0.3, maxWidth: "14ch", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {visible[active + 1]?.title}
               </span>
+              <svg width="32" height="12" viewBox="0 0 32 12" fill="none" className="group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.45 }}>
+                <line x1="0" y1="6" x2="32" y2="6" stroke="white" strokeWidth="0.8" />
+                <polyline points="24,1 31,6 24,11" stroke="white" strokeWidth="0.8" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+              </svg>
             </button>
           </div>
 
