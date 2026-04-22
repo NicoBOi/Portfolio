@@ -25,7 +25,6 @@ export default function ContactPage() {
         {/* Left — identity */}
         <div className="flex flex-col justify-between gap-12">
           <div>
-            <p className="label text-white mb-6" style={{ opacity: 0.25 }}>Contact</p>
             <h1
               className="text-white title"
               style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}

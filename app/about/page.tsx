@@ -34,12 +34,11 @@ export default function AboutPage() {
 
       {/* Header */}
       <div className="pt-14 pb-12 border-b border-white/10">
-        <p className="label text-white mb-5" style={{ opacity: 0.22 }}>À propos</p>
         <h1
           className="text-white title"
           style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
         >
-          Nicolas Sempere
+          À propos
         </h1>
       </div>
 
