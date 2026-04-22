@@ -68,7 +68,7 @@ export default function CustomCursor() {
     <div
       ref={cursorRef}
       className="fixed top-0 left-0 pointer-events-none z-[9999]"
-      style={{ opacity: 0, willChange: "transform", contain: "layout style paint" }}
+      style={{ opacity: 0, willChange: "transform" }}
     >
       {/* Dot */}
       <div
