@@ -50,6 +50,23 @@ export default function WorkGrid() {
     };
   }, [visible.length]);
 
+  // Horizontal scroll (trackpad swipe, shift+wheel) advances the carousel
+  // without fighting the vertical page scroll
+  useEffect(() => {
+    let locked = false;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 10) return;
+      e.preventDefault();
+      if (locked) return;
+      locked = true;
+      if (e.deltaX > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
+      else setActive((i) => Math.max(0, i - 1));
+      window.setTimeout(() => { locked = false; }, 600);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [visible.length]);
+
   const tiltRafRef = useRef<number | null>(null);
   const handleTiltMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();

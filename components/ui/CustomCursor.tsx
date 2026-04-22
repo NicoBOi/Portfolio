@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 
-function readCursorLabel(el: HTMLElement | null): string | null {
+function readCursorInfo(el: HTMLElement | null): { label: string | null; suppress: boolean } {
   let node = el;
   while (node) {
-    if (node.dataset?.cursor) return node.dataset.cursor;
+    if (node.dataset?.cursor) return { label: node.dataset.cursor, suppress: false };
+    if (node.dataset?.cursorSuppress !== undefined) return { label: null, suppress: true };
     node = node.parentElement as HTMLElement | null;
   }
-  return null;
+  return { label: null, suppress: false };
 }
 
 function closestInteractive(el: HTMLElement | null): HTMLElement | null {
@@ -50,8 +51,9 @@ export default function CustomCursor() {
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const interactive = closestInteractive(target);
-      let label = readCursorLabel(target);
-      if (!label && interactive) {
+      const { label: explicit, suppress } = readCursorInfo(target);
+      let label = explicit;
+      if (!label && !suppress && interactive) {
         // Default label: the element's own text, trimmed and compact
         const text = (interactive.innerText || "").trim().split("\n")[0];
         label = text && text.length <= 24 ? text : "→";
