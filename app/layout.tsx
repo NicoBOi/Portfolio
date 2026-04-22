@@ -23,7 +23,7 @@ export default function RootLayout({
       <body>
         <CustomCursor />
         <Navigation />
-        <main>{children}</main>
+        <main className="pb-7">{children}</main>
         <Footer />
       </body>
     </html>
