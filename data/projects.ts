@@ -27,7 +27,7 @@ export const projects: Project[] = [
     category: "Portrait",
     coverPlaceholder: "#1E1A18",
     description:
-      "Des portraits où le visage devient paysage — peau, pétale, ombre. Une série sur la douceur et l'exposition, captée en lumière naturelle diffuse. Chaque image tient juste assez longtemps pour mettre mal à l'aise.",
+      "Des visages tenus trop longtemps. Quand la peau cesse d'être un portrait et devient un territoire. Regardez. Tenez le regard. Quelque chose finit par céder.",
     imageFiles: [
       "DSCF7145-Modifier_AVIF.avif",
       "DSCF7125_AVIF.avif",
@@ -50,7 +50,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#0F1115",
     description:
-      "La nuit, lentement. Une série photographiée après minuit dans des pièces à peine éclairées et des rues vides — en travaillant avec ce qu'il restait de lumière. Corps, surfaces, objets : tout suspendu dans le même bleu.",
+      "Tournée après minuit, quand les corps oublient qu'on les regarde. La nuit n'est pas sombre — elle est bleue, lente, précise. On y voit mieux qu'on ne croit.",
     imageFiles: [
       "DSCF0244_AVIF.avif",
       "DSCF0356-2_AVIF.avif",
@@ -70,7 +70,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#1A2430",
     description:
-      "Une seule pièce, du carrelage bleu, un après-midi. La salle de bain comme scène — un lieu d'attente, de rituels privés. L'appareil reste immobile ; c'est la lumière qui bouge.",
+      "Une pièce. Du carrelage bleu. Une figure qui ne sort pas. Les salles de bain gardent les secrets que les chambres trahissent. Celle-ci est pleine.",
     imageFiles: [
       "P1000698_AVIF.avif",
       "P1000705_AVIF.avif",
@@ -93,7 +93,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#1D2118",
     description:
-      "Une répétition — le même parc, d'autres jours, d'autres lumières, d'autres gens. Une méditation sur le quotidien : regarder trois fois la même chose, ce n'est déjà plus la même chose.",
+      "Le même parc, trois fois. Trois lumières, trois absences, trois façons de ne rien voir. Ce qu'on regarde longtemps finit par nous regarder en retour.",
     imageFiles: [
       "DSCF1302_AVIF.avif",
       "DSCF0221_AVIF.avif",
@@ -115,7 +115,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#1A1414",
     description:
-      "Une étude de la corde, de la tension, de la peau. Le shibari comme géométrie — le corps tenu par intervalles, la ligne tendue puis relâchée. Photographié en lumière rasante, disponible. Les images ne cherchent pas à expliquer ; elles regardent.",
+      "La corde dit ce que les mots refusent. Un corps tenu, relâché, tenu encore. Ce n'est pas une soumission — c'est une précision. Un langage qui n'a besoin de personne pour se traduire.",
     imageFiles: [
       "14_AVIF.avif",
       "3_AVIF.avif",
@@ -137,7 +137,7 @@ export const projects: Project[] = [
     category: "Mode",
     coverPlaceholder: "#241820",
     description:
-      "Rose, pressé, plastique. Une courte série éditoriale construite autour d'une seule couleur. Le jeu poussé jusqu'à la tension.",
+      "Rose. Presque trop. Une seule couleur, poussée jusqu'à ce que le jeu devienne une menace. Cinq images — pas une de plus.",
     imageFiles: [
       "DSCF0493_AVIF.avif",
       "DSCF0129_AVIF.avif",
@@ -156,7 +156,7 @@ export const projects: Project[] = [
     category: "Éditorial",
     coverPlaceholder: "#201A16",
     description:
-      "Un intérieur pris au sérieux. Textiles, angles, la chorégraphie d'un lit fait. Une petite série sur la façon dont une pièce joue sa partition quand il n'y a personne.",
+      "Une chambre vide ne l'est jamais vraiment. Les tissus se souviennent. La lumière attend. Chaque angle tient une conversation qu'on n'entendra pas.",
     imageFiles: [
       "P1001688-2_AVIF.avif",
       "P1001662_AVIF.avif",
@@ -175,7 +175,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#17181A",
     description:
-      "Une figure entre deux états — ni apparaissant ni disparaissant. Trois images. Une histoire n'a pas toujours besoin de plus.",
+      "Ni arrivée, ni partie. Entre les deux, une figure qu'on n'arrive pas à nommer. Trois images suffisent — le reste se construit dans votre regard.",
     imageFiles: [
       "DSCF6154_AVIF.avif",
       "DSCF6082_AVIF.avif",
@@ -192,7 +192,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#141414",
     description:
-      "Noir et blanc cassé. Une étude du contraste poussée jusqu'à faire disparaître tout ce qu'il y a entre les deux. Trois images qui ont appris à ne plus s'excuser.",
+      "Contraste poussé jusqu'au bord. Noir. Blanc cassé. Rien au milieu. Ces images ne s'excusent plus d'exister — c'est leur seul projet.",
     imageFiles: [
       "P1002222_AVIF.avif",
       "P1001913-3_AVIF.avif",
@@ -209,7 +209,7 @@ export const projects: Project[] = [
     category: "Personnel",
     coverPlaceholder: "#1C1E17",
     description:
-      "Fin d'été, lumière longue. Des images faites avec la sensation d'un souvenir déjà en train de se former. Rien ne se passe ; quelque chose s'est passé.",
+      "Fin d'été. Lumière qui s'étire. Des images prises avec le pressentiment qu'elles deviendraient des souvenirs avant même d'exister.",
     imageFiles: [
       "P1002259-2_AVIF.avif",
       "P1002225_AVIF.avif",

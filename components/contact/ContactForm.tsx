@@ -29,9 +29,9 @@ export default function ContactForm() {
             className="text-white title"
             style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
           >
-            Envoyé.
+            Reçu.
           </p>
-          <p className="label text-white" style={{ opacity: 0.3 }}>Je reviens vers vous rapidement.</p>
+          <p className="label text-white" style={{ opacity: 0.3 }}>Je reviens vers vous sous 48 heures.</p>
         </motion.div>
       ) : (
         <motion.form

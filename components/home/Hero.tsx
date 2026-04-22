@@ -106,14 +106,12 @@ export default function Hero() {
         className="relative h-screen bg-black overflow-hidden flex flex-col"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        data-cursor="Scroll"
       >
 
         {/* Background */}
         <div
           className="absolute inset-0 z-0"
           onClick={() => setOpenSlug(current.slug)}
-          data-cursor="Ouvrir"
         >
           <AnimatePresence mode="sync">
             <motion.div

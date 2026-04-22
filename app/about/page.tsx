@@ -60,17 +60,18 @@ export default function AboutPage() {
         <div className="md:col-span-8 flex flex-col gap-10">
           <div className="flex flex-col gap-5 max-w-xl">
             <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.6, lineHeight: 1.9 }}>
-              Photographe et réalisateur. Je travaille à l&apos;intersection du silence et de la tension —
-              construisant des images qui refusent d&apos;être passives.
-              Basé entre Bordeaux et Paris, disponible partout.
+              Je ne photographie pas ce qui est. Je fabrique ce qui manque.
+              Chaque image naît d&apos;un silence qu&apos;il a fallu tenir pour le capter.
+              Basé entre Bordeaux et Paris.
             </p>
             <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}>
-              Chaque cadre est un argument. Chaque montage, une position. Je ne documente pas les situations —
-              je les construis de toutes pièces, en travaillant avec les sujets jusqu&apos;à ce que l&apos;image devienne inévitable.
+              Je travaille par obsession. Le décor, le geste, la lumière —
+              jusqu&apos;à ce que l&apos;image cesse d&apos;être un choix et devienne la seule possible.
+              Rien n&apos;est documenté ; tout est construit.
             </p>
             <p className="text-white font-light leading-relaxed" style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}>
-              Disponible pour des projets éditoriaux, commerciaux et longs-métrages personnels.
-              Les collaborations sont sélectives. La qualité n&apos;est pas négociable.
+              Éditorial, commercial, projets personnels. Peu de collaborations —
+              mais choisies. Celles qui méritent le temps qu&apos;elles demandent.
             </p>
 
             <Link

@@ -30,14 +30,15 @@ export default function ContactPage() {
               className="text-white title"
               style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
             >
-              Parlons-en.
+              Contact
             </h1>
             <p
               className="text-white font-light mt-8 leading-relaxed max-w-sm"
               style={{ fontSize: "0.875rem", opacity: 0.45, lineHeight: 1.9 }}
             >
-              Disponible pour des projets éditoriaux, commerciaux et cinématographiques.
-              Les collaborations sont sélectives — la qualité n&apos;est pas négociable.
+              Une idée qui demande du silence et du temps ?
+              Écrivez — je lis tout. Je réponds à ce qui m&apos;intrigue.
+              Les meilleurs projets commencent par un mail précis.
             </p>
           </div>
 
