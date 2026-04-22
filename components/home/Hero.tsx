@@ -212,7 +212,7 @@ export default function Hero() {
 
           {/* Bottom nav */}
           <motion.div
-            className="px-6 md:px-10 pb-8 grid grid-cols-3 items-end gap-4"
+            className="px-6 md:px-10 pb-20 md:pb-24 grid grid-cols-3 items-end gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
