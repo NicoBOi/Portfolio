@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 import ProjectPanel from "./ProjectPanel";
@@ -14,9 +14,9 @@ export default function Hero() {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [mouse, setMouse] = useState({ x: 50, y: 50 });
   const [showHint, setShowHint] = useState(false);
-  const rafRef = useRef<number | null>(null);
+  const [cursorPx, setCursorPx] = useState({ x: 0, y: 0 });
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
   const current = FEATURED[index];
@@ -25,23 +25,6 @@ export default function Hero() {
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100);
     return () => clearTimeout(t);
-  }, []);
-
-  // Animate feTurbulence via RAF
-  useEffect(() => {
-    let t = 0;
-    const animate = () => {
-      const el = document.getElementById("hero-turb") as SVGFETurbulenceElement | null;
-      if (el) {
-        t += 0.00018;
-        const f1 = (0.014 + Math.sin(t) * 0.005).toFixed(4);
-        const f2 = (0.009 + Math.cos(t * 1.4) * 0.006).toFixed(4);
-        el.setAttribute("baseFrequency", `${f1} ${f2}`);
-      }
-      rafRef.current = requestAnimationFrame(animate);
-    };
-    rafRef.current = requestAnimationFrame(animate);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, []);
 
   // Auto-cycle
@@ -88,46 +71,23 @@ export default function Hero() {
   const handleNavigate = useCallback((slug: string) => setOpenSlug(slug), []);
   const handleClose = useCallback(() => setOpenSlug(null), []);
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMouse({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+    setCursorPx({ x: e.clientX, y: e.clientY });
+  };
+
   return (
     <>
       <section
         className="relative h-screen bg-black overflow-hidden flex flex-col"
-        onMouseMove={(e) => setCursorPos({ x: e.clientX, y: e.clientY })}
+        onMouseMove={handleMouseMove}
         onMouseEnter={() => setShowHint(true)}
         onMouseLeave={() => setShowHint(false)}
       >
-
-        {/* SVG distortion filter */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none z-[5]"
-          style={{ mixBlendMode: "soft-light", opacity: 0.55 }}
-        >
-          <defs>
-            <filter id="hero-warp" x="-8%" y="-8%" width="116%" height="116%">
-              <feTurbulence
-                id="hero-turb"
-                type="fractalNoise"
-                baseFrequency="0.014 0.009"
-                numOctaves="2"
-                seed="5"
-                result="noise"
-              />
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="noise"
-                scale="28"
-                xChannelSelector="R"
-                yChannelSelector="G"
-              />
-            </filter>
-            <radialGradient id="hero-glow" cx="50%" cy="44%" r="62%">
-              <stop offset="0%" stopColor="white" stopOpacity="0.28" />
-              <stop offset="60%" stopColor="white" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="white" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hero-glow)" filter="url(#hero-warp)" />
-        </svg>
 
         {/* Background */}
         <div
@@ -168,12 +128,23 @@ export default function Hero() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
-        {/* Cursor hint — "Open" */}
+        {/* Spotlight — radial gradient following cursor */}
+        <div
+          className="absolute inset-0 z-[5] pointer-events-none"
+          style={{
+            background: `radial-gradient(circle 38vw at ${mouse.x}% ${mouse.y}%, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)`,
+            opacity: showHint ? 1 : 0,
+            transition: "opacity 0.6s ease",
+            mixBlendMode: "screen",
+          }}
+        />
+
+        {/* Cursor hint */}
         <div
           className="fixed pointer-events-none z-[15] label text-white"
           style={{
-            left: cursorPos.x + 18,
-            top: cursorPos.y + 14,
+            left: cursorPx.x + 18,
+            top: cursorPx.y + 14,
             opacity: showHint && !openSlug ? 0.4 : 0,
             transition: "opacity 0.25s ease",
           }}

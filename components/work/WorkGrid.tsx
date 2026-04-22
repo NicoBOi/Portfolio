@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { projects } from "@/data/projects";
@@ -14,6 +14,7 @@ export default function WorkGrid() {
   const [active, setActive] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isTilting, setIsTilting] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
 
   const visible =
     filter === "all"
@@ -22,6 +23,7 @@ export default function WorkGrid() {
 
   useEffect(() => { setActive(0); }, [filter]);
 
+  // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") setActive((i) => Math.max(0, i - 1));
@@ -31,6 +33,24 @@ export default function WorkGrid() {
     return () => window.removeEventListener("keydown", handler);
   }, [visible.length]);
 
+  // Wheel navigation on the stage (non-passive to prevent page scroll)
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    let locked = false;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      if (locked) return;
+      locked = true;
+      if (e.deltaY > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
+      else setActive((i) => Math.max(0, i - 1));
+      setTimeout(() => { locked = false; }, 600);
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [visible.length]);
+
+  // Touch swipe
   useEffect(() => {
     let sx = 0;
     const onStart = (e: TouchEvent) => { sx = e.touches[0].clientX; };
@@ -78,6 +98,7 @@ export default function WorkGrid() {
         <>
           {/* 3D Carousel Stage */}
           <div
+            ref={stageRef}
             className="relative overflow-hidden"
             style={{
               height: "clamp(260px, 60vh, 640px)",
