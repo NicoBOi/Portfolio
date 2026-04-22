@@ -17,6 +17,13 @@ interface YTPlayer {
   destroy(): void;
 }
 
+interface YTWindow {
+  YT?: {
+    Player: new (id: string, opts: object) => YTPlayer;
+  };
+  onYouTubeIframeAPIReady?: () => void;
+}
+
 function getVimeoId(url: string): string | null {
   return url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null;
 }
@@ -149,7 +156,8 @@ function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Pro
     let player: YTPlayer | null = null;
 
     const createPlayer = () => {
-      player = new (window as any).YT.Player(iframeId, {
+      const yt = (window as unknown as YTWindow).YT!;
+      player = new yt.Player(iframeId, {
         events: {
           onReady: () => setReady(true),
           onStateChange: (e: { data: number }) => setPlaying(e.data === 1),
@@ -158,7 +166,7 @@ function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Pro
       playerRef.current = player;
     };
 
-    if ((window as any).YT?.Player) {
+    if ((window as unknown as YTWindow).YT?.Player) {
       createPlayer();
     } else {
       if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
@@ -166,8 +174,8 @@ function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Pro
         tag.src = "https://www.youtube.com/iframe_api";
         document.head.appendChild(tag);
       }
-      const prevCb = (window as any).onYouTubeIframeAPIReady;
-      (window as any).onYouTubeIframeAPIReady = () => {
+      const prevCb = (window as unknown as YTWindow).onYouTubeIframeAPIReady;
+      (window as unknown as YTWindow).onYouTubeIframeAPIReady = () => {
         if (prevCb) prevCb();
         createPlayer();
       };
