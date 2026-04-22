@@ -22,29 +22,23 @@ export default function CustomCursor() {
     const el = cursorRef.current;
     if (!el) return;
 
-    let rafId: number | null = null;
-    let pendingX = 0;
-    let pendingY = 0;
     let visible = false;
     let moved = false;
 
-    const flush = () => {
-      rafId = null;
-      el.style.transform = `translate3d(${pendingX - 5}px, ${pendingY - 5}px, 0)`;
+    const apply = (x: number, y: number) => {
+      el.style.transform = `translate3d(${x - 5}px, ${y - 5}px, 0)`;
       if (!visible) {
         el.style.opacity = "1";
         visible = true;
       }
     };
 
-    const onMove = (e: PointerEvent | MouseEvent) => {
+    const onMove = (e: MouseEvent) => {
       if (!moved) moved = true;
-      pendingX = e.clientX;
-      pendingY = e.clientY;
-      if (rafId === null) rafId = requestAnimationFrame(flush);
+      apply(e.clientX, e.clientY);
     };
 
-    const onOver = (e: PointerEvent | MouseEvent) => {
+    const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const label = readCursorLabel(target);
       const isInteractive = !!target.closest("a, button") || !!label;
@@ -55,34 +49,21 @@ export default function CustomCursor() {
       );
     };
 
-    const onLeave = () => {
-      el.style.opacity = "0";
-      visible = false;
-    };
-
-    // Fallback: if pointer events aren't firing (some Mac configs), give up on the custom cursor
+    // Fallback: if the cursor never receives a move event in 2s (some macOS configs),
+    // restore the native cursor and hide the custom one
     const fallbackTimer = window.setTimeout(() => {
       if (!moved) document.documentElement.classList.add("cursor-fallback");
     }, 2000);
 
-    // Prefer PointerEvent (broader device + browser coverage), fall back to mouse
-    const hasPointer = typeof window !== "undefined" && "PointerEvent" in window;
-    const moveEvent = hasPointer ? "pointermove" : "mousemove";
-    const overEvent = hasPointer ? "pointerover" : "mouseover";
-    const leaveEvent = hasPointer ? "pointerleave" : "mouseleave";
-
-    window.addEventListener(moveEvent, onMove as EventListener, { passive: true });
-    document.addEventListener(overEvent, onOver as EventListener, { passive: true });
-    window.addEventListener(leaveEvent, onLeave, { passive: true });
-    window.addEventListener("blur", onLeave, { passive: true });
+    // Listen at document with capture so no child can stop propagation before us.
+    // mousemove works on every mouse-driven setup; we keep it as the single source of truth.
+    document.addEventListener("mousemove", onMove, { passive: true, capture: true });
+    document.addEventListener("mouseover", onOver, { passive: true, capture: true });
 
     return () => {
-      if (rafId !== null) cancelAnimationFrame(rafId);
       window.clearTimeout(fallbackTimer);
-      window.removeEventListener(moveEvent, onMove as EventListener);
-      document.removeEventListener(overEvent, onOver as EventListener);
-      window.removeEventListener(leaveEvent, onLeave);
-      window.removeEventListener("blur", onLeave);
+      document.removeEventListener("mousemove", onMove, { capture: true } as EventListenerOptions);
+      document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
     };
   }, []);
 

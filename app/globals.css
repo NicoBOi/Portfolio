@@ -11,7 +11,7 @@
 *,
 *::before,
 *::after {
-  cursor: none !important;
+  cursor: url("data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=") 0 0, none !important;
 }
 
 /* Re-enable native cursor behavior on touch devices (no mouse) and hide the custom one */
