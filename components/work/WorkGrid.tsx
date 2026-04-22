@@ -145,19 +145,6 @@ export default function WorkGrid() {
                 );
               })}
             </ul>
-
-            {/* Active CTA */}
-            <div className="mt-10 md:mt-14 pt-6 border-t border-white/10">
-              <button
-                onClick={() => current && router.push(`/work/${current.slug}`)}
-                className="label text-white inline-flex items-center gap-4 hover:opacity-100 transition-opacity duration-300"
-                style={{ opacity: 0.55 }}
-                data-cursor={current?.type === "video" ? "Lire" : "Voir"}
-              >
-                <span className="block h-px bg-white" style={{ width: 24, opacity: 0.6 }} />
-                {current?.type === "video" ? "Voir le film" : "Voir la série"}
-              </button>
-            </div>
           </div>
         </div>
       )}
