@@ -13,7 +13,7 @@ const CLIENTS = [
   "Made in Paris",
 ];
 
-const INFLUENCES = ["Lars von Trier", "Harmony Korine", "Zdzisław Beksiński"];
+const INFLUENCES = ["Lars von Trier", "Ash Thorp", "Zdzisław Beksiński"];
 
 export default function AboutPage() {
   return (
@@ -62,22 +62,24 @@ export default function AboutPage() {
               className="text-white font-light leading-relaxed"
               style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
             >
-              28 ans. Bordeaux. Photo depuis mes 15 ans, vidéo depuis 5.
-              Autodidacte d&apos;abord ; MJM Graphic Design ensuite — webdesign puis motion.
+              28 ans, basé à Bordeaux.
+              Photo depuis mes 15 ans, vidéo depuis 5.
+              Autodidacte au départ, puis diplômé du MJM Graphic Design
+              en webdesign et motion.
             </p>
             <p
               className="text-white font-light leading-relaxed"
               style={{ fontSize: "0.95rem", opacity: 0.55, lineHeight: 1.9 }}
             >
-              Je ne montre pas. Je déplace.
-              Brutal, minimal, spectaculaire — juste ce qu&apos;il faut pour que ça reste.
+              Je fais des images qui transportent.
+              Brut, minimal, spectaculaire.
             </p>
             <p
               className="text-white font-light leading-relaxed"
               style={{ fontSize: "0.95rem", opacity: 0.45, lineHeight: 1.9 }}
             >
-              Seul ou avec une équipe, selon le projet.
-              L&apos;art, la mode, les marques qui veulent sortir du rang. Pas la santé.
+              Seul ou avec mon équipe, selon les projets.
+              Art, mode, marques qui veulent sortir du rang. Pas la santé.
             </p>
 
             <Link
