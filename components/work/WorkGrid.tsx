@@ -138,12 +138,13 @@ export default function WorkGrid() {
               const isActive = absOffset === 0;
               const scale = isActive ? 1 : absOffset === 1 ? 0.82 : 0.62;
               const opacity = isActive ? 1 : absOffset === 1 ? 0.5 : 0.18;
-              const rotateY = offset * -28;
-              const tx = offset * 38; // tighter — side cards peek in
+              const tx = isActive ? 0 : offset * 38; // vw
+              const rotX = isActive ? tilt.x : 0;
+              const rotY = isActive ? tilt.y : offset * -28;
 
-              const transform = isActive
-                ? `translate(-50%, -50%) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
-                : `translate(-50%, -50%) translateX(${tx}vw) rotateY(${rotateY}deg) scale(${scale})`;
+              // Same transform signature (same functions, same order) on every
+              // state so the browser interpolates values instead of snapping.
+              const transform = `translate(-50%, -50%) translate3d(${tx}vw, 0, 0) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
 
               const transition = isActive && isTilting
                 ? "transform 0.08s linear, opacity 1s cubic-bezier(0.22,0.61,0.36,1)"
