@@ -19,23 +19,44 @@ export default function CustomCursor() {
   });
 
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${e.clientX - 5}px, ${e.clientY - 5}px)`;
-        cursorRef.current.style.opacity = "1";
+    const el = cursorRef.current;
+    if (!el) return;
+
+    let rafId: number | null = null;
+    let pendingX = 0;
+    let pendingY = 0;
+    let visible = false;
+
+    const flush = () => {
+      rafId = null;
+      el.style.transform = `translate3d(${pendingX - 5}px, ${pendingY - 5}px, 0)`;
+      if (!visible) {
+        el.style.opacity = "1";
+        visible = true;
       }
+    };
+
+    const onMove = (e: MouseEvent) => {
+      pendingX = e.clientX;
+      pendingY = e.clientY;
+      if (rafId === null) rafId = requestAnimationFrame(flush);
     };
 
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const label = readCursorLabel(target);
       const isInteractive = !!target.closest("a, button") || !!label;
-      setState({ hovered: isInteractive, label });
+      setState((prev) =>
+        prev.hovered === isInteractive && prev.label === label
+          ? prev
+          : { hovered: isInteractive, label }
+      );
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
-    document.addEventListener("mouseover", onOver);
+    document.addEventListener("mouseover", onOver, { passive: true });
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseover", onOver);
     };
@@ -47,7 +68,7 @@ export default function CustomCursor() {
     <div
       ref={cursorRef}
       className="fixed top-0 left-0 pointer-events-none z-[9999]"
-      style={{ opacity: 0, willChange: "transform" }}
+      style={{ opacity: 0, willChange: "transform", contain: "layout style paint" }}
     >
       {/* Dot */}
       <div
