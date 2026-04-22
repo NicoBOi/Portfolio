@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -14,75 +14,84 @@ export default function WorkGrid() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState(0);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const visible =
     filter === "all"
       ? projects
       : projects.filter((p) => p.type === (filter as ProjectType));
 
-  useEffect(() => { setActive(0); }, [filter]);
+  useEffect(() => {
+    setActive(0);
+    stripRef.current?.scrollTo({ left: 0, behavior: "auto" });
+  }, [filter]);
 
+  // Detect which card is closest to viewport center while scrolling
+  useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+    let raf: number | null = null;
+    const update = () => {
+      raf = null;
+      const rect = strip.getBoundingClientRect();
+      const center = rect.left + rect.width / 2;
+      let bestIdx = 0;
+      let bestDist = Infinity;
+      cardRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const c = r.left + r.width / 2;
+        const d = Math.abs(c - center);
+        if (d < bestDist) { bestDist = d; bestIdx = i; }
+      });
+      setActive(bestIdx);
+    };
+    const onScroll = () => {
+      if (raf === null) raf = requestAnimationFrame(update);
+    };
+    strip.addEventListener("scroll", onScroll, { passive: true });
+    update();
+    return () => {
+      strip.removeEventListener("scroll", onScroll);
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
+  }, [visible.length]);
+
+  const scrollToIndex = useCallback((i: number, behavior: ScrollBehavior = "smooth") => {
+    const card = cardRefs.current[i];
+    const strip = stripRef.current;
+    if (!card || !strip) return;
+    const cardRect = card.getBoundingClientRect();
+    const stripRect = strip.getBoundingClientRect();
+    const target =
+      strip.scrollLeft + (cardRect.left - stripRect.left) - (stripRect.width / 2 - cardRect.width / 2);
+    strip.scrollTo({ left: target, behavior });
+  }, []);
+
+  // Keyboard ←/→
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") setActive((i) => Math.max(0, i - 1));
-      if (e.key === "ArrowRight") setActive((i) => Math.min(visible.length - 1, i + 1));
+      if (e.key === "ArrowLeft") scrollToIndex(Math.max(0, active - 1));
+      if (e.key === "ArrowRight") scrollToIndex(Math.min(visible.length - 1, active + 1));
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [visible.length]);
+  }, [active, visible.length, scrollToIndex]);
 
+  // Vertical wheel → translate to horizontal scroll on the strip when hovering it
   useEffect(() => {
-    let sx = 0;
-    const onStart = (e: TouchEvent) => { sx = e.touches[0].clientX; };
-    const onEnd = (e: TouchEvent) => {
-      const dx = sx - e.changedTouches[0].clientX;
-      if (Math.abs(dx) < 50) return;
-      if (dx > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
-      else setActive((i) => Math.max(0, i - 1));
-    };
-    window.addEventListener("touchstart", onStart, { passive: true });
-    window.addEventListener("touchend", onEnd, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", onStart);
-      window.removeEventListener("touchend", onEnd);
-    };
-  }, [visible.length]);
-
-  // Horizontal scroll (trackpad swipe, shift+wheel) advances the carousel
-  // without fighting the vertical page scroll. Accumulate deltaX so a gentle
-  // trackpad swipe advances exactly one card instead of several.
-  useEffect(() => {
-    let acc = 0;
-    let resetId: number | null = null;
-    const STEP = 90;
-    const COOLDOWN_AFTER_ADVANCE = 550;
-    let lockedUntil = 0;
-
+    const strip = stripRef.current;
+    if (!strip) return;
     const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      // If the user is intentionally scrolling vertically a lot, let the page scroll
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) * 2 && Math.abs(e.deltaX) < 5) return;
       e.preventDefault();
-
-      const now = performance.now();
-      if (now < lockedUntil) return;
-
-      acc += e.deltaX;
-
-      if (resetId !== null) window.clearTimeout(resetId);
-      resetId = window.setTimeout(() => { acc = 0; resetId = null; }, 180);
-
-      if (Math.abs(acc) >= STEP) {
-        if (acc > 0) setActive((i) => Math.min(visible.length - 1, i + 1));
-        else setActive((i) => Math.max(0, i - 1));
-        acc = 0;
-        lockedUntil = now + COOLDOWN_AFTER_ADVANCE;
-      }
+      strip.scrollLeft += e.deltaX || e.deltaY;
     };
-    window.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      if (resetId !== null) window.clearTimeout(resetId);
-    };
-  }, [visible.length]);
+    strip.addEventListener("wheel", onWheel, { passive: false });
+    return () => strip.removeEventListener("wheel", onWheel);
+  }, []);
 
   const current = visible[active];
 
@@ -100,100 +109,87 @@ export default function WorkGrid() {
         <p className="label text-white opacity-20 py-32 text-center">Aucun projet</p>
       ) : (
         <>
-          {/* Horizontal glide carousel */}
+          {/* Filmstrip */}
           <div
-            className="relative overflow-hidden"
-            style={{ height: "clamp(260px, 60vh, 640px)" }}
+            ref={stripRef}
+            className="no-scrollbar flex items-center overflow-x-auto overflow-y-hidden"
+            style={{
+              height: "clamp(260px, 56vh, 600px)",
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
+              scrollBehavior: "smooth",
+            }}
           >
+            {/* Leading spacer to allow first card to snap to center */}
+            <div className="shrink-0" style={{ width: "calc(50vw - 14vw)" }} />
+
             {visible.map((project, i) => {
-              const offset = i - active;
-              const absOffset = Math.abs(offset);
-              if (absOffset > 2) return null;
-
-              const isActive = absOffset === 0;
-              const scale = isActive ? 1 : 0.85;
-              const opacity = isActive ? 1 : absOffset === 1 ? 0.45 : 0.15;
-              const tx = offset * 60; // vw — side cards sit fully off-frame
-
+              const isActive = i === active;
               return (
-                <motion.div
+                <div
                   key={project.slug}
-                  className="absolute top-1/2 left-1/2"
-                  initial={false}
-                  animate={{
-                    x: `calc(-50% + ${tx}vw)`,
-                    y: "-50%",
-                    scale,
-                    opacity,
+                  ref={(el) => { cardRefs.current[i] = el; }}
+                  className="shrink-0 px-3 md:px-4"
+                  style={{ scrollSnapAlign: "center" }}
+                  onClick={() => {
+                    if (isActive) router.push(`/work/${project.slug}`);
+                    else scrollToIndex(i);
                   }}
-                  transition={{ type: "spring", stiffness: 140, damping: 26, mass: 0.9 }}
-                  style={{
-                    width: "clamp(280px, 56vw, 880px)",
-                    zIndex: 20 - absOffset,
-                    cursor: "pointer",
-                    willChange: "transform, opacity",
-                  }}
-                  onClick={() => isActive ? router.push(`/work/${project.slug}`) : setActive(i)}
                   data-cursor={
                     isActive
                       ? (project.type === "video" ? "Lire" : "Voir")
-                      : offset < 0
-                        ? "← Précédent"
-                        : "Suivant →"
+                      : project.title
                   }
                 >
-                  <div
+                  <motion.div
                     className="relative aspect-video overflow-hidden"
                     style={{
+                      width: "clamp(240px, 28vw, 460px)",
                       backgroundColor: project.coverPlaceholder,
-                      boxShadow: isActive
-                        ? "0 40px 120px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)"
-                        : "0 20px 60px rgba(0,0,0,0.5)",
+                      cursor: "pointer",
                     }}
+                    animate={{
+                      opacity: isActive ? 1 : 0.45,
+                      scale: isActive ? 1 : 0.92,
+                    }}
+                    transition={{ type: "spring", stiffness: 200, damping: 30, mass: 0.7 }}
                   >
                     {project.imageFiles && project.imageFiles.length > 0 ? (
                       <img
                         src={`/projects/${project.slug}/${project.imageFiles[0]}`}
                         alt={project.title}
                         className="w-full h-full object-cover"
-                        loading={absOffset <= 1 ? "eager" : "lazy"}
+                        loading="lazy"
                         decoding="async"
                         fetchPriority={isActive ? "high" : "low"}
-                        style={{
-                          filter: !isActive ? "brightness(0.35)" : "none",
-                          transition: "filter 0.75s ease",
-                        }}
                       />
                     ) : project.youtubeId ? (
                       <img
                         src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
                         alt={project.title}
                         className="w-full h-full object-cover"
-                        style={{
-                          filter: !isActive ? "brightness(0.35)" : "none",
-                          transition: "filter 0.75s ease",
-                        }}
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
-                      <div
-                        className="placeholder-img text-white h-full"
-                        style={{ opacity: isActive ? 0.1 : 0.04 }}
-                      >
-                        {project.type === "video" ? "Video" : "Image"}
+                      <div className="placeholder-img text-white h-full">
+                        {project.type === "video" ? "Vidéo" : "Image"}
                       </div>
                     )}
 
-                    {isActive && project.type === "video" && (
-                      <span className="absolute top-4 right-4 label text-white z-10" style={{ opacity: 0.4 }}>▶</span>
+                    {project.type === "video" && (
+                      <span className="absolute top-3 right-3 label text-white z-10" style={{ opacity: 0.4 }}>▶</span>
                     )}
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               );
             })}
 
+            {/* Trailing spacer */}
+            <div className="shrink-0" style={{ width: "calc(50vw - 14vw)" }} />
           </div>
 
-          {/* Active card info */}
+          {/* Active info */}
           <AnimatePresence mode="wait">
             {current && (
               <motion.div
@@ -202,7 +198,7 @@ export default function WorkGrid() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4, ease: SOFT }}
+                transition={{ duration: 0.35, ease: SOFT }}
               >
                 <p className="label text-white mb-4" style={{ opacity: 0.22 }}>
                   {String(active + 1).padStart(2, "0")} / {String(visible.length).padStart(2, "0")}
@@ -234,7 +230,7 @@ export default function WorkGrid() {
             {visible.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setActive(i)}
+                onClick={() => scrollToIndex(i)}
                 className="rounded-full bg-white transition-all duration-500"
                 style={{ width: i === active ? 20 : 5, height: 2, opacity: i === active ? 0.55 : 0.18 }}
                 aria-label={`Projet ${i + 1}`}
