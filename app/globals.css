@@ -14,6 +14,18 @@
   cursor: none !important;
 }
 
+/* Re-enable native cursor behavior on touch devices (no mouse) and hide the custom one */
+@media (hover: none), (pointer: coarse) {
+  *,
+  *::before,
+  *::after {
+    cursor: auto !important;
+  }
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
