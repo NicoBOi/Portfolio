@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 import ProjectPanel from "./ProjectPanel";
@@ -10,28 +10,10 @@ const FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCROLL_LOCK_MS = 850;
 
-// ── Water simulation constants ──────────────────────────────────
-const W = 320;
-const H = 180;
-const DAMP = 0.993;
-// Light direction (upper-left) — normalised once
-const _lx = -0.25, _ly = -0.6, _lz = 2.8;
-const _ll = Math.sqrt(_lx * _lx + _ly * _ly + _lz * _lz);
-const LXN = _lx / _ll, LYN = _ly / _ll, LZN = _lz / _ll;
-const NZ = 5.5; // higher = flatter surface, less refraction
-
 export default function Hero() {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
-
-  // Stable refs for the water sim (survive re-renders, keep wave state on panel close)
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const waterRef = useRef({
-    buf1: new Float32Array(W * H),
-    buf2: new Float32Array(W * H),
-  });
-  const rafRef = useRef(0);
 
   const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
   const current = FEATURED[index];
@@ -81,98 +63,6 @@ export default function Hero() {
     return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
   }, [openSlug]);
 
-  // ── Water height-field simulation ────────────────────────────
-  useEffect(() => {
-    if (openSlug) return; // pause sim while panel is open
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = W;
-    canvas.height = H;
-
-    const water = waterRef.current;
-    const imgData = ctx.createImageData(W, H);
-    const px = imgData.data;
-
-    const disturb = (screenX: number, screenY: number) => {
-      const sx = Math.floor((screenX / window.innerWidth) * W);
-      const sy = Math.floor((screenY / window.innerHeight) * H);
-      const r = 5, r2 = r * r;
-      for (let dy = -r; dy <= r; dy++) {
-        for (let dx = -r; dx <= r; dx++) {
-          const d2 = dx * dx + dy * dy;
-          if (d2 > r2) continue;
-          const px2 = sx + dx, py = sy + dy;
-          if (px2 < 1 || px2 >= W - 1 || py < 1 || py >= H - 1) continue;
-          water.buf1[py * W + px2] += -90 * (1 - d2 / r2);
-        }
-      }
-    };
-
-    let prevX = 0, prevY = 0, prevT = 0;
-    const onMove = (e: MouseEvent) => {
-      const now = performance.now();
-      const dx = e.clientX - prevX, dy = e.clientY - prevY;
-      if (dx * dx + dy * dy > 1400 && now - prevT > 55) {
-        disturb(e.clientX, e.clientY);
-        prevX = e.clientX; prevY = e.clientY; prevT = now;
-      }
-    };
-
-    const tick = () => {
-      const { buf1, buf2 } = water;
-
-      // Wave propagation
-      for (let y = 1; y < H - 1; y++) {
-        for (let x = 1; x < W - 1; x++) {
-          const i = y * W + x;
-          buf2[i] = (buf1[i - 1] + buf1[i + 1] + buf1[i - W] + buf1[i + W]) * 0.5 - buf2[i];
-          buf2[i] *= DAMP;
-          const edge = Math.min(x, W - 1 - x, y, H - 1 - y);
-          if (edge < 18) buf2[i] *= (edge / 18) * (edge / 18);
-        }
-      }
-      water.buf1 = buf2;
-      water.buf2 = buf1;
-
-      // Specular caustic rendering
-      const b = water.buf1;
-      for (let y = 1; y < H - 1; y++) {
-        for (let x = 1; x < W - 1; x++) {
-          const i = y * W + x;
-          // Surface normal from finite differences
-          const nx = b[i + 1] - b[i - 1];
-          const ny = b[i + W] - b[i - W];
-          const len = Math.sqrt(nx * nx + ny * ny + NZ * NZ);
-          // Phong specular: N·L
-          const ndotl = (nx * LXN + ny * LYN + NZ * LZN) / len;
-          const spec = Math.max(0, ndotl);
-          // Power 6 = subtle, tight highlights
-          const bright = spec * spec * spec * spec * spec * spec * 255 * 1.4;
-          const v = bright > 255 ? 255 : bright | 0;
-          const base = i * 4;
-          px[base] = v;
-          px[base + 1] = v;
-          px[base + 2] = v;
-          px[base + 3] = v;
-        }
-      }
-      ctx.putImageData(imgData, 0, 0);
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    window.addEventListener("mousemove", onMove, { passive: true });
-    rafRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, [openSlug]);
-
   const goPrev = () => setIndex((i) => (i - 1 + FEATURED.length) % FEATURED.length);
   const goNext = () => setIndex((i) => (i + 1) % FEATURED.length);
   const handleNavigate = useCallback((slug: string) => setOpenSlug(slug), []);
@@ -182,6 +72,44 @@ export default function Hero() {
     <>
       <section className="relative h-screen bg-black overflow-hidden flex flex-col">
 
+        {/* SVG distortion filter — GPU-accelerated, full-screen */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none z-[5]"
+          style={{ mixBlendMode: "soft-light", opacity: 0.55 }}
+        >
+          <defs>
+            <filter id="hero-warp" x="-8%" y="-8%" width="116%" height="116%">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.014 0.009"
+                numOctaves="2"
+                seed="5"
+                result="noise"
+              >
+                <animate
+                  attributeName="baseFrequency"
+                  values="0.014 0.009;0.009 0.015;0.014 0.009"
+                  dur="16s"
+                  repeatCount="indefinite"
+                />
+              </feTurbulence>
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="noise"
+                scale="28"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+            <radialGradient id="hero-glow" cx="50%" cy="44%" r="62%">
+              <stop offset="0%" stopColor="white" stopOpacity="0.28" />
+              <stop offset="60%" stopColor="white" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-glow)" filter="url(#hero-warp)" />
+        </svg>
+
         {/* Background — click anywhere to open */}
         <div
           className="absolute inset-0 z-0"
@@ -190,7 +118,7 @@ export default function Hero() {
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
-              className="absolute inset-0"
+              className="absolute inset-0 overflow-hidden"
               style={{ backgroundColor: current.coverPlaceholder }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -198,31 +126,29 @@ export default function Hero() {
               transition={{ duration: 1.4, ease: SOFT }}
             >
               {current.youtubeId ? (
-                <img
-                  src={`https://img.youtube.com/vi/${current.youtubeId}/maxresdefault.jpg`}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
+                <iframe
+                  src={`https://www.youtube.com/embed/${current.youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&playlist=${current.youtubeId}`}
+                  className="absolute border-0 pointer-events-none"
+                  style={{
+                    top: "50%",
+                    left: "50%",
+                    width: "100vw",
+                    height: "56.25vw",
+                    minHeight: "100%",
+                    minWidth: "177.78vh",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                  allow="autoplay; encrypted-media"
                 />
               ) : (
                 <div className="placeholder-img text-white h-full">Image</div>
               )}
             </motion.div>
           </AnimatePresence>
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
 
-        {/* Water caustic canvas */}
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 pointer-events-none z-[5]"
-          style={{
-            width: "100%",
-            height: "100%",
-            mixBlendMode: "screen",
-            opacity: 0.28,
-            filter: "blur(4px)",
-          }}
-        />
+          {/* Dark overlay — just enough to read text */}
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
 
         {/* Foreground */}
         <motion.div
