@@ -36,12 +36,12 @@ export default function WorkGrid() {
       {visible.length === 0 ? (
         <p className="label text-white opacity-20 py-32 text-center">Aucun projet</p>
       ) : (
-        <div
-          className="flex flex-col md:flex-row border-b border-white/10"
-          style={{ minHeight: "clamp(540px, 78vh, 900px)" }}
-        >
-          {/* Left — image */}
-          <div className="md:w-3/5 relative bg-black overflow-hidden order-1 md:order-1">
+        <div className="flex flex-col md:flex-row border-b border-white/10 md:min-h-[78vh]">
+          {/* Left — image (sticky on mobile so it stays visible while the index scrolls) */}
+          <div
+            className="md:w-3/5 relative bg-black overflow-hidden order-1 md:order-1 aspect-[4/3] md:aspect-auto md:h-auto sticky top-14 md:static z-10"
+            style={{ minHeight: 0 }}
+          >
             <AnimatePresence mode="wait">
               {current && (
                 <motion.div
