@@ -11,7 +11,7 @@ const CHROME_UA =
   "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
 const SERIF_CSS =
-  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300&display=swap";
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap";
 const MONO_CSS =
   "https://fonts.googleapis.com/css2?family=Fragment+Mono&display=swap";
 

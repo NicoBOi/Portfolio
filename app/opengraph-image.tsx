@@ -81,7 +81,7 @@ export default async function OGImage() {
     {
       ...size,
       fonts: [
-        { name: "Cormorant Garamond", data: serif, style: "normal", weight: 300 },
+        { name: "Cormorant Garamond", data: serif, style: "normal", weight: 500 },
         { name: "Fragment Mono", data: mono, style: "normal", weight: 400 },
       ],
     }
