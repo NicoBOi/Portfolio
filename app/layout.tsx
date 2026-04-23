@@ -88,7 +88,10 @@ const personJsonLd = {
     addressCountry: "FR",
   },
   email: "mailto:nicosmp.pro@gmail.com",
-  sameAs: ["https://instagram.com/nicolas_Sempere"],
+  sameAs: [
+    "https://instagram.com/nicolas_Sempere",
+    "https://www.linkedin.com/in/nicolas-sempere-979284165/",
+  ],
 };
 
 export default function RootLayout({
