@@ -70,27 +70,75 @@ export default function Navigation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-black/95 flex flex-col items-center justify-center gap-10 md:hidden"
+            className="fixed inset-0 z-40 bg-black md:hidden flex flex-col"
           >
-            {[
-              { href: "/about", label: "À propos" },
-              { href: "/contact", label: "Contact" },
-            ].map(({ href, label }, i) => (
-              <motion.div
-                key={href}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: i * 0.07, ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
-              >
-                <Link
-                  href={href}
-                  className="text-white font-light tracking-widest uppercase text-2xl hover:opacity-100 transition-opacity"
+            {/* Top band — identity */}
+            <motion.div
+              className="px-6 pt-24 pb-8"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="label text-white" style={{ opacity: 0.4, letterSpacing: "0.3em" }}>
+                Photo — Film — 3D
+              </p>
+              <p className="label text-white mt-3" style={{ opacity: 0.35, letterSpacing: "0.24em" }}>
+                Bordeaux — Paris
+              </p>
+            </motion.div>
+
+            {/* Main links */}
+            <nav className="flex-1 flex flex-col justify-center px-6 gap-8">
+              {[
+                { href: "/", label: "Projets" },
+                { href: "/about", label: "À propos" },
+                { href: "/contact", label: "Contact" },
+              ].map(({ href, label }, i) => (
+                <motion.div
+                  key={href}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.1 + i * 0.07, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
                 >
-                  {label}
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    href={href}
+                    className="text-white title inline-flex items-baseline gap-3 hover:opacity-100 transition-opacity"
+                    style={{ fontSize: "clamp(2.2rem, 9vw, 3.5rem)", lineHeight: 1 }}
+                  >
+                    {label}
+                    <span aria-hidden="true" className="label opacity-30" style={{ fontSize: "10px" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+
+            {/* Bottom band — contact */}
+            <motion.div
+              className="px-6 pb-10 flex flex-col gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35, duration: 0.5 }}
+            >
+              <a
+                href="mailto:nicosmp.pro@gmail.com"
+                className="label text-white hover:opacity-100 transition-opacity"
+                style={{ opacity: 0.55 }}
+              >
+                nicosmp.pro@gmail.com
+              </a>
+              <a
+                href="https://instagram.com/nicolas_Sempere"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="label text-white hover:opacity-100 transition-opacity"
+                style={{ opacity: 0.55 }}
+              >
+                @nicolas_Sempere
+              </a>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
