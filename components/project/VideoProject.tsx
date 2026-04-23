@@ -61,7 +61,14 @@ export default function VideoProject({ project, prev, next }: Props) {
       {youtubeId ? (
         <YouTubePlayer youtubeId={youtubeId} project={project} />
       ) : vimeoId ? (
-        <div className="w-full mt-8" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
+        <div
+          className="w-full mt-6"
+          style={{
+            aspectRatio: project.videoAspect ?? "16/9",
+            maxHeight: "82vh",
+            backgroundColor: project.coverPlaceholder,
+          }}
+        >
           <iframe
             src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
             className="w-full h-full"
@@ -71,7 +78,14 @@ export default function VideoProject({ project, prev, next }: Props) {
           />
         </div>
       ) : (
-        <div className="relative w-full mt-8" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
+        <div
+          className="relative w-full mt-6"
+          style={{
+            aspectRatio: project.videoAspect ?? "16/9",
+            maxHeight: "82vh",
+            backgroundColor: project.coverPlaceholder,
+          }}
+        >
           <motion.div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="flex flex-col items-center gap-5">
@@ -110,24 +124,32 @@ export default function VideoProject({ project, prev, next }: Props) {
         </div>
       </div>
 
-      {/* Stills */}
-      <div className="px-6 md:px-10 py-10">
-        <div className="grid grid-cols-2 gap-4 md:gap-6">
-          {[0, 1, 2, 3].map((i) => (
-            <motion.div
-              key={i}
-              className="aspect-video"
-              style={{ backgroundColor: project.coverPlaceholder + (i % 2 === 0 ? "88" : "55") }}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-6%" }}
-              transition={{ duration: 0.6, delay: (i % 2) * 0.08, ease: SOFT }}
-            >
-              <div className="placeholder-img text-white h-full">Still {i + 1}</div>
-            </motion.div>
-          ))}
+      {/* Real stills only — no placeholder cards for video-only projects */}
+      {project.imageFiles && project.imageFiles.length > 0 && (
+        <div className="px-6 md:px-10 py-10">
+          <div className="grid grid-cols-2 gap-4 md:gap-6">
+            {project.imageFiles.slice(0, 4).map((f, i) => (
+              <motion.figure
+                key={f}
+                className="aspect-video overflow-hidden"
+                style={{ backgroundColor: project.coverPlaceholder }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: "-6%" }}
+                transition={{ duration: 0.6, delay: (i % 2) * 0.08, ease: SOFT }}
+              >
+                <img
+                  src={`/projects/${project.slug}/${f}`}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </motion.figure>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <ProjectNav prev={prev} next={next} />
     </article>

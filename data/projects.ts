@@ -19,6 +19,8 @@ export interface Project {
   images?: number;
   imageFiles?: string[];
   videoUrl?: string;
+  /** Native aspect ratio of the source video as a CSS aspect-ratio string, e.g. "2.35/1" for cinemascope. Defaults to "16/9". */
+  videoAspect?: string;
   youtubeId?: string;
   featured?: boolean;
   aspectRatio?: "landscape" | "portrait" | "square";
@@ -39,6 +41,7 @@ export const projects: Project[] = [
       credits: "Réalisation & post-prod",
     },
     videoUrl: "https://vimeo.com/722586890",
+    videoAspect: "2.35/1",
     aspectRatio: "landscape",
     featured: true,
   },
