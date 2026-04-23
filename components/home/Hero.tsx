@@ -256,6 +256,29 @@ export default function Hero() {
             />
           ))}
         </div>
+
+        {/* Scroll affordance — left middle */}
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4 pointer-events-none">
+          <span
+            className="label text-white"
+            style={{
+              opacity: 0.4,
+              writingMode: "vertical-rl",
+              transform: "rotate(180deg)",
+              letterSpacing: "0.32em",
+            }}
+          >
+            Scroll
+          </span>
+          <div className="relative h-12 w-px bg-white/15 overflow-hidden">
+            <motion.div
+              className="absolute left-0 w-full bg-white"
+              style={{ opacity: 0.7, height: 6 }}
+              animate={{ y: [-8, 48] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+            />
+          </div>
+        </div>
     </section>
   );
 }
