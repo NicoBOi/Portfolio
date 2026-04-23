@@ -22,3 +22,7 @@ Thumbs.db
 .idea/
 *.swp
 tsconfig.tsbuildinfo
+
+# Agent skills (installed via `npx skills add`, regenerable)
+.agents/
+.claude/
