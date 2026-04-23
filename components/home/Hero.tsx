@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 
-const FEATURED = projects;
+const FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCROLL_LOCK_MS = 850;
 const TITLE = "Nicolas Sempere";

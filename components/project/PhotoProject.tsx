@@ -15,6 +15,18 @@ interface Props {
   next: Project | null;
 }
 
+function PlateNumber({ current, total }: { current: number; total: number }) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <span
+      className="absolute top-3 left-3 md:top-4 md:left-4 label text-white pointer-events-none tabular-nums z-10"
+      style={{ opacity: 0.6, mixBlendMode: "difference" }}
+    >
+      {pad(current)} / {pad(total)}
+    </span>
+  );
+}
+
 // Editorial rhythm — each image gets a position + width
 // Keeps a breathable, varied pagination instead of full-bleed slabs
 const LAYOUTS = [
@@ -53,7 +65,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
       {/* Cover — framed, not full-bleed */}
       <div className="px-6 md:px-10 lg:px-16 mt-10 md:mt-16">
         <motion.div
-          className="w-full max-w-6xl mx-auto overflow-hidden"
+          className="relative w-full max-w-6xl mx-auto overflow-hidden"
           style={{
             aspectRatio: isPortrait ? "4/5" : "16/10",
             backgroundColor: bg,
@@ -83,6 +95,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
           ) : (
             <div className="placeholder-img text-white h-full">[01]</div>
           )}
+          <PlateNumber current={1} total={files.length} />
         </motion.div>
       </div>
 
@@ -110,7 +123,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
             return (
               <motion.figure
                 key={f}
-                className={className}
+                className={`relative ${className}`}
                 style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -133,6 +146,7 @@ export default function PhotoProject({ project, prev, next }: Props) {
                     decoding="async"
                   />
                 </button>
+                <PlateNumber current={i + 2} total={files.length} />
               </motion.figure>
             );
           })}

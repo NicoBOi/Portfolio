@@ -60,7 +60,6 @@ export const projects: Project[] = [
     },
     youtubeId: "ypJkTv3gFX8",
     aspectRatio: "landscape",
-    featured: true,
   },
   {
     slug: "affinessence",
@@ -78,7 +77,6 @@ export const projects: Project[] = [
     videoUrl: "https://vimeo.com/1033824012",
     videoAspect: "4/5",
     aspectRatio: "portrait",
-    featured: true,
   },
   {
     slug: "face-flower",
@@ -104,7 +102,6 @@ export const projects: Project[] = [
       "DSCF7545_AVIF.avif",
     ],
     aspectRatio: "portrait",
-    featured: true,
   },
   {
     slug: "floating-night",
@@ -178,7 +175,6 @@ export const projects: Project[] = [
       "DSCF1448_AVIF.avif",
     ],
     aspectRatio: "landscape",
-    featured: true,
   },
   {
     slug: "shibari",
@@ -248,6 +244,7 @@ export const projects: Project[] = [
       "P1001732_AVIF.avif",
     ],
     aspectRatio: "landscape",
+    featured: true,
   },
   {
     slug: "liminal-nymph",
@@ -288,6 +285,7 @@ export const projects: Project[] = [
       "P1002247_AVIF.avif",
     ],
     aspectRatio: "landscape",
+    featured: true,
   },
   {
     slug: "nostalgic-grass",
@@ -308,5 +306,6 @@ export const projects: Project[] = [
       "P1002226_AVIF.avif",
     ],
     aspectRatio: "landscape",
+    featured: true,
   },
 ];
