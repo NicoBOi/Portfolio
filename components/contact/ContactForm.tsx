@@ -8,11 +8,38 @@ const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export default function ContactForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
+    setError(null);
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSent(true); }, 800);
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      name: data.get("name"),
+      email: data.get("email"),
+      type: data.get("type"),
+      message: data.get("message"),
+      website: data.get("website"), // honeypot
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Envoi impossible");
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Envoi impossible");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +68,16 @@ export default function ContactForm() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
+          noValidate
         >
+          {/* Honeypot — hidden from humans, filled by bots */}
+          <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+            <label>
+              Ne pas remplir
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+            </label>
+          </div>
+
           {[
             { name: "name", label: "Nom", type: "text", placeholder: "Ton nom" },
             { name: "email", label: "Email", type: "email", placeholder: "ton@email.com" },
@@ -83,6 +119,12 @@ export default function ContactForm() {
               style={{ letterSpacing: "0.02em" }}
             />
           </div>
+
+          {error && (
+            <p className="label text-white" style={{ opacity: 0.7, color: "#ff8080" }}>
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
