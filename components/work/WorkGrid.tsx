@@ -181,7 +181,7 @@ export default function WorkGrid() {
                         className="label text-white hidden md:inline shrink-0"
                         style={{ opacity: isActive ? 0.45 : 0.25 }}
                       >
-                        {p.category}
+                        {p.type === "photo" ? "Photo" : p.type === "video" ? "Vidéo" : "3D"}
                       </span>
                       <span
                         className="label text-white shrink-0"
