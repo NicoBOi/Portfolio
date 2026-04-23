@@ -206,8 +206,9 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
 
   // autoplay=1 + mute=1 suppresses the initial YT play-button overlay.
   // loop=1 + playlist={id} loops a single video and avoids the "recommended
-  // videos" end-screen. modestbranding + rel=0 trims the rest of the chrome.
-  const src = `https://www.youtube.com/embed/${youtubeId}?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&vq=hd1080&playsinline=1`;
+  // videos" end-screen. youtube-nocookie keeps the privacy-enhanced embed
+  // (a bit less branding); modestbranding + rel=0 trim the rest.
+  const src = `https://www.youtube-nocookie.com/embed/${youtubeId}?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&vq=hd1080&playsinline=1`;
 
   return (
     <div
@@ -220,9 +221,22 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
         id={iframeId}
         src={src}
         className="w-full h-full block"
-        style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
+        style={{
+          border: 0,
+          backgroundColor: "#000",
+          verticalAlign: "bottom",
+          transform: "scale(1.02)",
+          transformOrigin: "center",
+        }}
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
+      />
+      {/* Click-to-toggle overlay. Suppresses YT/Vimeo hover chrome and labels the cursor. */}
+      <div
+        className="absolute inset-0 z-[5]"
+        onClick={togglePlay}
+        data-cursor={playing ? "Pause" : "Play"}
+        aria-hidden="true"
       />
       <VideoControls
         playing={playing}
@@ -327,9 +341,22 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
         ref={iframeRef}
         src={src}
         className="w-full h-full block"
-        style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
+        style={{
+          border: 0,
+          backgroundColor: "#000",
+          verticalAlign: "bottom",
+          transform: "scale(1.02)",
+          transformOrigin: "center",
+        }}
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
+      />
+      {/* Click-to-toggle overlay. Also blocks Vimeo hover chrome and labels the cursor. */}
+      <div
+        className="absolute inset-0 z-[5]"
+        onClick={togglePlay}
+        data-cursor={playing ? "Pause" : "Play"}
+        aria-hidden="true"
       />
       <VideoControls
         playing={playing}
