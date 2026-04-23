@@ -157,16 +157,7 @@ export default function Hero() {
               ) : getVimeoId(current.videoUrl) ? (
                 <iframe
                   src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
-                  className="absolute border-0 pointer-events-none"
-                  style={{
-                    top: "50%",
-                    left: "50%",
-                    width: "100vw",
-                    height: "56.25vw",
-                    minHeight: "100%",
-                    minWidth: "177.78vh",
-                    transform: "translate(-50%, -50%)",
-                  }}
+                  className="video-hero-frame"
                   allow="autoplay"
                 />
               ) : current.imageFiles && current.imageFiles.length > 0 ? (

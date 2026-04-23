@@ -117,6 +117,27 @@ body::after {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ── Cinemascope (2.35:1) video hero ──────────────────────
+   Mobile: letterboxed (full video visible, no crop).
+   Desktop: cover — iframe is scaled to cinemascope aspect so the
+   video inside fills the viewport; sides get cropped by overflow. */
+.video-hero-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 0;
+  pointer-events: none;
+  width: 100vw;
+  height: calc(100vw / 2.35);
+}
+@media (min-width: 768px) {
+  .video-hero-frame {
+    width: max(100vw, calc(100vh * 2.35));
+    height: max(calc(100vw / 2.35), 100vh);
+  }
+}
+
 /* ── Cursor REC pulse ────────────────────────────────────── */
 @keyframes rec-blink {
   from { opacity: 1; }
