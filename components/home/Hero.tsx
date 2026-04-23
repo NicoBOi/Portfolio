@@ -82,6 +82,7 @@ export default function Hero() {
 
   // Touch swipe — horizontal (carousel feel on mobile). Vertical gestures are left
   // alone so the browser's native handling stays intact and swipes up/down are ignored.
+  const swipingRef = useRef(false);
   useEffect(() => {
     if (featuredLen <= 1) return;
     let sx = 0;
@@ -89,18 +90,29 @@ export default function Hero() {
     const ts = (e: TouchEvent) => {
       sx = e.touches[0].clientX;
       sy = e.touches[0].clientY;
+      swipingRef.current = false;
+    };
+    const tm = (e: TouchEvent) => {
+      const dx = Math.abs(e.touches[0].clientX - sx);
+      const dy = Math.abs(e.touches[0].clientY - sy);
+      if (dx > 10 && dx > dy) swipingRef.current = true;
     };
     const te = (e: TouchEvent) => {
       const dx = sx - e.changedTouches[0].clientX;
       const dy = sy - e.changedTouches[0].clientY;
       // Require a horizontally-dominant swipe of at least 50px.
-      if (Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy)) return;
-      setIndex((i) => (dx > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
+      if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
+        setIndex((i) => (dx > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
+      }
+      // Keep the swiping flag alive briefly so the follow-up synthetic click is ignored.
+      window.setTimeout(() => { swipingRef.current = false; }, 120);
     };
     window.addEventListener("touchstart", ts, { passive: true });
+    window.addEventListener("touchmove", tm, { passive: true });
     window.addEventListener("touchend", te, { passive: true });
     return () => {
       window.removeEventListener("touchstart", ts);
+      window.removeEventListener("touchmove", tm);
       window.removeEventListener("touchend", te);
     };
   }, [featuredLen]);
@@ -155,7 +167,10 @@ export default function Hero() {
       {/* Background */}
       <div
         className="absolute inset-0 z-0"
-        onClick={() => router.push(`/work/${current.slug}`)}
+        onClick={() => {
+          if (swipingRef.current) return;
+          router.push(`/work/${current.slug}`);
+        }}
         data-cursor={current.type === "video" ? "Lire" : "Voir"}
         data-cursor-silent
       >
