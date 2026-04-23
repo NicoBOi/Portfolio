@@ -104,7 +104,7 @@ export default async function ProjectOG({
     {
       ...size,
       fonts: [
-        { name: "Space Grotesk", data: serif, style: "normal", weight: 400 },
+        { name: "Space Grotesk", data: serif, style: "normal", weight: 500 },
         { name: "Geist Mono", data: mono, style: "normal", weight: 400 },
       ],
     }
