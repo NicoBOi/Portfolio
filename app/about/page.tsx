@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import BackPill from "@/components/ui/BackPill";
 
 export const metadata: Metadata = {
   title: "À propos",
@@ -39,10 +38,20 @@ const INFLUENCES = ["Lars von Trier", "Ash Thorp", "Zdzisław Beksiński"];
 export default function AboutPage() {
   return (
     <div className="bg-black min-h-screen px-6 md:px-10">
-      <BackPill href="/" label="Accueil" />
+      {/* Back */}
+      <div className="pt-20 pb-0">
+        <Link
+          href="/"
+          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
+          style={{ opacity: 0.3 }}
+        >
+          <span aria-hidden="true">←</span>
+          Accueil
+        </Link>
+      </div>
 
       {/* Header */}
-      <div className="pt-32 pb-12 border-b border-white/10">
+      <div className="pt-14 pb-12 border-b border-white/10">
         <h1
           className="text-white title"
           style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}

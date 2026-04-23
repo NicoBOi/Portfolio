@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
-import BackPill from "@/components/ui/BackPill";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -45,13 +45,23 @@ export default function VideoProject({ project, prev, next }: Props) {
 
   return (
     <article className="bg-black min-h-screen">
-      <BackPill href="/work" label="Projets" />
+      {/* Back */}
+      <div className="px-6 md:px-10 pt-20 pb-0">
+        <Link
+          href="/work"
+          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
+          style={{ opacity: 0.3 }}
+        >
+          <span aria-hidden="true">←</span>
+          Projets
+        </Link>
+      </div>
 
       {/* Player */}
       {youtubeId ? (
         <YouTubePlayer youtubeId={youtubeId} project={project} />
       ) : vimeoId ? (
-        <div className="w-full mt-24" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
+        <div className="w-full mt-8" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
           <iframe
             src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
             className="w-full h-full"
@@ -61,7 +71,7 @@ export default function VideoProject({ project, prev, next }: Props) {
           />
         </div>
       ) : (
-        <div className="relative w-full mt-24" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
+        <div className="relative w-full mt-8" style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}>
           <motion.div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="flex flex-col items-center gap-5">
@@ -193,7 +203,7 @@ function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Pro
 
   return (
     <div
-      className="relative w-full mt-24"
+      className="relative w-full mt-8"
       style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
