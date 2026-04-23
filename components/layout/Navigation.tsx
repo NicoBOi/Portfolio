@@ -25,8 +25,12 @@ export default function Navigation() {
         {/* Left */}
         <Link
           href="/"
-          className="label text-white transition-opacity duration-300 hover:opacity-100"
-          style={{ opacity: isHome ? 0.5 : 0.7 }}
+          className="title text-white transition-opacity duration-300 hover:opacity-100"
+          style={{
+            opacity: isHome ? 0.5 : 0.7,
+            fontSize: "1rem",
+            letterSpacing: "-0.01em",
+          }}
         >
           NS
         </Link>
