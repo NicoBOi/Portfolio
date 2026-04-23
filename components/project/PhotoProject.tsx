@@ -18,7 +18,7 @@ interface Props {
 function PlateNumber({ current }: { current: number; total: number }) {
   return (
     <span
-      className="absolute top-3 left-4 md:top-5 md:left-6 title text-white pointer-events-none tabular-nums z-10"
+      className="absolute bottom-3 right-4 md:bottom-5 md:right-6 title text-white pointer-events-none tabular-nums z-10"
       style={{
         opacity: 0.85,
         mixBlendMode: "difference",

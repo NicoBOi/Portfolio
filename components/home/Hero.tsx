@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Player from "@vimeo/player";
 import { projects } from "@/data/projects";
 
 const FEATURED = projects.filter((p) => p.featured);
@@ -140,30 +141,13 @@ export default function Hero() {
             >
               {(() => {
                 const vId = getVimeoId(current.videoUrl);
-                if (current.youtubeId || vId) {
-                  // YouTube is 16:9 by convention; Vimeo reads from project metadata.
-                  const aspectStr = current.youtubeId ? "16/9" : current.videoAspect ?? "16/9";
+                if (vId) {
+                  const aspectStr = current.videoAspect ?? "16/9";
                   const [aw, ah] = aspectStr.split("/").map(Number);
-                  const ratio = aw / ah;
-                  const ratioStyle = { "--video-ratio": ratio } as React.CSSProperties;
-                  if (current.youtubeId) {
-                    return (
-                      <iframe
-                        src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&vq=hd1080&playsinline=1&playlist=${current.youtubeId}`}
-                        className="hero-video"
-                        style={ratioStyle}
-                        allow="autoplay; encrypted-media"
-                      />
-                    );
-                  }
-                  return (
-                    <iframe
-                      src={`https://player.vimeo.com/video/${vId}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p`}
-                      className="hero-video"
-                      style={ratioStyle}
-                      allow="autoplay"
-                    />
-                  );
+                  return <HeroVimeo vimeoId={vId} ratio={aw / ah} />;
+                }
+                if (current.youtubeId) {
+                  return <HeroYouTube youtubeId={current.youtubeId} />;
                 }
                 if (current.imageFiles && current.imageFiles.length > 0) {
                   return (
@@ -179,15 +163,6 @@ export default function Hero() {
                 }
                 return <div className="placeholder-img text-white h-full">Image</div>;
               })()}
-              {/* Black mask for video slides — covers the Vimeo/YT loading flash before playback starts. */}
-              {(current.youtubeId || getVimeoId(current.videoUrl)) && (
-                <motion.div
-                  className="absolute inset-0 bg-black pointer-events-none"
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: 0 }}
-                  transition={{ duration: 0.5, delay: 1.2, ease: SOFT }}
-                />
-              )}
             </motion.div>
           </AnimatePresence>
 
@@ -329,5 +304,64 @@ export default function Hero() {
           </div>
         </div>
     </section>
+  );
+}
+
+// Hero Vimeo slide: SDK-bound iframe that keeps a black mask over the player
+// until the actual \`play\` event fires — no grey/white autoplay blink.
+function HeroVimeo({ vimeoId, ratio }: { vimeoId: string; ratio: number }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!iframeRef.current) return;
+    const player = new Player(iframeRef.current);
+    const onPlay = () => setPlaying(true);
+    player.on("play", onPlay);
+    return () => {
+      player.off("play", onPlay);
+      player.destroy().catch(() => {});
+    };
+  }, [vimeoId]);
+
+  const ratioStyle = { "--video-ratio": ratio } as React.CSSProperties;
+
+  return (
+    <>
+      <iframe
+        ref={iframeRef}
+        src={`https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p`}
+        className="hero-video"
+        style={ratioStyle}
+        allow="autoplay"
+      />
+      <motion.div
+        className="absolute inset-0 bg-black pointer-events-none z-10"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: playing ? 0 : 1 }}
+        transition={{ duration: 0.5, ease: SOFT }}
+      />
+    </>
+  );
+}
+
+// Hero YouTube slide: we don't have the YT IFrame API wired into the hero, so we
+// fall back to a conservative time-based mask (generous delay to cover the init flash).
+function HeroYouTube({ youtubeId }: { youtubeId: string }) {
+  return (
+    <>
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&vq=hd1080&playsinline=1&playlist=${youtubeId}`}
+        className="hero-video"
+        style={{ "--video-ratio": 16 / 9 } as React.CSSProperties}
+        allow="autoplay; encrypted-media"
+      />
+      <motion.div
+        className="absolute inset-0 bg-black pointer-events-none z-10"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.5, delay: 2, ease: SOFT }}
+      />
+    </>
   );
 }
