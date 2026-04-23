@@ -177,7 +177,62 @@ export default function Hero() {
           animate={{ opacity: loaded ? 1 : 0 }}
           transition={{ duration: 1, delay: 0.3, ease: SOFT }}
         >
-          <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
+          <div className="relative flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
+            {/* Scroll affordance — anchored to the title's vertical center */}
+            <div className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-3 md:gap-4 pointer-events-none">
+              <span
+                className="label text-white"
+                style={{
+                  opacity: 0.4,
+                  writingMode: "vertical-rl",
+                  transform: "rotate(180deg)",
+                  letterSpacing: "0.28em",
+                  fontSize: "9px",
+                }}
+              >
+                Scroll
+              </span>
+              <div className="relative h-8 md:h-12 w-px bg-white/15 overflow-hidden">
+                <motion.div
+                  className="absolute left-0 w-full bg-white"
+                  style={{ opacity: 0.7, height: 5 }}
+                  animate={{ y: [-8, 40] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+                />
+              </div>
+            </div>
+
+            {/* Vertical index — hover to preview, click to open. Same vertical center as the title. */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-auto">
+              {FEATURED.map((p, i) => (
+                <button
+                  key={p.slug}
+                  onMouseEnter={() => setIndex(i)}
+                  onFocus={() => setIndex(i)}
+                  onClick={() => router.push(`/work/${p.slug}`)}
+                  className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
+                  style={{ opacity: i === index ? 0.7 : 0.18 }}
+                  data-cursor={p.type === "photo" ? "Voir" : "Lire"}
+                  aria-label={p.title}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </button>
+              ))}
+              <Link
+                href="/work"
+                className="transition-opacity duration-300 inline-flex items-center px-4 py-3"
+                style={{ opacity: 0.4 }}
+                data-cursor="Tous les projets"
+                aria-label="Tous les projets"
+              >
+                <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+                  <circle cx="2" cy="5" r="1" fill="white" />
+                  <circle cx="8" cy="5" r="1" fill="white" />
+                  <circle cx="14" cy="5" r="1" fill="white" />
+                </svg>
+              </Link>
+            </div>
+
             <motion.p
               className="label text-white"
               style={{ opacity: 0.4, letterSpacing: "0.32em" }}
@@ -264,68 +319,6 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Vertical index — hover to preview, click to open.
-            Offset upward to match the title's optical center (bottom nav shifts flex-1 center up). */}
-        <div
-          className="absolute right-2 z-20 flex flex-col items-end pointer-events-auto"
-          style={{ top: "calc(50% - 2rem)", transform: "translateY(-50%)" }}
-        >
-          {FEATURED.map((p, i) => (
-            <button
-              key={p.slug}
-              onMouseEnter={() => setIndex(i)}
-              onFocus={() => setIndex(i)}
-              onClick={() => router.push(`/work/${p.slug}`)}
-              className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
-              style={{ opacity: i === index ? 0.7 : 0.18 }}
-              data-cursor={p.type === "photo" ? "Voir" : "Lire"}
-              aria-label={p.title}
-            >
-              {String(i + 1).padStart(2, "0")}
-            </button>
-          ))}
-          <Link
-            href="/work"
-            className="transition-opacity duration-300 inline-flex items-center px-4 py-3"
-            style={{ opacity: 0.4 }}
-            data-cursor="Tous les projets"
-            aria-label="Tous les projets"
-          >
-            <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
-              <circle cx="2" cy="5" r="1" fill="white" />
-              <circle cx="8" cy="5" r="1" fill="white" />
-              <circle cx="14" cy="5" r="1" fill="white" />
-            </svg>
-          </Link>
-        </div>
-
-        {/* Scroll affordance — left middle. Smaller on mobile so it doesn't crowd.
-            Same optical-center offset as the right index. */}
-        <div
-          className="absolute left-3 md:left-6 z-20 flex flex-col items-center gap-3 md:gap-4 pointer-events-none"
-          style={{ top: "calc(50% - 2rem)", transform: "translateY(-50%)" }}
-        >
-          <span
-            className="label text-white"
-            style={{
-              opacity: 0.4,
-              writingMode: "vertical-rl",
-              transform: "rotate(180deg)",
-              letterSpacing: "0.28em",
-              fontSize: "9px",
-            }}
-          >
-            Scroll
-          </span>
-          <div className="relative h-8 md:h-12 w-px bg-white/15 overflow-hidden">
-            <motion.div
-              className="absolute left-0 w-full bg-white"
-              style={{ opacity: 0.7, height: 5 }}
-              animate={{ y: [-8, 40] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
-            />
-          </div>
-        </div>
     </section>
   );
 }
