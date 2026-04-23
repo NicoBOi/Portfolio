@@ -1,4 +1,4 @@
-export type ProjectType = "photo" | "video";
+export type ProjectType = "photo" | "video" | "3d";
 
 export interface ProjectMeta {
   type: string;      // e.g. "Mode / projet personnel"
@@ -32,8 +32,8 @@ export const projects: Project[] = [
     title: "Showreel 3D",
     year: 2024,
     role: "Réalisation",
-    type: "video",
-    category: "Motion",
+    type: "3d",
+    category: "3D",
     coverPlaceholder: "#0A0A0C",
     meta: {
       type: "Showreel / motion design 3D",
@@ -42,6 +42,23 @@ export const projects: Project[] = [
     },
     videoUrl: "https://vimeo.com/722586890",
     videoAspect: "2.4/1",
+    aspectRatio: "landscape",
+    featured: true,
+  },
+  {
+    slug: "sink-deeper-the-other",
+    title: "The Other",
+    year: 2024,
+    role: "Réalisation",
+    type: "video",
+    category: "Clip",
+    coverPlaceholder: "#0B0A0D",
+    meta: {
+      type: "Clip musical pour Sink Deeper",
+      location: "Clermont-Ferrand, France",
+      credits: "Réalisation & montage",
+    },
+    youtubeId: "ypJkTv3gFX8",
     aspectRatio: "landscape",
     featured: true,
   },

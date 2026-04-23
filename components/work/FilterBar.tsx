@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 
-export type Filter = "all" | "photo" | "video";
+export type Filter = "all" | "photo" | "video" | "3d";
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: "all", label: "Tout" },
   { value: "photo", label: "Photo" },
   { value: "video", label: "Vidéo" },
+  { value: "3d", label: "3D" },
 ];
 
 export default function FilterBar({

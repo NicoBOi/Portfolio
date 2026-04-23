@@ -193,7 +193,7 @@ export default function Hero() {
               animate={{ opacity: 0.4, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: SOFT }}
             >
-              Photographe — Réalisateur
+              Photo — Film — 3D
             </motion.p>
 
             {/* Magnetic title */}
