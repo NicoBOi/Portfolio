@@ -1,24 +1,43 @@
-// Fonts are fetched from GitHub raw instead of Google Fonts CSS:
-// Google's CSS response varies by User-Agent and isn't stable at the edge.
-// The TTF URLs below are permanent and return the raw font bytes directly.
-
-const SERIF_URL =
-  "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/CormorantGaramond-Regular.ttf";
-const MONO_URL =
-  "https://raw.githubusercontent.com/google/fonts/main/ofl/fragmentmono/FragmentMono-Regular.ttf";
+// OG fonts fetched at render time.
+// We resolve the actual font URL by reading the font service's CSS first —
+// Google Fonts and Fontshare both vary their file URLs per User-Agent / release
+// so hardcoding a raw URL would silently break over time.
 
 const FETCH_TIMEOUT_MS = 5000;
 
-async function fetchFont(url: string): Promise<ArrayBuffer> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-  if (!res.ok) throw new Error(`Font fetch ${url} → ${res.status}`);
-  return res.arrayBuffer();
+// A desktop Chrome UA gets us woff2 from Google Fonts
+const CHROME_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+  "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+
+const SERIF_CSS =
+  "https://api.fontshare.com/v2/css?f[]=general-sans@500&display=swap";
+const MONO_CSS =
+  "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap";
+
+async function fetchFontFromCss(cssUrl: string): Promise<ArrayBuffer> {
+  const cssRes = await fetch(cssUrl, {
+    headers: { "User-Agent": CHROME_UA },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  if (!cssRes.ok) throw new Error(`CSS ${cssUrl} → ${cssRes.status}`);
+  const css = await cssRes.text();
+  const match = css.match(/url\((https?:\/\/[^)]+\.woff2?)\)/);
+  if (!match) throw new Error(`No font url found in CSS: ${cssUrl}`);
+  const fontRes = await fetch(match[1], {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  if (!fontRes.ok) throw new Error(`Font ${match[1]} → ${fontRes.status}`);
+  return fontRes.arrayBuffer();
 }
 
 export async function loadOgFonts(): Promise<{
   serif: ArrayBuffer;
   mono: ArrayBuffer;
 }> {
-  const [serif, mono] = await Promise.all([fetchFont(SERIF_URL), fetchFont(MONO_URL)]);
+  const [serif, mono] = await Promise.all([
+    fetchFontFromCss(SERIF_CSS),
+    fetchFontFromCss(MONO_CSS),
+  ]);
   return { serif, mono };
 }

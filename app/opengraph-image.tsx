@@ -26,7 +26,7 @@ export default async function OGImage() {
       >
         <div
           style={{
-            fontFamily: "Fragment Mono",
+            fontFamily: "Geist Mono",
             fontSize: 18,
             letterSpacing: "0.32em",
             textTransform: "uppercase",
@@ -39,7 +39,7 @@ export default async function OGImage() {
 
         <div
           style={{
-            fontFamily: "Cormorant Garamond",
+            fontFamily: "General Sans",
             fontSize: 164,
             lineHeight: 1,
             letterSpacing: "0.01em",
@@ -51,7 +51,7 @@ export default async function OGImage() {
 
         <div
           style={{
-            fontFamily: "Fragment Mono",
+            fontFamily: "Geist Mono",
             fontSize: 16,
             letterSpacing: "0.24em",
             textTransform: "uppercase",
@@ -67,7 +67,7 @@ export default async function OGImage() {
             position: "absolute",
             bottom: 48,
             right: 64,
-            fontFamily: "Fragment Mono",
+            fontFamily: "Geist Mono",
             fontSize: 14,
             letterSpacing: "0.24em",
             textTransform: "uppercase",
@@ -81,8 +81,8 @@ export default async function OGImage() {
     {
       ...size,
       fonts: [
-        { name: "Cormorant Garamond", data: serif, style: "normal", weight: 400 },
-        { name: "Fragment Mono", data: mono, style: "normal", weight: 400 },
+        { name: "General Sans", data: serif, style: "normal", weight: 500 },
+        { name: "Geist Mono", data: mono, style: "normal", weight: 400 },
       ],
     }
   );

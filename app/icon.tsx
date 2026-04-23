@@ -17,8 +17,8 @@ export default function Icon() {
           backgroundColor: "#000",
           color: "#fff",
           fontSize: 24,
-          fontFamily: "Georgia, serif",
-          fontWeight: 400,
+          fontFamily: "Helvetica, Arial, sans-serif",
+          fontWeight: 500,
           letterSpacing: "-0.04em",
         }}
       >
