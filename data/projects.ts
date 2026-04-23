@@ -237,9 +237,9 @@ export const projects: Project[] = [
       credits: "Photo & post-prod",
     },
     imageFiles: [
+      "P1001664-2_AVIF.avif",
       "P1001688-2_AVIF.avif",
       "P1001662_AVIF.avif",
-      "P1001664-2_AVIF.avif",
       "P1001699-2_AVIF.avif",
       "P1001732_AVIF.avif",
     ],
