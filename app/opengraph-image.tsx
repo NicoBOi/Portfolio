@@ -81,7 +81,7 @@ export default async function OGImage() {
     {
       ...size,
       fonts: [
-        { name: "Space Grotesk", data: serif, style: "normal", weight: 600 },
+        { name: "Space Grotesk", data: serif, style: "normal", weight: 400 },
         { name: "Geist Mono", data: mono, style: "normal", weight: 400 },
       ],
     }
