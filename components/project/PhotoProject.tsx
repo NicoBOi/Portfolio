@@ -57,12 +57,12 @@ export default function PhotoProject({ project, prev, next }: Props) {
       {/* Back */}
       <div className="px-6 md:px-10 pt-20 pb-0">
         <Link
-          href="/work"
+          href="/"
           className="label text-white hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 px-3 py-2 -mx-3 rounded-full"
           style={{ opacity: 0.7 }}
         >
           <span aria-hidden="true">←</span>
-          Projets
+          Accueil
         </Link>
       </div>
 

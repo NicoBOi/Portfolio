@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects } from "@/data/projects";
@@ -237,29 +236,16 @@ export default function Hero() {
                   {String(i + 1).padStart(2, "0")}
                 </button>
               ))}
-              <Link
-                href="/work"
-                className="transition-opacity duration-300 inline-flex items-center px-4 py-3"
-                style={{ opacity: 0.4 }}
-                data-cursor="Tous les projets"
-                aria-label="Tous les projets"
-              >
-                <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
-                  <circle cx="2" cy="5" r="1" fill="white" />
-                  <circle cx="8" cy="5" r="1" fill="white" />
-                  <circle cx="14" cy="5" r="1" fill="white" />
-                </svg>
-              </Link>
             </div>
 
             <motion.div
-              className="flex items-center gap-4 md:gap-6 pointer-events-auto"
+              className="flex items-center gap-2 md:gap-4 pointer-events-auto"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: SOFT }}
             >
               {FILTERS.map((f, i) => (
-                <span key={f.value} className="flex items-center gap-4 md:gap-6">
+                <span key={f.value} className="flex items-center gap-2 md:gap-4">
                   {i > 0 && (
                     <span
                       aria-hidden="true"
@@ -272,7 +258,7 @@ export default function Hero() {
                   <button
                     type="button"
                     onClick={() => setFilter(f.value)}
-                    className="label text-white transition-opacity duration-300 relative pb-1"
+                    className="label text-white transition-opacity duration-300 relative px-2 py-2 rounded"
                     style={{
                       opacity: filter === f.value ? 0.9 : 0.4,
                       letterSpacing: "0.32em",
@@ -283,7 +269,7 @@ export default function Hero() {
                     {filter === f.value && (
                       <motion.span
                         layoutId="hero-filter-underline"
-                        className="absolute left-0 right-0 -bottom-0.5 h-px bg-white"
+                        className="absolute left-2 right-2 bottom-1 h-px bg-white"
                         style={{ opacity: 0.7 }}
                         transition={{ duration: 0.3, ease: SOFT }}
                       />

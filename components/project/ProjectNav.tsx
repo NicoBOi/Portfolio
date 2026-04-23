@@ -15,7 +15,7 @@ export default function ProjectNav({
           <Link href={`/work/${prev.slug}`} className="group flex items-center gap-3">
             <span className="block w-5 h-px bg-white opacity-35 group-hover:w-10 group-hover:opacity-80 transition-all duration-400" />
             <div>
-              <p className="label text-white mb-1" style={{ opacity: 0.25 }}>Précédent</p>
+              <p className="label text-white mb-1" style={{ opacity: 0.5 }}>Précédent</p>
               <p
                 className="text-white title"
                 style={{ fontSize: "clamp(0.85rem, 1.5vw, 1.1rem)" }}
@@ -29,9 +29,9 @@ export default function ProjectNav({
 
       <div className="flex justify-center">
         <Link
-          href="/work"
+          href="/"
           className="label text-white hover:opacity-100 transition-opacity duration-300"
-          style={{ opacity: 0.25 }}
+          style={{ opacity: 0.55 }}
         >
           ← Tous les projets
         </Link>
@@ -41,7 +41,7 @@ export default function ProjectNav({
         {next && (
           <Link href={`/work/${next.slug}`} className="group flex items-center gap-3 text-right">
             <div>
-              <p className="label text-white mb-1" style={{ opacity: 0.25 }}>Suivant</p>
+              <p className="label text-white mb-1" style={{ opacity: 0.5 }}>Suivant</p>
               <p
                 className="text-white title"
                 style={{ fontSize: "clamp(0.85rem, 1.5vw, 1.1rem)" }}

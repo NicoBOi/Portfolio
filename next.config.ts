@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // Old /work index page was merged into the landing. Keep the route redirecting
+      // so shared links and crawl history still land somewhere meaningful.
+      { source: "/work", destination: "/", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
