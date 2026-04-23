@@ -265,14 +265,14 @@ export default function Hero() {
         </motion.div>
 
         {/* Vertical index — hover to preview, click to open */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-end pointer-events-auto">
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-auto">
           {FEATURED.map((p, i) => (
             <button
               key={p.slug}
               onMouseEnter={() => setIndex(i)}
               onFocus={() => setIndex(i)}
               onClick={() => router.push(`/work/${p.slug}`)}
-              className="label text-white tabular-nums transition-opacity duration-300"
+              className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
               style={{ opacity: i === index ? 0.7 : 0.18 }}
               data-cursor={p.type === "photo" ? "Voir" : "Lire"}
               aria-label={p.title}
@@ -280,11 +280,9 @@ export default function Hero() {
               {String(i + 1).padStart(2, "0")}
             </button>
           ))}
-          {/* Separator + "all projects" affordance */}
-          <span className="block w-2 h-px bg-white mt-2" style={{ opacity: 0.3 }} aria-hidden="true" />
           <Link
             href="/work"
-            className="transition-opacity duration-300 inline-flex items-center"
+            className="transition-opacity duration-300 inline-flex items-center px-4 py-3"
             style={{ opacity: 0.4 }}
             data-cursor="Tous les projets"
             aria-label="Tous les projets"
