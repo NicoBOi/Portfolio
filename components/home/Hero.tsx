@@ -80,19 +80,29 @@ export default function Hero() {
     return () => window.removeEventListener("wheel", onWheel);
   }, [featuredLen]);
 
-  // Touch swipe — same dep handling.
+  // Touch swipe — horizontal (carousel feel on mobile). Vertical gestures are left
+  // alone so the browser's native handling stays intact and swipes up/down are ignored.
   useEffect(() => {
     if (featuredLen <= 1) return;
+    let sx = 0;
     let sy = 0;
-    const ts = (e: TouchEvent) => { sy = e.touches[0].clientY; };
+    const ts = (e: TouchEvent) => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    };
     const te = (e: TouchEvent) => {
-      const d = sy - e.changedTouches[0].clientY;
-      if (Math.abs(d) < 50) return;
-      setIndex((i) => (d > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
+      const dx = sx - e.changedTouches[0].clientX;
+      const dy = sy - e.changedTouches[0].clientY;
+      // Require a horizontally-dominant swipe of at least 50px.
+      if (Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy)) return;
+      setIndex((i) => (dx > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
     };
     window.addEventListener("touchstart", ts, { passive: true });
     window.addEventListener("touchend", te, { passive: true });
-    return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
+    return () => {
+      window.removeEventListener("touchstart", ts);
+      window.removeEventListener("touchend", te);
+    };
   }, [featuredLen]);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
@@ -319,9 +329,19 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
           >
-            <button onClick={goPrev} className="flex items-center gap-3 group text-left pointer-events-auto">
-              <span className="block h-px bg-white group-hover:opacity-80 transition-all duration-500" style={{ width: 24, opacity: 0.3 }} />
-              <span className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.3 }}>
+            <button
+              onClick={goPrev}
+              className="flex items-center gap-3 group text-left pointer-events-auto px-3 py-3 -mx-3"
+              aria-label="Projet précédent"
+            >
+              <span
+                className="block h-px bg-white group-hover:opacity-80 transition-all duration-500"
+                style={{ width: 24, opacity: 0.45 }}
+              />
+              <span
+                className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300"
+                style={{ opacity: 0.5 }}
+              >
                 {FEATURED[(index - 1 + FEATURED.length) % FEATURED.length].title}
               </span>
             </button>
@@ -336,21 +356,34 @@ export default function Hero() {
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.35, ease: SOFT }}
                 >
-                  <span className="text-white title text-center" style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.55 }}>
+                  <span
+                    className="text-white title text-center"
+                    style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.75 }}
+                  >
                     {current.title}
                   </span>
-                  <span className="label text-white" style={{ opacity: 0.25 }}>
+                  <span className="label text-white" style={{ opacity: 0.45 }}>
                     {String(index + 1).padStart(2, "0")} / {String(FEATURED.length).padStart(2, "0")}
                   </span>
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            <button onClick={goNext} className="flex items-center gap-3 justify-end group text-right pointer-events-auto">
-              <span className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300" style={{ opacity: 0.3 }}>
+            <button
+              onClick={goNext}
+              className="flex items-center gap-3 justify-end group text-right pointer-events-auto px-3 py-3 -mx-3"
+              aria-label="Projet suivant"
+            >
+              <span
+                className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300"
+                style={{ opacity: 0.5 }}
+              >
                 {FEATURED[(index + 1) % FEATURED.length].title}
               </span>
-              <span className="block h-px bg-white group-hover:opacity-80 transition-all duration-500" style={{ width: 24, opacity: 0.3 }} />
+              <span
+                className="block h-px bg-white group-hover:opacity-80 transition-all duration-500"
+                style={{ width: 24, opacity: 0.45 }}
+              />
             </button>
           </motion.div>
         </motion.div>
