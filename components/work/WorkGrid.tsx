@@ -59,9 +59,9 @@ export default function WorkGrid() {
           className="flex flex-col md:flex-row border-b border-white/10"
           style={{ minHeight: "clamp(540px, 78vh, 900px)" }}
         >
-          {/* Left — image (sticky on mobile so it stays visible while the index scrolls) */}
+          {/* Left — image */}
           <div
-            className="md:w-3/5 relative bg-black overflow-hidden order-1 md:order-1 h-[55vh] md:h-auto sticky top-14 md:static z-10 touch-pan-y"
+            className="md:w-3/5 relative bg-black overflow-hidden order-1 md:order-1 min-h-[55vh] md:min-h-0 touch-pan-y"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
