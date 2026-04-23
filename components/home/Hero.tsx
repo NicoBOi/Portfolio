@@ -330,10 +330,15 @@ function HeroVimeo({ vimeoId, ratio }: { vimeoId: string; ratio: number }) {
   useEffect(() => {
     if (!iframeRef.current) return;
     const player = new Player(iframeRef.current);
-    const onPlay = () => setPlaying(true);
-    player.on("play", onPlay);
+    // `timeupdate` only fires once a frame has actually painted — more reliable
+    // than `play` on mobile where the browser can report play before first paint.
+    const onFrame = () => {
+      setPlaying(true);
+      player.off("timeupdate", onFrame);
+    };
+    player.on("timeupdate", onFrame);
     return () => {
-      player.off("play", onPlay);
+      player.off("timeupdate", onFrame);
       player.destroy().catch(() => {});
     };
   }, [vimeoId]);
