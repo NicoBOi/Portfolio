@@ -26,6 +26,22 @@ export default function Hero() {
     return () => clearTimeout(t);
   }, []);
 
+  // Warm the browser cache for every featured image right after first paint
+  // so wheel/swipe transitions don't stall on a network fetch.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      FEATURED.forEach((p) => {
+        const first = p.imageFiles?.[0];
+        if (first) {
+          const img = new window.Image();
+          img.decoding = "async";
+          img.src = `/projects/${p.slug}/${first}`;
+        }
+      });
+    }, 400);
+    return () => clearTimeout(t);
+  }, []);
+
   // Wheel
   useEffect(() => {
     let locked = false;
