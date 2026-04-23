@@ -243,7 +243,7 @@ export default function Hero() {
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.35, ease: SOFT }}
                 >
-                  <span className="text-white title" style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.55 }}>
+                  <span className="text-white title text-center" style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.55 }}>
                     {current.title}
                   </span>
                   <span className="label text-white" style={{ opacity: 0.25 }}>
@@ -273,8 +273,8 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* Scroll affordance — left middle */}
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4 pointer-events-none">
+        {/* Scroll affordance — left middle (desktop only; mobile users swipe) */}
+        <div className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
           <span
             className="label text-white"
             style={{
