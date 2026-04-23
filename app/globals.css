@@ -119,8 +119,7 @@ body::after {
 
 /* ── Hero video iframe ────────────────────────────────────
    Reads --video-ratio (width/height) from the element's inline style.
-   Mobile: contain (full video visible, letterboxed — avoids over-cropping wide formats like cinemascope).
-   Desktop: cover (video fills viewport, overflow-hidden on parent crops the extra). */
+   Cover on every viewport: fill vertically + horizontally, crop the overflow. */
 .hero-video {
   position: absolute;
   top: 50%;
@@ -129,14 +128,8 @@ body::after {
   border: 0;
   background-color: #000;
   pointer-events: none;
-  width: 100vw;
-  height: calc(100vw / var(--video-ratio));
-}
-@media (min-width: 768px) {
-  .hero-video {
-    width: max(100vw, calc(100vh * var(--video-ratio)));
-    height: max(calc(100vw / var(--video-ratio)), 100vh);
-  }
+  width: max(100vw, calc(100vh * var(--video-ratio)));
+  height: max(calc(100vw / var(--video-ratio)), 100vh);
 }
 
 
