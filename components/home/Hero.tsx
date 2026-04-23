@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
-import ProjectPanel from "./ProjectPanel";
 
 const FEATURED = projects;
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -14,12 +13,11 @@ const REPEL_RADIUS = 110;
 const REPEL_STRENGTH = 50;
 
 export default function Hero() {
+  const router = useRouter();
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
-  const [openSlug, setOpenSlug] = useState<string | null>(null);
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-  const openProject = openSlug ? (projects.find((p) => p.slug === openSlug) ?? null) : null;
   const current = FEATURED[index];
 
   // Fade-in
@@ -30,7 +28,6 @@ export default function Hero() {
 
   // Wheel
   useEffect(() => {
-    if (openSlug) return;
     let locked = false;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -43,11 +40,10 @@ export default function Hero() {
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [openSlug]);
+  }, []);
 
   // Touch swipe
   useEffect(() => {
-    if (openSlug) return;
     let sy = 0;
     const ts = (e: TouchEvent) => { sy = e.touches[0].clientY; };
     const te = (e: TouchEvent) => {
@@ -58,7 +54,7 @@ export default function Hero() {
     window.addEventListener("touchstart", ts, { passive: true });
     window.addEventListener("touchend", te, { passive: true });
     return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
-  }, [openSlug]);
+  }, []);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
   const rafRef = useRef<number | null>(null);
@@ -97,25 +93,22 @@ export default function Hero() {
 
   const goPrev = () => setIndex((i) => (i - 1 + FEATURED.length) % FEATURED.length);
   const goNext = () => setIndex((i) => (i + 1) % FEATURED.length);
-  const handleNavigate = useCallback((slug: string) => setOpenSlug(slug), []);
-  const handleClose = useCallback(() => setOpenSlug(null), []);
 
   return (
-    <>
-      <section
-        className="relative h-screen bg-black overflow-hidden flex flex-col"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        data-cursor-suppress
-      >
+    <section
+      className="relative h-screen bg-black overflow-hidden flex flex-col"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      data-cursor-suppress
+    >
 
-        {/* Background */}
-        <div
-          className="absolute inset-0 z-0"
-          onClick={() => setOpenSlug(current.slug)}
-          data-cursor="Ouvrir"
-          data-cursor-silent
-        >
+      {/* Background */}
+      <div
+        className="absolute inset-0 z-0"
+        onClick={() => router.push(`/work/${current.slug}`)}
+        data-cursor={current.type === "video" ? "Lire" : "Voir"}
+        data-cursor-silent
+      >
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
@@ -263,9 +256,6 @@ export default function Hero() {
             />
           ))}
         </div>
-      </section>
-
-      <ProjectPanel project={openProject} onClose={handleClose} onNavigate={handleNavigate} />
-    </>
+    </section>
   );
 }
