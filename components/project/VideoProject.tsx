@@ -102,10 +102,10 @@ export default function VideoProject({ project, prev, next }: Props) {
           {project.title}
         </h1>
         <div className="flex flex-col gap-2 self-center">
-          <p className="label text-white" style={{ opacity: 0.55 }}>{project.meta.type}</p>
-          <p className="label text-white" style={{ opacity: 0.35 }}>{project.meta.location}</p>
-          <p className="label text-white" style={{ opacity: 0.35 }}>{project.meta.credits}</p>
-          <p className="label text-white mt-3" style={{ opacity: 0.25 }}>{project.year}</p>
+          <p className="label text-white" style={{ opacity: 0.8 }}>{project.meta.type}</p>
+          <p className="label text-white" style={{ opacity: 0.6 }}>{project.meta.location}</p>
+          <p className="label text-white" style={{ opacity: 0.6 }}>{project.meta.credits}</p>
+          <p className="label text-white mt-3" style={{ opacity: 0.45 }}>{project.year}</p>
         </div>
       </div>
 

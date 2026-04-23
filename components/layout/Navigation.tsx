@@ -27,7 +27,7 @@ export default function Navigation() {
           href="/"
           className="title text-white transition-opacity duration-300 hover:opacity-100"
           style={{
-            opacity: isHome ? 0.5 : 0.7,
+            opacity: isHome ? 0.75 : 0.9,
             fontSize: "1.1rem",
           }}
         >

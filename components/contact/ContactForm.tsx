@@ -58,7 +58,7 @@ export default function ContactForm() {
           >
             Reçu.
           </p>
-          <p className="label text-white" style={{ opacity: 0.3 }}>Je te réponds sous 24h.</p>
+          <p className="label text-white" style={{ opacity: 0.55 }}>Je vous réponds sous 24h.</p>
         </motion.div>
       ) : (
         <motion.form
@@ -79,11 +79,11 @@ export default function ContactForm() {
           </div>
 
           {[
-            { name: "name", label: "Nom", type: "text", placeholder: "Ton nom" },
-            { name: "email", label: "Email", type: "email", placeholder: "ton@email.com" },
+            { name: "name", label: "Nom", type: "text", placeholder: "Votre nom" },
+            { name: "email", label: "Email", type: "email", placeholder: "vous@email.com" },
           ].map(({ name, label, type, placeholder }) => (
             <div key={name} className="flex flex-col gap-2.5">
-              <label className="label text-white" style={{ opacity: 0.28 }}>{label}</label>
+              <label className="label text-white" style={{ opacity: 0.55 }}>{label}</label>
               <input
                 type={type}
                 name={name}
@@ -96,7 +96,7 @@ export default function ContactForm() {
           ))}
 
           <div className="flex flex-col gap-2.5">
-            <label className="label text-white" style={{ opacity: 0.28 }}>Type de projet</label>
+            <label className="label text-white" style={{ opacity: 0.55 }}>Type de projet</label>
             <select
               name="type"
               className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white/50 font-light focus:border-white/40 transition-colors duration-300 appearance-none"
@@ -109,7 +109,7 @@ export default function ContactForm() {
           </div>
 
           <div className="flex flex-col gap-2.5">
-            <label className="label text-white" style={{ opacity: 0.28 }}>Message</label>
+            <label className="label text-white" style={{ opacity: 0.55 }}>Message</label>
             <textarea
               name="message"
               required
@@ -130,7 +130,7 @@ export default function ContactForm() {
             type="submit"
             disabled={loading}
             className="self-start label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-5 disabled:opacity-25 mt-2"
-            style={{ opacity: 0.55 }}
+            style={{ opacity: 0.8 }}
           >
             {loading ? "Envoi…" : "Envoyer"}
             <span className="block w-8 h-px bg-white" />

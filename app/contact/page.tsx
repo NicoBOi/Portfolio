@@ -52,16 +52,16 @@ export default function ContactPage() {
             </h1>
             <p
               className="text-white font-light mt-8 leading-relaxed max-w-sm"
-              style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
+              style={{ fontSize: "0.95rem", opacity: 0.85, lineHeight: 1.9 }}
             >
-              Parle-moi du projet. Insta, mail, ou le formulaire —
-              comme tu préfères. Je réponds dans les 24 heures.
+              Parlez-moi du projet. Insta, mail, ou le formulaire —
+              comme vous préférez. Je réponds dans les 24 heures.
             </p>
             <p
               className="text-white font-light mt-2 leading-relaxed max-w-sm"
-              style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}
+              style={{ fontSize: "0.9rem", opacity: 0.6, lineHeight: 1.9 }}
             >
-              Idéalement, tu me donnes un budget, une date, et une
+              Idéalement, vous me donnez un budget, une date, et une
               référence visuelle. Dans les faits, l&apos;idée seule
               suffit à commencer.
             </p>
@@ -69,7 +69,7 @@ export default function ContactPage() {
 
           <div className="flex flex-col gap-6">
             <div>
-              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Email</p>
+              <p className="label text-white mb-2" style={{ opacity: 0.5 }}>Email</p>
               <a
                 href="mailto:nicosmp.pro@gmail.com"
                 className="text-white font-light hover:opacity-100 transition-opacity duration-300"
@@ -79,7 +79,7 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Instagram</p>
+              <p className="label text-white mb-2" style={{ opacity: 0.5 }}>Instagram</p>
               <a
                 href="https://instagram.com/nicolas_Sempere"
                 target="_blank"
@@ -91,7 +91,7 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <p className="label text-white mb-2" style={{ opacity: 0.22 }}>Basé à</p>
+              <p className="label text-white mb-2" style={{ opacity: 0.5 }}>Basé à</p>
               <p
                 className="text-white font-light"
                 style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)", opacity: 0.4, letterSpacing: "0.02em" }}
@@ -104,7 +104,7 @@ export default function ContactPage() {
 
         {/* Right — form */}
         <div className="flex flex-col justify-center">
-          <p className="label text-white mb-10" style={{ opacity: 0.22 }}>Brief</p>
+          <p className="label text-white mb-10" style={{ opacity: 0.5 }}>Brief</p>
           <ContactForm />
         </div>
       </div>

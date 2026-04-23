@@ -87,24 +87,24 @@ export default function AboutPage() {
           <div className="flex flex-col gap-5 max-w-xl">
             <p
               className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
+              style={{ fontSize: "0.95rem", opacity: 0.9, lineHeight: 1.9 }}
             >
-              Photographe et réalisateur à Bordeaux, 28 ans. Je fais
-              des images pour les marques et les projets qui ne veulent
-              pas ressembler aux autres — campagnes, éditoriaux, films,
+              Photographe et réalisateur à Bordeaux, 28 ans. Je crée
+              des images pour les marques et les projets qui refusent
+              de ressembler aux autres — campagnes, éditoriaux, films,
               quand l&apos;image doit dire quelque chose de précis.
             </p>
             <p
               className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.55, lineHeight: 1.9 }}
+              style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
             >
-              Photo depuis mes 15 ans, vidéo depuis 23. Autodidacte
-              pendant longtemps, puis diplômé de MJM Graphic Design
-              en webdesign et motion.
+              Photographe depuis mes 15 ans, réalisateur depuis 23.
+              Autodidacte pendant longtemps, puis diplômé de MJM
+              Graphic Design en webdesign et motion.
             </p>
             <p
               className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.45, lineHeight: 1.9 }}
+              style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
             >
               Seul ou avec une équipe, selon le projet. Trois
               références reviennent toujours : Lars von Trier pour
@@ -115,9 +115,9 @@ export default function AboutPage() {
             <Link
               href="/contact"
               className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-2"
-              style={{ opacity: 0.55 }}
+              style={{ opacity: 0.8 }}
             >
-              Écris-moi
+              Écrivez-moi
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -125,7 +125,7 @@ export default function AboutPage() {
           {/* Clients + Influences */}
           <div className="border-t border-white/10 pt-10 grid grid-cols-1 sm:grid-cols-2 gap-10 md:gap-16">
             <div>
-              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>
+              <p className="label text-white mb-6" style={{ opacity: 0.5 }}>
                 Clients
               </p>
               <ul className="flex flex-col gap-2.5">
@@ -133,7 +133,7 @@ export default function AboutPage() {
                   <li
                     key={c}
                     className="text-white font-light"
-                    style={{ fontSize: "0.85rem", opacity: 0.55, letterSpacing: "0.02em" }}
+                    style={{ fontSize: "0.85rem", opacity: 0.75, letterSpacing: "0.02em" }}
                   >
                     {c}
                   </li>
@@ -141,7 +141,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <div>
-              <p className="label text-white mb-6" style={{ opacity: 0.22 }}>
+              <p className="label text-white mb-6" style={{ opacity: 0.5 }}>
                 Influences
               </p>
               <ul className="flex flex-col gap-2.5">
@@ -149,7 +149,7 @@ export default function AboutPage() {
                   <li
                     key={i}
                     className="text-white font-light"
-                    style={{ fontSize: "0.85rem", opacity: 0.55, letterSpacing: "0.02em" }}
+                    style={{ fontSize: "0.85rem", opacity: 0.75, letterSpacing: "0.02em" }}
                   >
                     {i}
                   </li>

@@ -49,11 +49,8 @@ export default function WorkGrid() {
   return (
     <div>
       {/* Filter bar */}
-      <div className="px-6 md:px-10 pb-10 border-b border-white/10 flex items-center justify-between">
+      <div className="px-6 md:px-10 pb-10 border-b border-white/10">
         <FilterBar active={filter} onChange={setFilter} />
-        <span className="label text-white hidden md:block" style={{ opacity: 0.2 }}>
-          {visible.length} projets
-        </span>
       </div>
 
       {visible.length === 0 ? (
@@ -127,11 +124,8 @@ export default function WorkGrid() {
                     </div>
                   )}
 
-                  {/* Bottom-left meta overlay */}
+                  {/* Bottom-left title overlay */}
                   <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10">
-                    <p className="label text-white mb-2" style={{ opacity: 0.5, mixBlendMode: "difference" }}>
-                      {String(active + 1).padStart(2, "0")} / {String(visible.length).padStart(2, "0")}
-                    </p>
                     <h2
                       className="text-white title"
                       style={{ fontSize: "clamp(1.6rem, 3.2vw, 3rem)", lineHeight: 1, mixBlendMode: "difference" }}
@@ -146,7 +140,7 @@ export default function WorkGrid() {
 
           {/* Right — index list */}
           <div className="md:w-2/5 flex flex-col justify-center px-6 md:px-12 lg:px-16 py-10 md:py-16 order-2 md:order-2">
-            <p className="label text-white mb-8 md:mb-10" style={{ opacity: 0.25 }}>
+            <p className="label text-white mb-8 md:mb-10" style={{ opacity: 0.5 }}>
               Index
             </p>
             <ul className="flex flex-col gap-1 md:gap-1.5">
@@ -159,12 +153,12 @@ export default function WorkGrid() {
                       onFocus={() => setActive(i)}
                       onClick={() => router.push(`/work/${p.slug}`)}
                       className="w-full text-left flex items-baseline gap-4 md:gap-6 py-1.5 md:py-2 transition-opacity duration-300"
-                      style={{ opacity: isActive ? 1 : 0.32 }}
+                      style={{ opacity: isActive ? 1 : 0.55 }}
                       data-cursor={p.type === "video" ? "Lire" : "Voir"}
                     >
                       <span
                         className="label text-white shrink-0 transition-opacity duration-300"
-                        style={{ opacity: isActive ? 0.55 : 0.45 }}
+                        style={{ opacity: isActive ? 0.8 : 0.55 }}
                       >
                         {String(i + 1).padStart(2, "0")}
                       </span>
@@ -179,13 +173,13 @@ export default function WorkGrid() {
                       </span>
                       <span
                         className="label text-white hidden md:inline shrink-0"
-                        style={{ opacity: isActive ? 0.45 : 0.25 }}
+                        style={{ opacity: isActive ? 0.65 : 0.45 }}
                       >
                         {p.type === "photo" ? "Photo" : p.type === "video" ? "Vidéo" : "3D"}
                       </span>
                       <span
                         className="label text-white shrink-0"
-                        style={{ opacity: isActive ? 0.45 : 0.25 }}
+                        style={{ opacity: isActive ? 0.65 : 0.45 }}
                       >
                         {p.year}
                       </span>

@@ -8,7 +8,7 @@ export default function NotFound() {
         <Link
           href="/"
           className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
-          style={{ opacity: 0.3 }}
+          style={{ opacity: 0.7 }}
         >
           <span aria-hidden="true">←</span>
           Accueil
@@ -20,7 +20,7 @@ export default function NotFound() {
         <div>
           <p
             className="label text-white mb-6"
-            style={{ opacity: 0.22 }}
+            style={{ opacity: 0.5 }}
           >
             404
           </p>
@@ -34,7 +34,7 @@ export default function NotFound() {
 
         <p
           className="text-white font-light leading-relaxed max-w-md"
-          style={{ fontSize: "0.95rem", opacity: 0.5, lineHeight: 1.9 }}
+          style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
         >
           Rien à cette adresse. Un lien qui a changé, une URL tapée de travers.
           Revenons à l&apos;accueil — tout est là-bas.
@@ -43,7 +43,7 @@ export default function NotFound() {
         <Link
           href="/"
           className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4"
-          style={{ opacity: 0.55 }}
+          style={{ opacity: 0.85 }}
         >
           Retour à l&apos;accueil
           <span aria-hidden="true">→</span>
