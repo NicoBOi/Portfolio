@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects } from "@/data/projects";
@@ -279,6 +280,21 @@ export default function Hero() {
               {String(i + 1).padStart(2, "0")}
             </button>
           ))}
+          {/* Separator + "all projects" affordance */}
+          <span className="block w-2 h-px bg-white mt-2" style={{ opacity: 0.3 }} aria-hidden="true" />
+          <Link
+            href="/work"
+            className="transition-opacity duration-300 inline-flex items-center"
+            style={{ opacity: 0.4 }}
+            data-cursor="Tous les projets"
+            aria-label="Tous les projets"
+          >
+            <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+              <circle cx="2" cy="5" r="1" fill="white" />
+              <circle cx="8" cy="5" r="1" fill="white" />
+              <circle cx="14" cy="5" r="1" fill="white" />
+            </svg>
+          </Link>
         </div>
 
         {/* Scroll affordance — left middle (desktop only; mobile users swipe) */}
