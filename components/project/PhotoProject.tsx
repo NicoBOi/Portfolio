@@ -94,27 +94,11 @@ export default function PhotoProject({ project, prev, next }: Props) {
         >
           {project.title}
         </h1>
-        <div className="flex flex-col gap-4 md:justify-end">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="label text-white" style={{ opacity: 0.35 }}>{project.year}</span>
-            <span className="label text-white" style={{ opacity: 0.14 }}>/</span>
-            <span className="label text-white" style={{ opacity: 0.35 }}>{project.role}</span>
-            <span className="label text-white" style={{ opacity: 0.14 }}>/</span>
-            <span className="label text-white" style={{ opacity: 0.35 }}>{project.category}</span>
-          </div>
-          {project.description && (
-            <p
-              className="text-white font-light"
-              style={{
-                fontSize: "0.9rem",
-                opacity: 0.55,
-                lineHeight: 1.9,
-                maxWidth: "54ch",
-              }}
-            >
-              {project.description}
-            </p>
-          )}
+        <div className="flex flex-col gap-2 md:justify-end">
+          <p className="label text-white" style={{ opacity: 0.55 }}>{project.meta.type}</p>
+          <p className="label text-white" style={{ opacity: 0.35 }}>{project.meta.location}</p>
+          <p className="label text-white" style={{ opacity: 0.35 }}>{project.meta.credits}</p>
+          <p className="label text-white mt-4" style={{ opacity: 0.25 }}>{project.year}</p>
         </div>
       </div>
 

@@ -1,5 +1,11 @@
 export type ProjectType = "photo" | "video";
 
+export interface ProjectMeta {
+  type: string;      // e.g. "Mode / projet personnel"
+  location: string;  // e.g. "Bordeaux, France"
+  credits: string;   // e.g. "Photo & post-prod"
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -8,6 +14,7 @@ export interface Project {
   type: ProjectType;
   category: string;
   coverPlaceholder: string;
+  meta: ProjectMeta;
   description?: string;
   images?: number;
   imageFiles?: string[];
@@ -26,8 +33,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Portrait",
     coverPlaceholder: "#1E1A18",
-    description:
-      "Des visages tenus trop longtemps. Quand la peau cesse d'être un portrait et devient un territoire. Regardez. Tenez le regard. Quelque chose finit par céder.",
+    meta: {
+      type: "Portrait / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "DSCF7145-Modifier_AVIF.avif",
       "DSCF7125_AVIF.avif",
@@ -49,8 +59,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#0F1115",
-    description:
-      "Tournée après minuit, quand les corps oublient qu'on les regarde. La nuit n'est pas sombre — elle est bleue, lente, précise. On y voit mieux qu'on ne croit.",
+    meta: {
+      type: "Nocturne / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "DSCF0244_AVIF.avif",
       "DSCF0356-2_AVIF.avif",
@@ -69,8 +82,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1A2430",
-    description:
-      "Une pièce. Du carrelage bleu. Une figure qui ne sort pas. Les salles de bain gardent les secrets que les chambres trahissent. Celle-ci est pleine.",
+    meta: {
+      type: "Intérieur / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "P1000698_AVIF.avif",
       "P1000705_AVIF.avif",
@@ -92,8 +108,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1D2118",
-    description:
-      "Le même parc, trois fois. Trois lumières, trois absences, trois façons de ne rien voir. Ce qu'on regarde longtemps finit par nous regarder en retour.",
+    meta: {
+      type: "Paysage / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "DSCF1302_AVIF.avif",
       "DSCF0221_AVIF.avif",
@@ -114,8 +133,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1A1414",
-    description:
-      "La corde dit ce que les mots refusent. Un corps tenu, relâché, tenu encore. Ce n'est pas une soumission — c'est une précision. Un langage qui n'a besoin de personne pour se traduire.",
+    meta: {
+      type: "Documentaire / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "14_AVIF.avif",
       "3_AVIF.avif",
@@ -136,8 +158,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Mode",
     coverPlaceholder: "#241820",
-    description:
-      "Rose. Presque trop. Une seule couleur, poussée jusqu'à ce que le jeu devienne une menace. Cinq images — pas une de plus.",
+    meta: {
+      type: "Mode / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "DSCF0493_AVIF.avif",
       "DSCF0129_AVIF.avif",
@@ -155,8 +180,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Éditorial",
     coverPlaceholder: "#201A16",
-    description:
-      "Une chambre vide ne l'est jamais vraiment. Les tissus se souviennent. La lumière attend. Chaque angle tient une conversation qu'on n'entendra pas.",
+    meta: {
+      type: "Éditorial / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "P1001688-2_AVIF.avif",
       "P1001662_AVIF.avif",
@@ -174,8 +202,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#17181A",
-    description:
-      "Ni arrivée, ni partie. Entre les deux, une figure qu'on n'arrive pas à nommer. Trois images suffisent — le reste se construit dans votre regard.",
+    meta: {
+      type: "Fiction / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "DSCF6154_AVIF.avif",
       "DSCF6082_AVIF.avif",
@@ -191,8 +222,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#141414",
-    description:
-      "Contraste poussé jusqu'au bord. Noir. Blanc cassé. Rien au milieu. Ces images ne s'excusent plus d'exister — c'est leur seul projet.",
+    meta: {
+      type: "Série noir & blanc / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "P1002222_AVIF.avif",
       "P1001913-3_AVIF.avif",
@@ -208,8 +242,11 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1C1E17",
-    description:
-      "Fin d'été. Lumière qui s'étire. Des images prises avec le pressentiment qu'elles deviendraient des souvenirs avant même d'exister.",
+    meta: {
+      type: "Paysage / projet personnel",
+      location: "Bordeaux, France",
+      credits: "Photo & post-prod",
+    },
     imageFiles: [
       "P1002259-2_AVIF.avif",
       "P1002225_AVIF.avif",
