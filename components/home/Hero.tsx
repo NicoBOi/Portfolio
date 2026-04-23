@@ -295,24 +295,25 @@ export default function Hero() {
           </Link>
         </div>
 
-        {/* Scroll affordance — left middle (desktop only; mobile users swipe) */}
-        <div className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
+        {/* Scroll affordance — left middle. Smaller on mobile so it doesn't crowd. */}
+        <div className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-3 md:gap-4 pointer-events-none">
           <span
             className="label text-white"
             style={{
               opacity: 0.4,
               writingMode: "vertical-rl",
               transform: "rotate(180deg)",
-              letterSpacing: "0.32em",
+              letterSpacing: "0.28em",
+              fontSize: "9px",
             }}
           >
             Scroll
           </span>
-          <div className="relative h-12 w-px bg-white/15 overflow-hidden">
+          <div className="relative h-8 md:h-12 w-px bg-white/15 overflow-hidden">
             <motion.div
               className="absolute left-0 w-full bg-white"
-              style={{ opacity: 0.7, height: 6 }}
-              animate={{ y: [-8, 48] }}
+              style={{ opacity: 0.7, height: 5 }}
+              animate={{ y: [-8, 40] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
             />
           </div>
