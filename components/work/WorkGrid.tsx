@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
@@ -8,11 +8,13 @@ import type { ProjectType } from "@/data/projects";
 import FilterBar, { type Filter } from "./FilterBar";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const SWIPE_THRESHOLD = 40; // px
 
 export default function WorkGrid() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [active, setActive] = useState(0);
+  const touchRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
   const visible =
     filter === "all"
@@ -22,6 +24,23 @@ export default function WorkGrid() {
   useEffect(() => { setActive(0); }, [filter]);
 
   const current = visible[active];
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY, t: performance.now() };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchRef.current;
+    if (!start) return;
+    const end = e.changedTouches[0];
+    const dx = end.clientX - start.x;
+    const dy = end.clientY - start.y;
+    touchRef.current = null;
+    // ignore vertical swipes — let the page scroll
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) <= Math.abs(dy)) return;
+    if (dx < 0) setActive((i) => Math.min(visible.length - 1, i + 1));
+    else setActive((i) => Math.max(0, i - 1));
+  };
 
   return (
     <div>
@@ -39,8 +58,10 @@ export default function WorkGrid() {
         <div className="flex flex-col md:flex-row border-b border-white/10 md:min-h-[78vh]">
           {/* Left — image (sticky on mobile so it stays visible while the index scrolls) */}
           <div
-            className="md:w-3/5 relative bg-black overflow-hidden order-1 md:order-1 aspect-[4/3] md:aspect-auto md:h-auto sticky top-14 md:static z-10"
+            className="md:w-3/5 relative bg-black overflow-hidden order-1 md:order-1 aspect-[4/3] md:aspect-auto md:h-auto sticky top-14 md:static z-10 touch-pan-y"
             style={{ minHeight: 0 }}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
             <AnimatePresence mode="wait">
               {current && (
