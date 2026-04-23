@@ -73,14 +73,13 @@ export default function WorkGrid() {
               {current && (
                 <motion.div
                   key={current.slug}
-                  className="absolute inset-0"
-                  style={{ backgroundColor: current.coverPlaceholder }}
+                  className="absolute inset-0 bg-black"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5, ease: SOFT }}
                   onClick={() => router.push(`/work/${current.slug}`)}
-                  data-cursor={current.type === "video" ? "Lire" : "Voir"}
+                  data-cursor={current.type === "photo" ? "Voir" : "Lire"}
                   data-cursor-silent
                 >
                   {current.imageFiles && current.imageFiles.length > 0 ? (
@@ -103,6 +102,7 @@ export default function WorkGrid() {
                     <iframe
                       src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
                       className="absolute inset-0 w-full h-full pointer-events-none border-0"
+                      style={{ backgroundColor: "#000" }}
                       allow="autoplay"
                       title={current.title}
                     />

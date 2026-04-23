@@ -179,6 +179,15 @@ export default function Hero() {
                 }
                 return <div className="placeholder-img text-white h-full">Image</div>;
               })()}
+              {/* Black mask for video slides — covers the Vimeo/YT loading flash before playback starts. */}
+              {(current.youtubeId || getVimeoId(current.videoUrl)) && (
+                <motion.div
+                  className="absolute inset-0 bg-black pointer-events-none"
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 0 }}
+                  transition={{ duration: 0.5, delay: 1.2, ease: SOFT }}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
 
