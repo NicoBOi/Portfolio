@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
@@ -52,6 +52,20 @@ export default function PhotoProject({ project, prev, next }: Props) {
   const rest = files.slice(1);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
+  // Mobile gallery: horizontal scroll-snap with live page indicator
+  const mobileScrollerRef = useRef<HTMLDivElement>(null);
+  const [mobileActive, setMobileActive] = useState(0);
+  useEffect(() => {
+    const el = mobileScrollerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const page = Math.round(el.scrollLeft / el.clientWidth);
+      setMobileActive(page);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <article className="bg-black min-h-screen">
       {/* Back */}
@@ -66,45 +80,120 @@ export default function PhotoProject({ project, prev, next }: Props) {
         </Link>
       </div>
 
-      {/* Cover — framed, not full-bleed */}
-      <div className="px-6 md:px-10 lg:px-16 mt-10 md:mt-16">
-        <motion.div
-          className="relative w-full max-w-6xl mx-auto overflow-hidden"
-          style={{
-            aspectRatio: isPortrait ? "4/5" : "16/10",
-            backgroundColor: bg,
-            maxHeight: "78vh",
-          }}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: SOFT }}
+      {/* Mobile — horizontal swipe gallery. All files in one scroll-snap row. */}
+      <div className="md:hidden mt-8">
+        <div
+          ref={mobileScrollerRef}
+          className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
+          style={{ scrollbarWidth: "none" }}
         >
-          {cover ? (
+          {files.map((f, i) => (
             <button
+              key={f}
               type="button"
-              onClick={() => setLightbox(0)}
-              className="w-full h-full block"
-              data-cursor="Agrandir"
-              aria-label="Agrandir"
+              onClick={() => setLightbox(i)}
+              className="snap-center shrink-0 w-screen relative"
+              style={{ aspectRatio: isPortrait ? "4/5" : "3/2", backgroundColor: bg }}
+              aria-label={`Agrandir la photo ${i + 1}`}
             >
               <img
-                src={`/projects/${project.slug}/${cover}`}
-                alt={project.title}
-                className="w-full h-full object-cover"
-                loading="eager"
-                fetchPriority="high"
+                src={`/projects/${project.slug}/${f}`}
+                alt=""
+                className="w-full h-full object-cover block"
+                loading={i === 0 ? "eager" : "lazy"}
                 decoding="async"
               />
+              <PlateNumber current={i + 1} total={files.length} />
             </button>
-          ) : (
-            <div className="placeholder-img text-white h-full">[01]</div>
-          )}
-          <PlateNumber current={1} total={files.length} />
-        </motion.div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center gap-2 py-4">
+          <span className="label text-white tabular-nums" style={{ opacity: 0.5 }}>
+            {String(mobileActive + 1).padStart(2, "0")} / {String(files.length).padStart(2, "0")}
+          </span>
+        </div>
       </div>
 
-      {/* Metadata */}
-      <div className="px-6 md:px-10 lg:px-16 py-16 md:py-24 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+      {/* Desktop — cover + editorial sequence */}
+      <div className="hidden md:block">
+        {/* Cover — framed, not full-bleed */}
+        <div className="px-6 md:px-10 lg:px-16 mt-10 md:mt-16">
+          <motion.div
+            className="relative w-full max-w-6xl mx-auto overflow-hidden"
+            style={{
+              aspectRatio: isPortrait ? "4/5" : "16/10",
+              backgroundColor: bg,
+              maxHeight: "78vh",
+            }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: SOFT }}
+          >
+            {cover ? (
+              <button
+                type="button"
+                onClick={() => setLightbox(0)}
+                className="w-full h-full block"
+                data-cursor="Agrandir"
+                aria-label="Agrandir"
+              >
+                <img
+                  src={`/projects/${project.slug}/${cover}`}
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </button>
+            ) : (
+              <div className="placeholder-img text-white h-full">[01]</div>
+            )}
+            <PlateNumber current={1} total={files.length} />
+          </motion.div>
+        </div>
+
+        {/* Editorial image sequence — generous, varied, breathing */}
+        <div className="px-6 md:px-10 lg:px-16 pb-0">
+          <div className="max-w-6xl mx-auto flex flex-col gap-16 md:gap-28 pt-16 md:pt-24">
+            {rest.map((f, i) => {
+              const className = LAYOUTS[i % LAYOUTS.length];
+              return (
+                <motion.figure
+                  key={f}
+                  className={`relative ${className}`}
+                  style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-8%" }}
+                  transition={{ duration: 0.9, ease: SOFT }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setLightbox(i + 1)}
+                    className="w-full block"
+                    style={{ backgroundColor: bg + "66" }}
+                    data-cursor="Agrandir"
+                    aria-label="Agrandir"
+                  >
+                    <img
+                      src={`/projects/${project.slug}/${f}`}
+                      alt=""
+                      className="w-full h-auto object-cover block"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </button>
+                  <PlateNumber current={i + 2} total={files.length} />
+                </motion.figure>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Metadata — shared between mobile + desktop */}
+      <div className="px-6 md:px-10 lg:px-16 py-14 md:py-24 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16">
         <h1
           className="text-white title"
           style={{ fontSize: "clamp(2rem, 4.5vw, 4.5rem)", lineHeight: 1 }}
@@ -116,44 +205,6 @@ export default function PhotoProject({ project, prev, next }: Props) {
           <p className="label text-white" style={{ opacity: 0.6 }}>{project.meta.location}</p>
           <p className="label text-white" style={{ opacity: 0.6 }}>{project.meta.credits}</p>
           <p className="label text-white mt-4" style={{ opacity: 0.45 }}>{project.year}</p>
-        </div>
-      </div>
-
-      {/* Editorial image sequence — generous, varied, breathing */}
-      <div className="px-6 md:px-10 lg:px-16 pb-24 md:pb-40">
-        <div className="max-w-6xl mx-auto flex flex-col gap-16 md:gap-28">
-          {rest.map((f, i) => {
-            const className = LAYOUTS[i % LAYOUTS.length];
-            return (
-              <motion.figure
-                key={f}
-                className={`relative ${className}`}
-                style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-8%" }}
-                transition={{ duration: 0.9, ease: SOFT }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setLightbox(i + 1)}
-                  className="w-full block"
-                  style={{ backgroundColor: bg + "66" }}
-                  data-cursor="Agrandir"
-                  aria-label="Agrandir"
-                >
-                  <img
-                    src={`/projects/${project.slug}/${f}`}
-                    alt=""
-                    className="w-full h-auto object-cover block"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </button>
-                <PlateNumber current={i + 2} total={files.length} />
-              </motion.figure>
-            );
-          })}
         </div>
       </div>
 
