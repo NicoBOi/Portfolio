@@ -264,8 +264,12 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Vertical index — hover to preview, click to open */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-auto">
+        {/* Vertical index — hover to preview, click to open.
+            Offset upward to match the title's optical center (bottom nav shifts flex-1 center up). */}
+        <div
+          className="absolute right-2 z-20 flex flex-col items-end pointer-events-auto"
+          style={{ top: "calc(50% - 2rem)", transform: "translateY(-50%)" }}
+        >
           {FEATURED.map((p, i) => (
             <button
               key={p.slug}
@@ -295,8 +299,12 @@ export default function Hero() {
           </Link>
         </div>
 
-        {/* Scroll affordance — left middle. Smaller on mobile so it doesn't crowd. */}
-        <div className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-3 md:gap-4 pointer-events-none">
+        {/* Scroll affordance — left middle. Smaller on mobile so it doesn't crowd.
+            Same optical-center offset as the right index. */}
+        <div
+          className="absolute left-3 md:left-6 z-20 flex flex-col items-center gap-3 md:gap-4 pointer-events-none"
+          style={{ top: "calc(50% - 2rem)", transform: "translateY(-50%)" }}
+        >
           <span
             className="label text-white"
             style={{
