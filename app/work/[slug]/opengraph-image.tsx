@@ -96,7 +96,7 @@ export default async function ProjectOG({
             opacity: 0.35,
           }}
         >
-          <span>Photographie</span>
+          <span>{project?.type === "photo" ? "Photo" : project?.type === "3d" ? "Motion 3D" : "Film"}</span>
           <span>sempere.studio</span>
         </div>
       </div>

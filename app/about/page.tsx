@@ -4,14 +4,14 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "À propos",
   description:
-    "Nicolas Sempere, 28 ans, basé à Bordeaux. Photographe depuis l'adolescence, réalisateur depuis cinq ans. Images brutes, minimales, spectaculaires.",
+    "Nicolas Sempere — photographie, film, motion 3D. 28 ans, basé à Bordeaux. Images brutes, minimales, spectaculaires.",
   alternates: { canonical: "/about" },
   openGraph: {
     type: "profile",
     url: "/about",
     title: "À propos — Nicolas Sempere",
     description:
-      "Nicolas Sempere, photographe et réalisateur basé à Bordeaux. Images brutes, minimales, spectaculaires.",
+      "Photographe, réalisateur et motion designer 3D basé à Bordeaux. Images brutes, minimales, spectaculaires.",
     siteName: "Nicolas Sempere",
     locale: "fr_FR",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "À propos — Nicolas Sempere",
     description:
-      "Photographe et réalisateur basé à Bordeaux. Images brutes, minimales, spectaculaires.",
+      "Photo, film, motion 3D. Basé à Bordeaux. Images brutes, minimales, spectaculaires.",
   },
 };
 

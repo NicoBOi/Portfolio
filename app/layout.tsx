@@ -5,9 +5,9 @@ import CustomCursor from "@/components/ui/CustomCursor";
 
 const SITE_URL = "https://sempere.studio";
 const SITE_NAME = "Nicolas Sempere";
-const SITE_TITLE = "Nicolas Sempere — Photographe & Réalisateur";
+const SITE_TITLE = "Nicolas Sempere — Photo, Film, 3D";
 const SITE_DESCRIPTION =
-  "Nicolas Sempere, photographe et réalisateur basé entre Bordeaux et Paris. Images brutes, minimales, spectaculaires. Art, mode, éditorial.";
+  "Nicolas Sempere — photographie, film et motion 3D. Basé entre Bordeaux et Paris. Art, mode, éditorial, clip, pub. Des images brutes, minimales, spectaculaires.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -24,6 +24,9 @@ export const metadata: Metadata = {
     "Nicolas Sempere",
     "photographe",
     "réalisateur",
+    "motion designer 3D",
+    "motion 3D",
+    "réalisation 3D",
     "photographe Bordeaux",
     "photographe Paris",
     "direction artistique",
@@ -31,8 +34,12 @@ export const metadata: Metadata = {
     "photographie éditoriale",
     "portrait",
     "film",
+    "clip musical",
+    "pub",
+    "Cinéma 4D",
+    "Blender",
   ],
-  category: "photography",
+  category: "creative services",
   alternates: {
     canonical: "/",
   },
@@ -80,7 +87,16 @@ const personJsonLd = {
   name: "Nicolas Sempere",
   url: SITE_URL,
   image: `${SITE_URL}/about/portrait.avif`,
-  jobTitle: "Photographe & Réalisateur",
+  jobTitle: "Photographe, réalisateur & motion designer 3D",
+  description:
+    "Photographe, réalisateur et motion designer 3D basé entre Bordeaux et Paris. Art, mode, éditorial, clip, pub.",
+  knowsAbout: [
+    "Photographie",
+    "Réalisation",
+    "Motion design 3D",
+    "Direction artistique",
+    "Post-production",
+  ],
   worksFor: { "@type": "Organization", name: "Nicolas Sempere" },
   address: {
     "@type": "PostalAddress",

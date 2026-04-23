@@ -18,9 +18,11 @@ export async function generateMetadata({
   if (!project) return {};
 
   const title = project.title;
+  const discipline =
+    project.type === "photo" ? "Photographie" : project.type === "3d" ? "Motion 3D" : "Film";
   const description =
     project.description ??
-    `${project.title} — ${project.category}, ${project.year}. Photographie par Nicolas Sempere.`;
+    `${project.title} — ${project.meta.type}. ${discipline} par Nicolas Sempere, ${project.year}.`;
   const url = `/work/${project.slug}`;
 
   return {

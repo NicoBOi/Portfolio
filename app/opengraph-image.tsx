@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { loadOgFonts } from "@/lib/og-fonts";
 
 export const runtime = "edge";
-export const alt = "Nicolas Sempere — Photographe & Réalisateur";
+export const alt = "Nicolas Sempere — Photo, Film, 3D";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,7 +34,7 @@ export default async function OGImage() {
             marginBottom: 40,
           }}
         >
-          Photographe — Réalisateur
+          Photo — Film — 3D
         </div>
 
         <div
