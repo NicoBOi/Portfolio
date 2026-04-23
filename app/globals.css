@@ -117,26 +117,28 @@ body::after {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ── Cinemascope (2.39:1) video hero ──────────────────────
-   Mobile: letterboxed (full video visible, no crop).
-   Desktop: cover — iframe is scaled to cinemascope aspect so the
-   video inside fills the viewport; sides get cropped by overflow. */
-.video-hero-frame {
+/* ── Hero video iframe ────────────────────────────────────
+   Reads --video-ratio (width/height) from the element's inline style.
+   Mobile: contain (full video visible, letterboxed — avoids over-cropping wide formats like cinemascope).
+   Desktop: cover (video fills viewport, overflow-hidden on parent crops the extra). */
+.hero-video {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   border: 0;
+  background-color: #000;
   pointer-events: none;
   width: 100vw;
-  height: calc(100vw / 2.39);
+  height: calc(100vw / var(--video-ratio));
 }
 @media (min-width: 768px) {
-  .video-hero-frame {
-    width: max(100vw, calc(100vh * 2.39));
-    height: max(calc(100vw / 2.39), 100vh);
+  .hero-video {
+    width: max(100vw, calc(100vh * var(--video-ratio)));
+    height: max(calc(100vw / var(--video-ratio)), 100vh);
   }
 }
+
 
 /* ── Cursor REC pulse ────────────────────────────────────── */
 @keyframes rec-blink {

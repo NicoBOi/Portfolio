@@ -149,6 +149,7 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   const [muted, setMuted] = useState(true);
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const iframeId = `yt-vp-${youtubeId}`;
 
@@ -160,7 +161,11 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
       player = new yt.Player(iframeId, {
         events: {
           onReady: () => setReady(true),
-          onStateChange: (e: { data: number }) => setPlaying(e.data === 1),
+          onStateChange: (e: { data: number }) => {
+            const isPlaying = e.data === 1;
+            setPlaying(isPlaying);
+            if (isPlaying) setHasPlayed(true);
+          },
         },
       });
       playerRef.current = player;
@@ -186,6 +191,7 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
       playerRef.current = null;
       setReady(false);
       setPlaying(false);
+      setHasPlayed(false);
     };
   }, [iframeId]);
 
@@ -268,6 +274,15 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
         onVolumeChange={handleVolume}
         onFullscreen={handleFullscreen}
       />
+      {/* Opaque loading mask — hides YT's title/branding/spinner chrome until the video actually starts. */}
+      {!hasPlayed && (
+        <div className="absolute inset-0 z-20 bg-black flex items-center justify-center pointer-events-none">
+          <div
+            className="w-8 h-8 rounded-full border border-white/20 animate-spin"
+            style={{ borderTopColor: "rgba(255,255,255,0.55)" }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -284,6 +299,7 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
   const [muted, setMuted] = useState(true);
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
   const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
@@ -292,7 +308,10 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
     playerRef.current = player;
 
     player.ready().then(() => setReady(true));
-    const onPlay = () => setPlaying(true);
+    const onPlay = () => {
+      setPlaying(true);
+      setHasPlayed(true);
+    };
     const onPause = () => setPlaying(false);
     player.on("play", onPlay);
     player.on("pause", onPause);
@@ -388,6 +407,15 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
         onVolumeChange={handleVolume}
         onFullscreen={handleFullscreen}
       />
+      {/* Opaque loading mask — hides any Vimeo flash until the video actually starts. */}
+      {!hasPlayed && (
+        <div className="absolute inset-0 z-20 bg-black flex items-center justify-center pointer-events-none">
+          <div
+            className="w-8 h-8 rounded-full border border-white/20 animate-spin"
+            style={{ borderTopColor: "rgba(255,255,255,0.55)" }}
+          />
+        </div>
+      )}
     </div>
   );
 }

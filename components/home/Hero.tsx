@@ -132,46 +132,53 @@ export default function Hero() {
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
-              className="absolute inset-0 overflow-hidden"
-              style={{ backgroundColor: current.coverPlaceholder }}
+              className="absolute inset-0 overflow-hidden bg-black"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.4, ease: SOFT }}
             >
-              {current.youtubeId ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${current.youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&vq=hd1080&playlist=${current.youtubeId}`}
-                  className="absolute border-0 pointer-events-none"
-                  style={{
-                    top: "50%",
-                    left: "50%",
-                    width: "100vw",
-                    height: "56.25vw",
-                    minHeight: "100%",
-                    minWidth: "177.78vh",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                  allow="autoplay; encrypted-media"
-                />
-              ) : getVimeoId(current.videoUrl) ? (
-                <iframe
-                  src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
-                  className="video-hero-frame"
-                  allow="autoplay"
-                />
-              ) : current.imageFiles && current.imageFiles.length > 0 ? (
-                <img
-                  src={`/projects/${current.slug}/${current.imageFiles[0]}`}
-                  alt={current.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="eager"
-                  fetchPriority="high"
-                  decoding="async"
-                />
-              ) : (
-                <div className="placeholder-img text-white h-full">Image</div>
-              )}
+              {(() => {
+                const vId = getVimeoId(current.videoUrl);
+                if (current.youtubeId || vId) {
+                  // YouTube is 16:9 by convention; Vimeo reads from project metadata.
+                  const aspectStr = current.youtubeId ? "16/9" : current.videoAspect ?? "16/9";
+                  const [aw, ah] = aspectStr.split("/").map(Number);
+                  const ratio = aw / ah;
+                  const ratioStyle = { "--video-ratio": ratio } as React.CSSProperties;
+                  if (current.youtubeId) {
+                    return (
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&vq=hd1080&playsinline=1&playlist=${current.youtubeId}`}
+                        className="hero-video"
+                        style={ratioStyle}
+                        allow="autoplay; encrypted-media"
+                      />
+                    );
+                  }
+                  return (
+                    <iframe
+                      src={`https://player.vimeo.com/video/${vId}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
+                      className="hero-video"
+                      style={ratioStyle}
+                      allow="autoplay"
+                    />
+                  );
+                }
+                if (current.imageFiles && current.imageFiles.length > 0) {
+                  return (
+                    <img
+                      src={`/projects/${current.slug}/${current.imageFiles[0]}`}
+                      alt={current.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                    />
+                  );
+                }
+                return <div className="placeholder-img text-white h-full">Image</div>;
+              })()}
             </motion.div>
           </AnimatePresence>
 
