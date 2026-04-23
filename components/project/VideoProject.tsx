@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import Player from "@vimeo/player";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
+import VideoControls from "./VideoControls";
+import Link from "next/link";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -39,9 +41,10 @@ interface Props {
 }
 
 export default function VideoProject({ project, prev, next }: Props) {
-  // Prefer Vimeo URL when present (youtubeId may only be a thumbnail placeholder)
   const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
-  const youtubeId = vimeoId ? null : (project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null));
+  const youtubeId = vimeoId
+    ? null
+    : project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null);
 
   return (
     <article className="bg-black min-h-screen">
@@ -57,58 +60,19 @@ export default function VideoProject({ project, prev, next }: Props) {
         </Link>
       </div>
 
-      {/* Player */}
-      {youtubeId ? (
-        <YouTubePlayer youtubeId={youtubeId} project={project} />
-      ) : vimeoId ? (
-        <div
-          className="w-full mt-6 overflow-hidden bg-black"
-          style={{
-            aspectRatio: project.videoAspect ?? "16/9",
-            maxHeight: "82vh",
-          }}
-        >
-          <iframe
-            src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
-            className="w-full h-full block"
-            style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      ) : (
-        <div
-          className="relative w-full mt-6"
-          style={{
-            aspectRatio: project.videoAspect ?? "16/9",
-            maxHeight: "82vh",
-            backgroundColor: project.coverPlaceholder,
-          }}
-        >
-          <motion.div className="absolute inset-0 bg-black/60" />
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="flex flex-col items-center gap-5">
-              <div className="w-20 h-20 border-2 border-white/40 rounded-full flex items-center justify-center">
-                <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
-                  <path d="M1 1L15 9L1 17V1Z" fill="white" />
-                </svg>
-              </div>
-              <span className="label text-white" style={{ opacity: 0.4 }}>Bientôt disponible</span>
-            </div>
-          </div>
-          <motion.div
-            className="absolute bottom-6 left-6 md:left-10 z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <p className="label text-white mb-2" style={{ opacity: 0.3 }}>{project.year} — {project.role}</p>
-            <h1 className="text-white title" style={{ fontSize: "clamp(1.5rem, 3.5vw, 3rem)" }}>
-              {project.title}
-            </h1>
-          </motion.div>
-        </div>
-      )}
+      {/* Player — edge to edge, native aspect */}
+      <div
+        className="relative w-full mt-6 overflow-hidden bg-black"
+        style={{ aspectRatio: project.videoAspect ?? "16/9" }}
+      >
+        {youtubeId ? (
+          <YouTubePlayer youtubeId={youtubeId} />
+        ) : vimeoId ? (
+          <VimeoPlayer vimeoId={vimeoId} />
+        ) : (
+          <VideoPlaceholder project={project} />
+        )}
+      </div>
 
       {/* Info + meta */}
       <div className="px-6 md:px-10 py-8 border-b border-white/10 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,11 +119,15 @@ export default function VideoProject({ project, prev, next }: Props) {
   );
 }
 
-function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Project }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+// ──────────────────────────────────────────────────────────────
+// YouTube
+// ──────────────────────────────────────────────────────────────
+
+function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
   const [showControls, setShowControls] = useState(false);
@@ -210,8 +178,13 @@ function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Pro
 
   const toggleMute = () => {
     if (!playerRef.current) return;
-    if (muted) { playerRef.current.unMute(); setMuted(false); }
-    else { playerRef.current.mute(); setMuted(true); }
+    if (muted) {
+      playerRef.current.unMute();
+      setMuted(false);
+    } else {
+      playerRef.current.mute();
+      setMuted(true);
+    }
   };
 
   const handleVolume = (v: number) => {
@@ -219,96 +192,191 @@ function YouTubePlayer({ youtubeId, project }: { youtubeId: string; project: Pro
     setVolume(v);
     playerRef.current.setVolume(v);
     if (v === 0) setMuted(true);
-    else if (muted) { playerRef.current.unMute(); setMuted(false); }
+    else if (muted) {
+      playerRef.current.unMute();
+      setMuted(false);
+    }
   };
+
+  const handleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (document.fullscreenElement) document.exitFullscreen();
+    else containerRef.current.requestFullscreen?.();
+  };
+
+  // autoplay=1 + mute=1 suppresses the initial YT play-button overlay.
+  // loop=1 + playlist={id} loops a single video and avoids the "recommended
+  // videos" end-screen. modestbranding + rel=0 trims the rest of the chrome.
+  const src = `https://www.youtube.com/embed/${youtubeId}?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&vq=hd1080&playsinline=1`;
 
   return (
     <div
-      className="relative w-full mt-8"
-      style={{ aspectRatio: "16/9", maxHeight: "82vh", backgroundColor: project.coverPlaceholder }}
+      ref={containerRef}
+      className="absolute inset-0"
+      onMouseEnter={() => setShowControls(true)}
+      onMouseLeave={() => setShowControls(false)}
+    >
+      <iframe
+        id={iframeId}
+        src={src}
+        className="w-full h-full block"
+        style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+      <VideoControls
+        playing={playing}
+        muted={muted}
+        volume={volume}
+        ready={ready}
+        visible={showControls}
+        onTogglePlay={togglePlay}
+        onToggleMute={toggleMute}
+        onVolumeChange={handleVolume}
+        onFullscreen={handleFullscreen}
+      />
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Vimeo (uses background=1 to hide all native chrome; SDK for control)
+// ──────────────────────────────────────────────────────────────
+
+function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const playerRef = useRef<Player | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [volume, setVolume] = useState(80);
+  const [ready, setReady] = useState(false);
+  const [showControls, setShowControls] = useState(false);
+
+  useEffect(() => {
+    if (!iframeRef.current) return;
+    const player = new Player(iframeRef.current);
+    playerRef.current = player;
+
+    player.ready().then(() => setReady(true));
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    player.on("play", onPlay);
+    player.on("pause", onPause);
+
+    return () => {
+      player.off("play", onPlay);
+      player.off("pause", onPause);
+      player.destroy().catch(() => {});
+      playerRef.current = null;
+    };
+  }, [vimeoId]);
+
+  const togglePlay = () => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (playing) p.pause();
+    else p.play();
+  };
+
+  const toggleMute = () => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (muted) {
+      p.setMuted(false);
+      p.setVolume(volume / 100);
+      setMuted(false);
+    } else {
+      p.setMuted(true);
+      setMuted(true);
+    }
+  };
+
+  const handleVolume = (v: number) => {
+    const p = playerRef.current;
+    if (!p) return;
+    setVolume(v);
+    p.setVolume(v / 100);
+    if (v === 0) {
+      p.setMuted(true);
+      setMuted(true);
+    } else if (muted) {
+      p.setMuted(false);
+      setMuted(false);
+    }
+  };
+
+  const handleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (document.fullscreenElement) document.exitFullscreen();
+    else containerRef.current.requestFullscreen?.();
+  };
+
+  // background=1 hides every native Vimeo control / overlay (works on free accounts).
+  // We drive playback through the Player SDK instead.
+  const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1`;
+
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
     >
       <iframe
         ref={iframeRef}
-        id={iframeId}
-        src={`https://www.youtube.com/embed/${youtubeId}?enablejsapi=1&rel=0&modestbranding=1&vq=hd1080&controls=0&disablekb=1&fs=0&iv_load_policy=3`}
-        className="w-full h-full"
-        style={{ border: 0 }}
+        src={src}
+        className="w-full h-full block"
+        style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
       />
+      <VideoControls
+        playing={playing}
+        muted={muted}
+        volume={volume}
+        ready={ready}
+        visible={showControls}
+        onTogglePlay={togglePlay}
+        onToggleMute={toggleMute}
+        onVolumeChange={handleVolume}
+        onFullscreen={handleFullscreen}
+      />
+    </div>
+  );
+}
 
-      {/* Custom controls — bottom right, visible on hover */}
-      <div
-        className="absolute bottom-5 right-5 z-10 flex items-center gap-2"
-        style={{
-          opacity: showControls ? 1 : 0,
-          transition: "opacity 0.3s ease",
-          pointerEvents: showControls ? "auto" : "none",
-        }}
-      >
-        {/* Volume */}
-        <div
-          className="flex items-center gap-2 px-3 py-2 rounded"
-          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)" }}
-        >
-          <button
-            onClick={toggleMute}
-            className="flex items-center justify-center hover:opacity-100 transition-opacity duration-200"
-            style={{ opacity: 0.65 }}
-            aria-label={muted ? "Unmute" : "Mute"}
-          >
-            {muted || volume === 0 ? (
-              <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
-                <path d="M1 4H3L6 1V11L3 8H1V4Z" fill="white" />
-                <line x1="9" y1="3" x2="13" y2="9" stroke="white" strokeWidth="1.2" />
-                <line x1="13" y1="3" x2="9" y2="9" stroke="white" strokeWidth="1.2" />
-              </svg>
-            ) : (
-              <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
-                <path d="M1 4H3L6 1V11L3 8H1V4Z" fill="white" />
-                <path d="M9 3.5C10.2 4.5 11 5.7 11 6C11 6.3 10.2 7.5 9 8.5" stroke="white" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-                {volume > 50 && <path d="M11.5 1.5C13.2 3 14 4.5 14 6C14 7.5 13.2 9 11.5 10.5" stroke="white" strokeWidth="1.2" fill="none" strokeLinecap="round" />}
-              </svg>
-            )}
-          </button>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={muted ? 0 : volume}
-            onChange={(e) => handleVolume(Number(e.target.value))}
-            className="cursor-pointer"
-            style={{ width: 64, height: 2, accentColor: "white", opacity: 0.65 }}
-          />
+// ──────────────────────────────────────────────────────────────
+// Placeholder for projects without a resolved video source
+// ──────────────────────────────────────────────────────────────
+
+function VideoPlaceholder({ project }: { project: Project }) {
+  return (
+    <div className="absolute inset-0" style={{ backgroundColor: project.coverPlaceholder }}>
+      <motion.div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="flex flex-col items-center gap-5">
+          <div className="w-20 h-20 border-2 border-white/40 rounded-full flex items-center justify-center">
+            <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
+              <path d="M1 1L15 9L1 17V1Z" fill="white" />
+            </svg>
+          </div>
+          <span className="label text-white" style={{ opacity: 0.4 }}>Bientôt disponible</span>
         </div>
-
-        {/* Play / Pause */}
-        <button
-          onClick={togglePlay}
-          disabled={!ready}
-          className="flex items-center justify-center rounded hover:opacity-100 transition-opacity duration-200"
-          style={{
-            background: "rgba(0,0,0,0.65)",
-            backdropFilter: "blur(8px)",
-            padding: "8px 10px",
-            opacity: ready ? 0.75 : 0.3,
-          }}
-          aria-label={playing ? "Pause" : "Play"}
-        >
-          {playing ? (
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="white">
-              <rect x="0" y="0" width="3.5" height="12" rx="1" />
-              <rect x="6.5" y="0" width="3.5" height="12" rx="1" />
-            </svg>
-          ) : (
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="white">
-              <path d="M1 0.5L9.5 6L1 11.5V0.5Z" />
-            </svg>
-          )}
-        </button>
       </div>
+      <motion.div
+        className="absolute bottom-6 left-6 md:left-10 z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <p className="label text-white mb-2" style={{ opacity: 0.3 }}>
+          {project.year} — {project.role}
+        </p>
+        <h1 className="text-white title" style={{ fontSize: "clamp(1.5rem, 3.5vw, 3rem)" }}>
+          {project.title}
+        </h1>
+      </motion.div>
     </div>
   );
 }
