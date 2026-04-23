@@ -8,13 +8,12 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-*,
-*::before,
-*::after {
-  cursor: none !important;
-}
-
-html, body {
+/* Applied once CustomCursor mounts — avoids a "no cursor" flash on slow loads */
+html.cursor-ready,
+html.cursor-ready body,
+html.cursor-ready *,
+html.cursor-ready *::before,
+html.cursor-ready *::after {
   cursor: none !important;
 }
 
@@ -28,9 +27,10 @@ button:hover * {
 
 /* Re-enable native cursor behavior on touch devices (no mouse) and hide the custom one */
 @media (hover: none), (pointer: coarse) {
-  *,
-  *::before,
-  *::after {
+  html,
+  html *,
+  html *::before,
+  html *::after {
     cursor: auto !important;
   }
   .custom-cursor {
@@ -121,4 +121,16 @@ body::after {
 @keyframes rec-blink {
   from { opacity: 1; }
   to   { opacity: 0.05; }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

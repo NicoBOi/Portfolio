@@ -83,7 +83,7 @@ export default function WorkGrid() {
                     <img
                       src={`/projects/${current.slug}/${current.imageFiles[0]}`}
                       alt={current.title}
-                      className="w-full h-full object-cover cursor-pointer"
+                      className="w-full h-full object-cover"
                       loading="eager"
                       decoding="async"
                       fetchPriority="high"
@@ -92,7 +92,7 @@ export default function WorkGrid() {
                     <img
                       src={`https://img.youtube.com/vi/${current.youtubeId}/maxresdefault.jpg`}
                       alt={current.title}
-                      className="w-full h-full object-cover cursor-pointer"
+                      className="w-full h-full object-cover"
                       decoding="async"
                     />
                   ) : (

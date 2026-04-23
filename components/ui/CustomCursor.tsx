@@ -34,6 +34,9 @@ export default function CustomCursor() {
     const el = cursorRef.current;
     if (!el) return;
 
+    // Gate `cursor: none` on mount so there's no "no cursor" flash before this runs
+    document.documentElement.classList.add("cursor-ready");
+
     let visible = false;
     let moved = false;
 
@@ -95,6 +98,7 @@ export default function CustomCursor() {
       document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseout", onWindowOut);
       document.documentElement.removeEventListener("mouseleave", onDocLeave);
+      document.documentElement.classList.remove("cursor-ready");
     };
   }, []);
 
