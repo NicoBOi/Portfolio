@@ -12,6 +12,10 @@ const TITLE = "Nicolas Sempere";
 const REPEL_RADIUS = 110;
 const REPEL_STRENGTH = 50;
 
+function getVimeoId(url?: string): string | null {
+  return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
+}
+
 export default function Hero() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
@@ -149,6 +153,21 @@ export default function Hero() {
                     transform: "translate(-50%, -50%)",
                   }}
                   allow="autoplay; encrypted-media"
+                />
+              ) : getVimeoId(current.videoUrl) ? (
+                <iframe
+                  src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
+                  className="absolute border-0 pointer-events-none"
+                  style={{
+                    top: "50%",
+                    left: "50%",
+                    width: "100vw",
+                    height: "56.25vw",
+                    minHeight: "100%",
+                    minWidth: "177.78vh",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                  allow="autoplay"
                 />
               ) : current.imageFiles && current.imageFiles.length > 0 ? (
                 <img

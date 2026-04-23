@@ -26,6 +26,23 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    slug: "showreel-3d",
+    title: "Showreel 3D",
+    year: 2024,
+    role: "Réalisation",
+    type: "video",
+    category: "Motion",
+    coverPlaceholder: "#0A0A0C",
+    meta: {
+      type: "Showreel / motion design 3D",
+      location: "Bordeaux, France",
+      credits: "Réalisation & post-prod",
+    },
+    videoUrl: "https://vimeo.com/722586890",
+    aspectRatio: "landscape",
+    featured: true,
+  },
+  {
     slug: "face-flower",
     title: "Face Flower",
     year: 2024,

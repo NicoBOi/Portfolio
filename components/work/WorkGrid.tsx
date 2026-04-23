@@ -10,6 +10,10 @@ import FilterBar, { type Filter } from "./FilterBar";
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SWIPE_THRESHOLD = 40; // px
 
+function getVimeoId(url?: string): string | null {
+  return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
+}
+
 export default function WorkGrid() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
@@ -94,6 +98,13 @@ export default function WorkGrid() {
                       alt={current.title}
                       className="w-full h-full object-cover"
                       decoding="async"
+                    />
+                  ) : getVimeoId(current.videoUrl) ? (
+                    <iframe
+                      src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
+                      className="absolute inset-0 w-full h-full pointer-events-none border-0"
+                      allow="autoplay"
+                      title={current.title}
                     />
                   ) : (
                     <div className="placeholder-img text-white h-full">
