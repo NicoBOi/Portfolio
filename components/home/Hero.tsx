@@ -332,14 +332,17 @@ function HeroVimeo({ vimeoId, ratio }: { vimeoId: string; ratio: number }) {
   useEffect(() => {
     if (!iframeRef.current) return;
     const player = new Player(iframeRef.current);
-    // `timeupdate` only fires once a frame has actually painted — more reliable
-    // than `play` on mobile where the browser can report play before first paint.
+    let revealTimer: number | undefined;
+    // `timeupdate` fires only once a frame has actually painted, but mobile
+    // Safari still has a small gap between the event and the compositor
+    // committing the frame. Wait an extra beat before revealing.
     const onFrame = () => {
-      setPlaying(true);
       player.off("timeupdate", onFrame);
+      revealTimer = window.setTimeout(() => setPlaying(true), 220);
     };
     player.on("timeupdate", onFrame);
     return () => {
+      if (revealTimer) window.clearTimeout(revealTimer);
       player.off("timeupdate", onFrame);
       player.destroy().catch(() => {});
     };
@@ -360,7 +363,7 @@ function HeroVimeo({ vimeoId, ratio }: { vimeoId: string; ratio: number }) {
         className="absolute inset-0 bg-black pointer-events-none z-10"
         initial={{ opacity: 1 }}
         animate={{ opacity: playing ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: SOFT }}
+        transition={{ duration: 0.25, ease: "linear" }}
       />
     </>
   );
