@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface Props {
   slug: string;
@@ -50,34 +51,60 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={onClose}
           data-cursor="Fermer"
         >
+          {/* Tap-to-close layer — below the zoom wrapper so pinch doesn't close the modal */}
+          <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
+
           <AnimatePresence mode="wait">
-            <motion.img
+            <motion.div
               key={current}
-              src={`/projects/${slug}/${current}`}
-              alt=""
-              className="max-w-[94vw] max-h-[92vh] object-contain"
+              className="relative z-[1] w-full h-full flex items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              draggable={false}
-            />
+            >
+              <TransformWrapper
+                doubleClick={{ mode: "toggle", step: 2.2 }}
+                pinch={{ disabled: false }}
+                wheel={{ step: 0.2 }}
+                minScale={1}
+                maxScale={5}
+                centerOnInit
+                limitToBounds
+              >
+                <TransformComponent
+                  wrapperStyle={{ width: "100%", height: "100%" }}
+                  contentStyle={{ width: "100%", height: "100%" }}
+                >
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <img
+                      src={`/projects/${slug}/${current}`}
+                      alt=""
+                      className="max-w-[94vw] max-h-[92vh] object-contain select-none"
+                      draggable={false}
+                    />
+                  </div>
+                </TransformComponent>
+              </TransformWrapper>
+            </motion.div>
           </AnimatePresence>
 
           {/* Close button */}
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
-            className="absolute top-5 right-6 label text-white hover:opacity-100 transition-opacity duration-300"
-            style={{ opacity: 0.6 }}
+            className="absolute top-5 right-6 z-[10] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-2 -mx-3"
+            style={{ opacity: 0.75 }}
           >
             Fermer
           </button>
 
           {/* Counter */}
-          <span className="absolute top-5 left-6 label text-white" style={{ opacity: 0.35 }}>
+          <span className="absolute top-5 left-6 z-[10] label text-white" style={{ opacity: 0.55 }}>
             {rendered !== null ? String(rendered + 1).padStart(2, "0") : "00"} / {String(files.length).padStart(2, "0")}
           </span>
 
@@ -85,8 +112,8 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
           {hasPrev && (
             <button
               onClick={(e) => { e.stopPropagation(); onChange(rendered! - 1); }}
-              className="absolute left-5 md:left-8 top-1/2 -translate-y-1/2 label text-white hover:opacity-100 transition-opacity duration-300"
-              style={{ opacity: 0.5 }}
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[10] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
+              style={{ opacity: 0.65 }}
               data-cursor="Précédent"
               aria-label="Précédent"
             >
@@ -98,8 +125,8 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
           {hasNext && (
             <button
               onClick={(e) => { e.stopPropagation(); onChange(rendered! + 1); }}
-              className="absolute right-5 md:right-8 top-1/2 -translate-y-1/2 label text-white hover:opacity-100 transition-opacity duration-300"
-              style={{ opacity: 0.5 }}
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[10] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
+              style={{ opacity: 0.65 }}
               data-cursor="Suivant"
               aria-label="Suivant"
             >
