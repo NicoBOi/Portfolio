@@ -46,6 +46,12 @@ export default function VideoProject({ project, prev, next }: Props) {
     ? null
     : project.youtubeId ?? (project.videoUrl ? getYoutubeId(project.videoUrl) : null);
 
+  // Portrait videos (e.g. 4:5) can't go edge-to-edge on desktop without scrolling
+  // the full page off. Cap height to viewport and center instead.
+  const videoAspect = project.videoAspect ?? "16/9";
+  const [aw, ah] = videoAspect.split("/").map(Number);
+  const isPortrait = aw && ah ? aw < ah : false;
+
   return (
     <article className="bg-black min-h-screen">
       {/* Back */}
@@ -60,10 +66,23 @@ export default function VideoProject({ project, prev, next }: Props) {
         </Link>
       </div>
 
-      {/* Player — edge to edge, native aspect */}
+      {/* Player */}
       <div
-        className="relative w-full mt-6 overflow-hidden bg-black"
-        style={{ aspectRatio: project.videoAspect ?? "16/9" }}
+        className={
+          isPortrait
+            ? "relative mt-6 overflow-hidden bg-black mx-auto"
+            : "relative w-full mt-6 overflow-hidden bg-black"
+        }
+        style={
+          isPortrait
+            ? {
+                aspectRatio: videoAspect,
+                // height = min(100vw * ratio, 85vh); width follows from aspect-ratio
+                height: `min(calc(100vw * ${ah / aw}), 85vh)`,
+                width: "auto",
+              }
+            : { aspectRatio: videoAspect }
+        }
       >
         {youtubeId ? (
           <YouTubePlayer youtubeId={youtubeId} />
