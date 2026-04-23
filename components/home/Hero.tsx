@@ -7,7 +7,7 @@ import { projects } from "@/data/projects";
 
 const FEATURED = projects;
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const SCROLL_LOCK_MS = 850;
+const SCROLL_LOCK_MS = 1050;
 const TITLE = "Nicolas Sempere";
 const REPEL_RADIUS = 110;
 const REPEL_STRENGTH = 50;
@@ -129,11 +129,11 @@ export default function Hero() {
             <motion.div
               key={index}
               className="absolute inset-0 overflow-hidden"
-              style={{ backgroundColor: current.coverPlaceholder }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: SOFT }}
+              style={{ backgroundColor: current.coverPlaceholder, willChange: "clip-path" }}
+              initial={{ clipPath: "inset(0 100% 0 0)" }}
+              animate={{ clipPath: "inset(0 0 0 0)" }}
+              exit={{ clipPath: "inset(0 0 0 100%)" }}
+              transition={{ duration: 1.0, ease: SOFT }}
             >
               {current.youtubeId ? (
                 <iframe
