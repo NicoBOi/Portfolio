@@ -17,8 +17,8 @@ export default function AppleIcon() {
           backgroundColor: "#000",
           color: "#fff",
           fontSize: 120,
-          fontFamily: "Helvetica, Arial, sans-serif",
-          fontWeight: 500,
+          fontFamily: "Georgia, serif",
+          fontWeight: 400,
           letterSpacing: "-0.04em",
         }}
       >

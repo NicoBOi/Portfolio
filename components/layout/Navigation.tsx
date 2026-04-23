@@ -28,8 +28,7 @@ export default function Navigation() {
           className="title text-white transition-opacity duration-300 hover:opacity-100"
           style={{
             opacity: isHome ? 0.5 : 0.7,
-            fontSize: "1rem",
-            letterSpacing: "-0.01em",
+            fontSize: "1.1rem",
           }}
         >
           NS

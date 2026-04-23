@@ -40,7 +40,7 @@ export default async function ProjectOG({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "baseline",
-            fontFamily: "Geist Mono",
+            fontFamily: "Fragment Mono",
             fontSize: 15,
             letterSpacing: "0.28em",
             textTransform: "uppercase",
@@ -60,7 +60,7 @@ export default async function ProjectOG({
         >
           <div
             style={{
-              fontFamily: "Space Grotesk",
+              fontFamily: "Cormorant Garamond",
               fontSize: 140,
               lineHeight: 1,
               letterSpacing: "0.01em",
@@ -72,7 +72,7 @@ export default async function ProjectOG({
           {category && (
             <div
               style={{
-                fontFamily: "Geist Mono",
+                fontFamily: "Fragment Mono",
                 fontSize: 16,
                 letterSpacing: "0.28em",
                 textTransform: "uppercase",
@@ -89,7 +89,7 @@ export default async function ProjectOG({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "baseline",
-            fontFamily: "Geist Mono",
+            fontFamily: "Fragment Mono",
             fontSize: 13,
             letterSpacing: "0.24em",
             textTransform: "uppercase",
@@ -104,8 +104,8 @@ export default async function ProjectOG({
     {
       ...size,
       fonts: [
-        { name: "Space Grotesk", data: serif, style: "normal", weight: 500 },
-        { name: "Geist Mono", data: mono, style: "normal", weight: 400 },
+        { name: "Cormorant Garamond", data: serif, style: "normal", weight: 300 },
+        { name: "Fragment Mono", data: mono, style: "normal", weight: 400 },
       ],
     }
   );
