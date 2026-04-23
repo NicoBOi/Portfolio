@@ -62,17 +62,16 @@ export default function VideoProject({ project, prev, next }: Props) {
         <YouTubePlayer youtubeId={youtubeId} project={project} />
       ) : vimeoId ? (
         <div
-          className="w-full mt-6"
+          className="w-full mt-6 overflow-hidden bg-black"
           style={{
             aspectRatio: project.videoAspect ?? "16/9",
             maxHeight: "82vh",
-            backgroundColor: project.coverPlaceholder,
           }}
         >
           <iframe
             src={`https://player.vimeo.com/video/${vimeoId}?color=ffffff&title=0&byline=0&portrait=0&dnt=1`}
-            className="w-full h-full"
-            style={{ border: 0 }}
+            className="w-full h-full block"
+            style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
             allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
           />

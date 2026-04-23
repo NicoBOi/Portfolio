@@ -272,16 +272,21 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Vertical progress — numbers */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-end pointer-events-none">
-          {FEATURED.map((_, i) => (
-            <span
-              key={i}
-              className="label text-white tabular-nums transition-opacity duration-500"
+        {/* Vertical index — hover to preview, click to open */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-end pointer-events-auto">
+          {FEATURED.map((p, i) => (
+            <button
+              key={p.slug}
+              onMouseEnter={() => setIndex(i)}
+              onFocus={() => setIndex(i)}
+              onClick={() => router.push(`/work/${p.slug}`)}
+              className="label text-white tabular-nums transition-opacity duration-300"
               style={{ opacity: i === index ? 0.7 : 0.18 }}
+              data-cursor={p.type === "photo" ? "Voir" : "Lire"}
+              aria-label={p.title}
             >
               {String(i + 1).padStart(2, "0")}
-            </span>
+            </button>
           ))}
         </div>
 
