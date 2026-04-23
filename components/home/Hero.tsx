@@ -272,14 +272,16 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Vertical progress */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-center pointer-events-none">
+        {/* Vertical progress — numbers */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 items-end pointer-events-none">
           {FEATURED.map((_, i) => (
-            <div
+            <span
               key={i}
-              className="w-px rounded-full bg-white transition-all duration-500"
-              style={{ height: i === index ? 24 : 8, opacity: i === index ? 0.65 : 0.2 }}
-            />
+              className="label text-white tabular-nums transition-opacity duration-500"
+              style={{ opacity: i === index ? 0.7 : 0.18 }}
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
           ))}
         </div>
 

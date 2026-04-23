@@ -41,7 +41,7 @@ export const projects: Project[] = [
       credits: "Réalisation & post-prod",
     },
     videoUrl: "https://vimeo.com/722586890",
-    videoAspect: "2.4/1",
+    videoAspect: "2.39/1",
     aspectRatio: "landscape",
     featured: true,
   },
