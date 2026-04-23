@@ -2,7 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/components/contact/ContactForm";
 
-export const metadata: Metadata = { title: "Contact" };
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Écris-moi pour un projet photo ou vidéo. Insta ou mail. Réponse en 24h.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    type: "website",
+    url: "/contact",
+    title: "Contact — Nicolas Sempere",
+    description:
+      "Écris-moi pour un projet photo ou vidéo. Insta ou mail. Réponse en 24h.",
+    siteName: "Nicolas Sempere",
+    locale: "fr_FR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact — Nicolas Sempere",
+    description: "Écris-moi pour un projet photo ou vidéo. Réponse en 24h.",
+  },
+};
 
 export default function ContactPage() {
   return (

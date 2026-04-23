@@ -2,7 +2,27 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import WorkGrid from "@/components/work/WorkGrid";
 
-export const metadata: Metadata = { title: "Projets" };
+export const metadata: Metadata = {
+  title: "Projets",
+  description:
+    "Sélection de projets photographiques de Nicolas Sempere. Portrait, mode, éditorial, personnel.",
+  alternates: { canonical: "/work" },
+  openGraph: {
+    type: "website",
+    url: "/work",
+    title: "Projets — Nicolas Sempere",
+    description:
+      "Sélection de projets photographiques de Nicolas Sempere. Portrait, mode, éditorial, personnel.",
+    siteName: "Nicolas Sempere",
+    locale: "fr_FR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Projets — Nicolas Sempere",
+    description:
+      "Sélection de projets photographiques. Portrait, mode, éditorial, personnel.",
+  },
+};
 
 export default function WorkPage() {
   return (

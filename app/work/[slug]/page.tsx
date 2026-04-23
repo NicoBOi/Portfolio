@@ -16,9 +16,30 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) return {};
+
+  const title = project.title;
+  const description =
+    project.description ??
+    `${project.title} — ${project.category}, ${project.year}. Photographie par Nicolas Sempere.`;
+  const url = `/work/${project.slug}`;
+
   return {
-    title: project.title,
-    description: `${project.title} — ${project.role}, ${project.year}. Par Nicolas Sempere.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: `${title} — Nicolas Sempere`,
+      description,
+      siteName: "Nicolas Sempere",
+      locale: "fr_FR",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} — Nicolas Sempere`,
+      description,
+    },
   };
 }
 
