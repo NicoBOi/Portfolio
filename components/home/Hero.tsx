@@ -206,8 +206,9 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.3, ease: SOFT }}
         >
           <div className="relative flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
-            {/* Scroll affordance — anchored to the title's vertical center */}
-            <div className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-3 md:gap-4 pointer-events-none">
+            {/* Scroll affordance — desktop only (wheel gesture hint).
+                Mobile users discover horizontal swipe naturally, no label needed. */}
+            <div className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
               <span
                 className="label text-white"
                 style={{
@@ -215,12 +216,11 @@ export default function Hero() {
                   writingMode: "vertical-rl",
                   transform: "rotate(180deg)",
                   letterSpacing: "0.28em",
-                  fontSize: "9px",
                 }}
               >
                 Scroll
               </span>
-              <div className="relative h-8 md:h-12 w-px bg-white/15 overflow-hidden">
+              <div className="relative h-12 w-px bg-white/15 overflow-hidden">
                 <motion.div
                   className="absolute left-0 w-full bg-white"
                   style={{ opacity: 0.7, height: 5 }}
