@@ -7,12 +7,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects } from "@/data/projects";
 
-const FEATURED = projects.filter((p) => p.featured);
+const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCROLL_LOCK_MS = 850;
 const TITLE = "Nicolas Sempere";
 const REPEL_RADIUS = 110;
 const REPEL_STRENGTH = 50;
+
+type HeroFilter = "all" | "photo" | "video" | "3d";
+
+const FILTERS: { value: HeroFilter; label: string }[] = [
+  { value: "all", label: "Tout" },
+  { value: "photo", label: "Photo" },
+  { value: "video", label: "Film" },
+  { value: "3d", label: "3D" },
+];
 
 function getVimeoId(url?: string): string | null {
   return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
@@ -20,11 +29,19 @@ function getVimeoId(url?: string): string | null {
 
 export default function Hero() {
   const router = useRouter();
+  const [filter, setFilter] = useState<HeroFilter>("all");
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-  const current = FEATURED[index];
+  const FEATURED =
+    filter === "all" ? ALL_FEATURED : ALL_FEATURED.filter((p) => p.type === filter);
+  const current = FEATURED[index] ?? ALL_FEATURED[0];
+
+  // Reset index when filter changes so we land on the first project of the new set.
+  useEffect(() => {
+    setIndex(0);
+  }, [filter]);
 
   // Fade-in
   useEffect(() => {
@@ -33,10 +50,10 @@ export default function Hero() {
   }, []);
 
   // Warm the browser cache for every featured image right after first paint
-  // so wheel/swipe transitions don't stall on a network fetch.
+  // so wheel/swipe transitions + filter changes don't stall on a network fetch.
   useEffect(() => {
     const t = setTimeout(() => {
-      FEATURED.forEach((p) => {
+      ALL_FEATURED.forEach((p) => {
         const first = p.imageFiles?.[0];
         if (first) {
           const img = new window.Image();
@@ -48,35 +65,36 @@ export default function Hero() {
     return () => clearTimeout(t);
   }, []);
 
-  // Wheel
+  // Wheel — rebind when FEATURED length changes so the modulo sees the right count.
+  const featuredLen = FEATURED.length;
   useEffect(() => {
+    if (featuredLen <= 1) return;
     let locked = false;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (locked || Math.abs(e.deltaY) < 8) return;
       locked = true;
-      setIndex((i) =>
-        e.deltaY > 0 ? (i + 1) % FEATURED.length : (i - 1 + FEATURED.length) % FEATURED.length
-      );
+      setIndex((i) => (e.deltaY > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
       setTimeout(() => { locked = false; }, SCROLL_LOCK_MS);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, []);
+  }, [featuredLen]);
 
-  // Touch swipe
+  // Touch swipe — same dep handling.
   useEffect(() => {
+    if (featuredLen <= 1) return;
     let sy = 0;
     const ts = (e: TouchEvent) => { sy = e.touches[0].clientY; };
     const te = (e: TouchEvent) => {
       const d = sy - e.changedTouches[0].clientY;
       if (Math.abs(d) < 50) return;
-      setIndex((i) => d > 0 ? (i + 1) % FEATURED.length : (i - 1 + FEATURED.length) % FEATURED.length);
+      setIndex((i) => (d > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
     };
     window.addEventListener("touchstart", ts, { passive: true });
     window.addEventListener("touchend", te, { passive: true });
     return () => { window.removeEventListener("touchstart", ts); window.removeEventListener("touchend", te); };
-  }, []);
+  }, [featuredLen]);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
   const rafRef = useRef<number | null>(null);
@@ -113,8 +131,9 @@ export default function Hero() {
     });
   };
 
-  const goPrev = () => setIndex((i) => (i - 1 + FEATURED.length) % FEATURED.length);
-  const goNext = () => setIndex((i) => (i + 1) % FEATURED.length);
+  const goPrev = () =>
+    featuredLen > 1 && setIndex((i) => (i - 1 + featuredLen) % featuredLen);
+  const goNext = () => featuredLen > 1 && setIndex((i) => (i + 1) % featuredLen);
 
   return (
     <section
@@ -233,15 +252,46 @@ export default function Hero() {
               </Link>
             </div>
 
-            <motion.p
-              className="label text-white"
-              style={{ opacity: 0.4, letterSpacing: "0.32em" }}
+            <motion.div
+              className="flex items-center gap-4 md:gap-6 pointer-events-auto"
               initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 0.4, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: SOFT }}
             >
-              Photo — Film — 3D
-            </motion.p>
+              {FILTERS.map((f, i) => (
+                <span key={f.value} className="flex items-center gap-4 md:gap-6">
+                  {i > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="label text-white"
+                      style={{ opacity: 0.2, letterSpacing: "0.32em" }}
+                    >
+                      —
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setFilter(f.value)}
+                    className="label text-white transition-opacity duration-300 relative pb-1"
+                    style={{
+                      opacity: filter === f.value ? 0.9 : 0.4,
+                      letterSpacing: "0.32em",
+                    }}
+                    aria-pressed={filter === f.value}
+                  >
+                    {f.label}
+                    {filter === f.value && (
+                      <motion.span
+                        layoutId="hero-filter-underline"
+                        className="absolute left-0 right-0 -bottom-0.5 h-px bg-white"
+                        style={{ opacity: 0.7 }}
+                        transition={{ duration: 0.3, ease: SOFT }}
+                      />
+                    )}
+                  </button>
+                </span>
+              ))}
+            </motion.div>
 
             {/* Magnetic title */}
             <motion.h1

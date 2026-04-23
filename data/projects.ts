@@ -60,6 +60,7 @@ export const projects: Project[] = [
     },
     youtubeId: "ypJkTv3gFX8",
     aspectRatio: "landscape",
+    featured: true,
   },
   {
     slug: "affinessence",
@@ -77,6 +78,7 @@ export const projects: Project[] = [
     videoUrl: "https://vimeo.com/1033824012",
     videoAspect: "4/5",
     aspectRatio: "portrait",
+    featured: true,
   },
   {
     slug: "face-flower",
