@@ -89,24 +89,27 @@ export default function AboutPage() {
               className="text-white font-light leading-relaxed"
               style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
             >
-              28 ans, basé à Bordeaux.
-              Photo depuis mes 15 ans, vidéo depuis 5.
-              Autodidacte au départ, puis diplômé du MJM Graphic Design
-              en webdesign et motion.
+              Photographe et réalisateur à Bordeaux, 28 ans. Je fais
+              des images pour les marques et les projets qui ne veulent
+              pas ressembler aux autres — campagnes, éditoriaux, films,
+              quand l&apos;image doit dire quelque chose de précis.
             </p>
             <p
               className="text-white font-light leading-relaxed"
               style={{ fontSize: "0.95rem", opacity: 0.55, lineHeight: 1.9 }}
             >
-              Je fais des images qui transportent.
-              Brut, minimal, spectaculaire.
+              Photo depuis mes 15 ans, vidéo depuis 23. Autodidacte
+              pendant longtemps, puis diplômé de MJM Graphic Design
+              en webdesign et motion.
             </p>
             <p
               className="text-white font-light leading-relaxed"
               style={{ fontSize: "0.95rem", opacity: 0.45, lineHeight: 1.9 }}
             >
-              Seul ou avec mon équipe, selon les projets.
-              Art, mode, marques qui veulent sortir du rang. Pas la santé.
+              Seul ou avec une équipe, selon le projet. Trois
+              références reviennent toujours : Lars von Trier pour
+              la tension, Ash Thorp pour la rigueur du motion,
+              Beksiński pour l&apos;élégance sombre.
             </p>
 
             <Link

@@ -54,15 +54,16 @@ export default function ContactPage() {
               className="text-white font-light mt-8 leading-relaxed max-w-sm"
               style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
             >
-              Écris-moi. Insta ou mail — comme tu préfères.
-              Réponse en 24h.
+              Parle-moi du projet. Insta, mail, ou le formulaire —
+              comme tu préfères. Je réponds dans les 24 heures.
             </p>
             <p
               className="text-white font-light mt-2 leading-relaxed max-w-sm"
               style={{ fontSize: "0.9rem", opacity: 0.38, lineHeight: 1.9 }}
             >
-              Trois choses qui m&apos;aident à répondre vite : budget, date, référence.
-              Le reste, on verra ensemble.
+              Idéalement, tu me donnes un budget, une date, et une
+              référence visuelle. Dans les faits, l&apos;idée seule
+              suffit à commencer.
             </p>
           </div>
 
