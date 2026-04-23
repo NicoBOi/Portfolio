@@ -1,4 +1,4 @@
-@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=host-grotesk@400,500,600,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap');
 
 @tailwind base;
@@ -84,12 +84,12 @@ body::after {
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); }
 
-/* ── Title (General Sans Medium) ─────────────────────────── */
+/* ── Title (Host Grotesk) ────────────────────────────────── */
 .title {
-  font-family: 'General Sans', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  font-weight: 500;
+  font-family: 'Host Grotesk', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
   line-height: 1.0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 /* ── Label (Geist Mono Regular) ──────────────────────────── */

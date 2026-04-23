@@ -39,7 +39,7 @@ export default async function OGImage() {
 
         <div
           style={{
-            fontFamily: "General Sans",
+            fontFamily: "Host Grotesk",
             fontSize: 164,
             lineHeight: 1,
             letterSpacing: "0.01em",
@@ -81,7 +81,7 @@ export default async function OGImage() {
     {
       ...size,
       fonts: [
-        { name: "General Sans", data: serif, style: "normal", weight: 500 },
+        { name: "Host Grotesk", data: serif, style: "normal", weight: 600 },
         { name: "Geist Mono", data: mono, style: "normal", weight: 400 },
       ],
     }

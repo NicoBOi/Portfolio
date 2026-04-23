@@ -11,7 +11,7 @@ const CHROME_UA =
   "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
 const SERIF_CSS =
-  "https://api.fontshare.com/v2/css?f[]=general-sans@500&display=swap";
+  "https://api.fontshare.com/v2/css?f[]=host-grotesk@600&display=swap";
 const MONO_CSS =
   "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap";
 
