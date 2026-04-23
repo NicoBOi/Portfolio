@@ -51,7 +51,7 @@ export const projects: Project[] = [
     year: 2024,
     role: "Réalisation",
     type: "video",
-    category: "Clip musical",
+    category: "Clip",
     coverPlaceholder: "#0B0A0D",
     meta: {
       type: "Clip musical pour Sink Deeper",
@@ -109,7 +109,7 @@ export const projects: Project[] = [
     year: 2024,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#0F1115",
     meta: {
       type: "Nocturne / projet personnel",
@@ -132,7 +132,7 @@ export const projects: Project[] = [
     year: 2024,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#1A2430",
     meta: {
       type: "Intérieur / projet personnel",
@@ -158,7 +158,7 @@ export const projects: Project[] = [
     year: 2023,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#1D2118",
     meta: {
       type: "Paysage / projet personnel",
@@ -182,7 +182,7 @@ export const projects: Project[] = [
     year: 2024,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#1A1414",
     meta: {
       type: "Documentaire / projet personnel",
@@ -252,7 +252,7 @@ export const projects: Project[] = [
     year: 2023,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#17181A",
     meta: {
       type: "Fiction / projet personnel",
@@ -272,7 +272,7 @@ export const projects: Project[] = [
     year: 2023,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#141414",
     meta: {
       type: "Série noir & blanc / projet personnel",
@@ -293,7 +293,7 @@ export const projects: Project[] = [
     year: 2023,
     role: "Photographie",
     type: "photo",
-    category: "Projet personnel",
+    category: "Personnel",
     coverPlaceholder: "#1C1E17",
     meta: {
       type: "Paysage / projet personnel",
