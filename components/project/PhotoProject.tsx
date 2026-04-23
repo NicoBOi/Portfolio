@@ -15,14 +15,18 @@ interface Props {
   next: Project | null;
 }
 
-function PlateNumber({ current, total }: { current: number; total: number }) {
-  const pad = (n: number) => String(n).padStart(2, "0");
+function PlateNumber({ current }: { current: number; total: number }) {
   return (
     <span
-      className="absolute top-3 left-3 md:top-4 md:left-4 label text-white pointer-events-none tabular-nums z-10"
-      style={{ opacity: 0.6, mixBlendMode: "difference" }}
+      className="absolute top-3 left-4 md:top-5 md:left-6 title text-white pointer-events-none tabular-nums z-10"
+      style={{
+        opacity: 0.85,
+        mixBlendMode: "difference",
+        fontSize: "clamp(2.2rem, 3.5vw, 4rem)",
+        lineHeight: 1,
+      }}
     >
-      {pad(current)} / {pad(total)}
+      {String(current).padStart(2, "0")}
     </span>
   );
 }

@@ -100,10 +100,16 @@ export default function WorkGrid() {
                     />
                   ) : getVimeoId(current.videoUrl) ? (
                     <>
+                      {/* Aspect-matched iframe scaled to cover the tile — no letterbox from Vimeo. */}
                       <iframe
                         src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p`}
-                        className="absolute inset-0 w-full h-full pointer-events-none border-0"
-                        style={{ backgroundColor: "#000" }}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none border-0"
+                        style={{
+                          backgroundColor: "#000",
+                          aspectRatio: current.videoAspect ?? "16/9",
+                          minWidth: "100%",
+                          minHeight: "100%",
+                        }}
                         allow="autoplay"
                         title={current.title}
                       />
