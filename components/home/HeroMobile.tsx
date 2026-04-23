@@ -47,32 +47,37 @@ export default function HeroMobile() {
 
   return (
     <>
-      {/* Hero identity — simple, calm, no cycle */}
-      <section className="bg-black min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-6 pt-14 pb-24 text-center">
-        <motion.h1
-          className="text-white title"
-          style={{ fontSize: "clamp(3rem, 13vw, 5.5rem)", lineHeight: 1 }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.1, ease: SOFT }}
-        >
-          Nicolas Sempere
-        </motion.h1>
+      {/* Hero identity — shorter than viewport so the first card peeks underneath and signals scrollable content. */}
+      <section className="bg-black flex flex-col items-center px-6 text-center" style={{ minHeight: "82vh" }}>
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 pt-16">
+          <motion.h1
+            className="text-white title"
+            style={{ fontSize: "clamp(2.8rem, 12vw, 5rem)", lineHeight: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.1, ease: SOFT }}
+          >
+            Nicolas Sempere
+          </motion.h1>
+          <motion.p
+            className="label text-white"
+            style={{ opacity: 0.5, letterSpacing: "0.28em" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            Bordeaux — Paris
+          </motion.p>
+        </div>
         <motion.p
-          className="label text-white mt-6"
-          style={{ opacity: 0.5, letterSpacing: "0.28em" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          Bordeaux — Paris
-        </motion.p>
-        <motion.p
-          className="label text-white mt-20"
-          style={{ opacity: 0.35 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.35 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
+          className="label text-white pb-8"
+          style={{ opacity: 0.5 }}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 0.5, y: [0, 4, 0] }}
+          transition={{
+            opacity: { duration: 0.6, delay: 0.7 },
+            y: { duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 1.3 },
+          }}
         >
           ↓ Projets
         </motion.p>
@@ -177,10 +182,11 @@ export default function HeroMobile() {
                 key={f.value}
                 type="button"
                 onClick={() => setFilter(f.value)}
-                className="label text-white relative px-4 py-2 transition-opacity duration-300"
+                className="label text-white relative px-4 py-2 transition-opacity duration-300 focus:outline-none"
                 style={{
                   opacity: active ? 0.95 : 0.4,
                   letterSpacing: "0.24em",
+                  WebkitTapHighlightColor: "transparent",
                 }}
                 aria-pressed={active}
               >
