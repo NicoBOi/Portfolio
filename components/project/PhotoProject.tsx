@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
 import Lightbox from "./Lightbox";
+import BackPill from "@/components/ui/BackPill";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -38,20 +38,10 @@ export default function PhotoProject({ project, prev, next }: Props) {
 
   return (
     <article className="bg-black min-h-screen">
-      {/* Back */}
-      <div className="px-6 md:px-10 pt-20 pb-0">
-        <Link
-          href="/work"
-          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
-          style={{ opacity: 0.3 }}
-        >
-          <span aria-hidden="true">←</span>
-          Projets
-        </Link>
-      </div>
+      <BackPill href="/work" label="Projets" />
 
       {/* Cover — framed, not full-bleed */}
-      <div className="px-6 md:px-10 lg:px-16 mt-10 md:mt-16">
+      <div className="px-6 md:px-10 lg:px-16 pt-28 md:pt-32">
         <motion.div
           className="w-full max-w-6xl mx-auto overflow-hidden"
           style={{

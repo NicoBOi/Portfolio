@@ -1,22 +1,13 @@
 import Link from "next/link";
+import BackPill from "@/components/ui/BackPill";
 
 export default function NotFound() {
   return (
     <div className="bg-black min-h-screen flex flex-col px-6 md:px-10">
-      {/* Back */}
-      <div className="pt-20 pb-0">
-        <Link
-          href="/"
-          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
-          style={{ opacity: 0.3 }}
-        >
-          <span aria-hidden="true">←</span>
-          Accueil
-        </Link>
-      </div>
+      <BackPill href="/" label="Accueil" />
 
       {/* Main */}
-      <div className="flex-1 flex flex-col justify-center gap-10 pb-24">
+      <div className="flex-1 flex flex-col justify-center gap-10 pb-24 pt-32">
         <div>
           <p
             className="label text-white mb-6"

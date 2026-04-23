@@ -25,9 +25,11 @@ export default function Navigation() {
         {/* Left */}
         <Link
           href="/"
-          className="label text-white transition-opacity duration-300 hover:opacity-100"
+          className="label text-white transition-opacity duration-300 hover:opacity-100 inline-flex items-center gap-2"
           style={{ opacity: isHome ? 0.5 : 0.7 }}
+          aria-label={isHome ? "Accueil" : "Retour à l'accueil"}
         >
+          {!isHome && <span aria-hidden="true">←</span>}
           NS
         </Link>
 
