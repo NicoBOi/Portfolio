@@ -158,7 +158,7 @@ export default function Hero() {
                   }
                   return (
                     <iframe
-                      src={`https://player.vimeo.com/video/${vId}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
+                      src={`https://player.vimeo.com/video/${vId}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p`}
                       className="hero-video"
                       style={ratioStyle}
                       allow="autoplay"

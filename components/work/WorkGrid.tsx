@@ -99,16 +99,25 @@ export default function WorkGrid() {
                       decoding="async"
                     />
                   ) : getVimeoId(current.videoUrl) ? (
-                    <iframe
-                      src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1`}
-                      className="absolute inset-0 w-full h-full pointer-events-none border-0"
-                      style={{ backgroundColor: "#000" }}
-                      allow="autoplay"
-                      title={current.title}
-                    />
+                    <>
+                      <iframe
+                        src={`https://player.vimeo.com/video/${getVimeoId(current.videoUrl)}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p`}
+                        className="absolute inset-0 w-full h-full pointer-events-none border-0"
+                        style={{ backgroundColor: "#000" }}
+                        allow="autoplay"
+                        title={current.title}
+                      />
+                      {/* Black loading mask — covers the grey Vimeo init flash. */}
+                      <motion.div
+                        className="absolute inset-0 bg-black pointer-events-none"
+                        initial={{ opacity: 1 }}
+                        animate={{ opacity: 0 }}
+                        transition={{ duration: 0.5, delay: 1.4, ease: SOFT }}
+                      />
+                    </>
                   ) : (
                     <div className="placeholder-img text-white h-full">
-                      {current.type === "video" ? "Vidéo" : "Image"}
+                      {current.type === "video" || current.type === "3d" ? "Vidéo" : "Image"}
                     </div>
                   )}
 

@@ -16,6 +16,9 @@ interface YTPlayer {
   mute(): void;
   unMute(): void;
   setVolume(v: number): void;
+  setPlaybackQuality(quality: string): void;
+  getAvailableQualityLevels(): string[];
+  getPlaybackQuality(): string;
   destroy(): void;
 }
 
@@ -160,11 +163,31 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
       const yt = (window as unknown as YTWindow).YT!;
       player = new yt.Player(iframeId, {
         events: {
-          onReady: () => setReady(true),
+          onReady: () => {
+            setReady(true);
+            // Force 1080p (or highest available >= hd1080). YT honors this as a preference.
+            try {
+              player?.setPlaybackQuality("hd1080");
+            } catch {}
+          },
           onStateChange: (e: { data: number }) => {
             const isPlaying = e.data === 1;
             setPlaying(isPlaying);
-            if (isPlaying) setHasPlayed(true);
+            if (isPlaying) {
+              setHasPlayed(true);
+              try {
+                player?.setPlaybackQuality("hd1080");
+              } catch {}
+            }
+          },
+          onPlaybackQualityChange: () => {
+            // If YT downgrades below 1080, nudge it back up.
+            try {
+              const q = player?.getPlaybackQuality();
+              if (q && !["hd1080", "hd1440", "hd2160", "highres"].includes(q)) {
+                player?.setPlaybackQuality("hd1080");
+              }
+            } catch {}
           },
         },
       });
@@ -307,10 +330,15 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
     const player = new Player(iframeRef.current);
     playerRef.current = player;
 
-    player.ready().then(() => setReady(true));
+    player.ready().then(() => {
+      setReady(true);
+      // Prefer 1080p. Works on Vimeo Pro+; silently no-op on free accounts.
+      player.setQuality("1080p").catch(() => {});
+    });
     const onPlay = () => {
       setPlaying(true);
       setHasPlayed(true);
+      player.setQuality("1080p").catch(() => {});
     };
     const onPause = () => setPlaying(false);
     player.on("play", onPlay);
@@ -365,8 +393,8 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
   };
 
   // background=1 hides every native Vimeo control / overlay (works on free accounts).
-  // We drive playback through the Player SDK instead.
-  const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1`;
+  // We drive playback through the Player SDK instead. quality=1080p requests HD.
+  const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1&quality=1080p`;
 
   return (
     <div
