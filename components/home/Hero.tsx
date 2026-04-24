@@ -543,16 +543,16 @@ export default function Hero({
         {/* Mobile-only fixed filter bar — browse mode only. */}
         {!isProject && (
         <nav
-          className="hero-mobile-filter md:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-white/10"
+          className="hero-mobile-filter md:hidden fixed bottom-0 left-0 right-0 z-30"
           style={{
-            backgroundColor: "rgba(0,0,0,0.78)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
             paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
           aria-label="Filtrer par discipline"
         >
-          <div className="flex items-center justify-around px-2 py-2">
+          <div className="flex items-center justify-around px-2 py-1">
             {FILTERS.map((f) => {
               const active = filter === f.value;
               return (
@@ -560,10 +560,11 @@ export default function Hero({
                   key={f.value}
                   type="button"
                   onClick={() => setFilter(f.value)}
-                  className="label text-white relative px-4 py-4 transition-opacity duration-300 focus:outline-none"
+                  className="label text-white relative px-3 py-3 transition-opacity duration-300 focus:outline-none"
                   style={{
-                    opacity: active ? 1 : 0.6,
-                    letterSpacing: "0.24em",
+                    opacity: active ? 0.95 : 0.5,
+                    fontSize: "10px",
+                    letterSpacing: "0.32em",
                     WebkitTapHighlightColor: "transparent",
                   }}
                   aria-pressed={active}
@@ -572,7 +573,8 @@ export default function Hero({
                   {active && (
                     <motion.span
                       layoutId="hero-filter-bottom-underline"
-                      className="absolute left-4 right-4 bottom-1 h-px bg-white"
+                      className="absolute left-3 right-3 bottom-1 h-px bg-white"
+                      style={{ opacity: 0.75 }}
                       transition={{ duration: 0.3, ease: SOFT }}
                     />
                   )}
