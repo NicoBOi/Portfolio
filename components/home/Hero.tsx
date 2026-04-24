@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects, type Project } from "@/data/projects";
@@ -280,13 +281,13 @@ export default function Hero({
                 }
                 if (current.imageFiles && current.imageFiles.length > 0) {
                   return (
-                    <img
+                    <Image
                       src={`/projects/${current.slug}/${current.imageFiles[0]}`}
                       alt={current.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      loading="eager"
-                      fetchPriority="high"
-                      decoding="async"
+                      fill
+                      priority
+                      sizes="100vw"
+                      className="object-cover"
                     />
                   );
                 }
@@ -587,7 +588,7 @@ export default function Hero({
                   key={f.value}
                   type="button"
                   onClick={() => setFilter(f.value)}
-                  className="label text-white relative px-3 py-3 transition-opacity duration-300 focus:outline-none"
+                  className="label text-white relative px-3 py-3 transition-opacity duration-300"
                   style={{
                     opacity: active ? 0.95 : 0.5,
                     fontSize: "10px",

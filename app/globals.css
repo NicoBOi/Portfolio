@@ -8,6 +8,33 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Respect the OS "reduce motion" preference. Kills CSS @keyframes and
+   transitions so nothing loops or moves for viewers who've opted out
+   (vestibular disorders, photosensitivity). Framer's JS-driven motion
+   is handled by MotionProvider (reducedMotion="user"). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Keyboard focus ring. The custom cursor replaces the native pointer,
+   so without an explicit focus-visible style tab navigation lands in
+   the dark. Thin white outline, 3px offset, no layout shift. */
+:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Applied once CustomCursor mounts — avoids a "no cursor" flash on slow loads */
 html.cursor-ready,
 html.cursor-ready body,

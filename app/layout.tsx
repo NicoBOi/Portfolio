@@ -4,6 +4,7 @@ import { preconnect, prefetchDNS } from "react-dom";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import CustomCursor from "@/components/ui/CustomCursor";
+import MotionProvider from "@/components/providers/MotionProvider";
 
 // Self-host Google Fonts instead of CSS @import — avoids a render-blocking
 // request to fonts.googleapis.com on every page load.
@@ -145,13 +146,15 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${cormorant.variable} ${fragmentMono.variable}`}>
       <body>
-        <CustomCursor />
-        <Navigation />
-        <main>{children}</main>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
-        />
+        <MotionProvider>
+          <CustomCursor />
+          <Navigation />
+          <main>{children}</main>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+          />
+        </MotionProvider>
       </body>
     </html>
   );

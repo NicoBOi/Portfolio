@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -65,16 +66,16 @@ export default function AboutPage() {
         {/* Portrait */}
         <div className="md:col-span-4">
           <div
-            className="w-full overflow-hidden"
+            className="relative w-full overflow-hidden"
             style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 400 }}
           >
-            <img
+            <Image
               src="/about/portrait.avif"
               alt="Nicolas Sempere"
-              className="w-full h-full object-cover"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
+              fill
+              priority
+              sizes="(min-width: 768px) 400px, 100vw"
+              className="object-cover"
             />
           </div>
           <p className="label text-white mt-3" style={{ opacity: 0.2 }}>
