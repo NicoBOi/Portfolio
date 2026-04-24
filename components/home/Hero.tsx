@@ -50,8 +50,10 @@ export default function Hero() {
 
   // Warm the browser cache for every featured image right after first paint
   // so wheel/swipe transitions + filter changes don't stall on a network fetch.
+  // Use requestIdleCallback so this runs during browser downtime without
+  // competing with the LCP paint — with a short setTimeout fallback for Safari.
   useEffect(() => {
-    const t = setTimeout(() => {
+    const warm = () => {
       ALL_FEATURED.forEach((p) => {
         const first = p.imageFiles?.[0];
         if (first) {
@@ -60,7 +62,14 @@ export default function Hero() {
           img.src = `/projects/${p.slug}/${first}`;
         }
       });
-    }, 400);
+    };
+    type IC = (cb: () => void, opts?: { timeout?: number }) => number;
+    const ric = (window as unknown as { requestIdleCallback?: IC }).requestIdleCallback;
+    if (ric) {
+      const id = ric(warm, { timeout: 800 });
+      return () => (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(id);
+    }
+    const t = setTimeout(warm, 120);
     return () => clearTimeout(t);
   }, []);
 

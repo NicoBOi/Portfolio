@@ -110,7 +110,7 @@ export default function Navigation() {
                       href={href}
                       onClick={() => setOpen(false)}
                       aria-current={current ? "page" : undefined}
-                      className="text-white title inline-flex items-baseline gap-3 hover:opacity-100 transition-opacity"
+                      className="text-white title inline-flex items-baseline gap-4 hover:opacity-100 transition-opacity"
                       style={{
                         fontSize: "clamp(2.2rem, 9vw, 3.5rem)",
                         lineHeight: 1,
@@ -120,8 +120,8 @@ export default function Navigation() {
                       {current && (
                         <span
                           aria-hidden="true"
-                          className="inline-block w-2 h-2 rounded-full bg-white"
-                          style={{ opacity: 0.85 }}
+                          className="block h-px bg-white self-center"
+                          style={{ width: 44, opacity: 0.8 }}
                         />
                       )}
                       {label}
@@ -132,15 +132,6 @@ export default function Navigation() {
                       >
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      {current && (
-                        <span
-                          aria-hidden="true"
-                          className="label"
-                          style={{ opacity: 0.5, fontSize: "10px" }}
-                        >
-                          — vous êtes ici
-                        </span>
-                      )}
                     </Link>
                   </motion.div>
                 );

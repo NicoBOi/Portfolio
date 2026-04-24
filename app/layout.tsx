@@ -1,7 +1,26 @@
 import type { Metadata, Viewport } from "next";
+import { Cormorant_Garamond, Fragment_Mono } from "next/font/google";
+import { preconnect, prefetchDNS } from "react-dom";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import CustomCursor from "@/components/ui/CustomCursor";
+
+// Self-host Google Fonts instead of CSS @import — avoids a render-blocking
+// request to fonts.googleapis.com on every page load.
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const fragmentMono = Fragment_Mono({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-fragment",
+  display: "swap",
+});
 
 const SITE_URL = "https://sempere.studio";
 const SITE_NAME = "Nicolas Sempere";
@@ -115,8 +134,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Warm up the sockets for the media origins so the first iframe/thumbnail
+  // request doesn't pay the DNS + TCP + TLS handshake cost.
+  preconnect("https://player.vimeo.com");
+  preconnect("https://i.vimeocdn.com");
+  preconnect("https://www.youtube-nocookie.com");
+  preconnect("https://img.youtube.com");
+  prefetchDNS("https://vumbnail.com");
+
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${cormorant.variable} ${fragmentMono.variable}`}>
       <body>
         <CustomCursor />
         <Navigation />
