@@ -86,37 +86,36 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
         </div>
       )}
 
-      {/* Mobile — horizontal swipe gallery. All files in one scroll-snap row. */}
+      {/* Mobile — horizontal swipe gallery. Fixed-height slides so mixed
+          orientations (landscape + portrait in the same project) don't
+          create variable gaps. Image is object-contain inside each slide —
+          no crop, no coloured letterbox, just centred against the page's
+          black so the eye reads "next photo, next photo" cleanly. */}
       <div className="md:hidden mt-8">
         <div
           ref={mobileScrollerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
+          className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar h-[75svh]"
           style={{ scrollbarWidth: "none" }}
         >
-          {files.map((f, i) => {
-            const { width, height } = getImageDims(project.slug, f);
-            return (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setLightbox(i)}
-                className="snap-center shrink-0 w-screen relative block"
-                style={{ backgroundColor: bg }}
-                aria-label={`Agrandir la photo ${i + 1}`}
-              >
-                <Image
-                  src={`/projects/${project.slug}/${f}`}
-                  alt=""
-                  width={width}
-                  height={height}
-                  sizes="100vw"
-                  priority={i === 0}
-                  className="w-full h-auto block"
-                />
-                <PlateNumber current={i + 1} total={files.length} />
-              </button>
-            );
-          })}
+          {files.map((f, i) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setLightbox(i)}
+              className="snap-center shrink-0 w-screen h-full relative block"
+              aria-label={`Agrandir la photo ${i + 1}`}
+            >
+              <Image
+                src={`/projects/${project.slug}/${f}`}
+                alt=""
+                fill
+                sizes="100vw"
+                priority={i === 0}
+                className="object-contain"
+              />
+              <PlateNumber current={i + 1} total={files.length} />
+            </button>
+          ))}
         </div>
         <div className="flex items-center justify-center gap-2 py-4">
           <span className="label text-white tabular-nums" style={{ opacity: 0.5 }}>
