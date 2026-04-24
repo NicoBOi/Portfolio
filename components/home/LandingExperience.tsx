@@ -48,17 +48,31 @@ export default function LandingExperience({ initialSlug }: Props) {
     return () => document.documentElement.classList.remove("project-active");
   }, [active]);
 
-  const openProject = useCallback((slug: string) => {
-    setActiveSlug(slug);
-    window.history.pushState({}, "", `/work/${slug}`);
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  // Wrap state + URL updates in document.startViewTransition when the browser
+  // supports it (Chromium + latest Safari TP). Progressive enhancement — if
+  // the API is missing (Firefox, older browsers) we fall through to a plain
+  // setState and the site keeps its Framer-driven motion.
+  const withTransition = useCallback((update: () => void) => {
+    type ViewDoc = Document & { startViewTransition?: (cb: () => void) => unknown };
+    const doc = document as ViewDoc;
+    if (typeof doc.startViewTransition === "function") {
+      doc.startViewTransition(update);
+    } else {
+      update();
+    }
   }, []);
 
+  const openProject = useCallback((slug: string) => {
+    withTransition(() => setActiveSlug(slug));
+    window.history.pushState({}, "", `/work/${slug}`);
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [withTransition]);
+
   const closeProject = useCallback(() => {
-    setActiveSlug(null);
+    withTransition(() => setActiveSlug(null));
     window.history.pushState({}, "", "/");
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, []);
+  }, [withTransition]);
 
   // ESC to close, plus a window-level event so the site Navigation (which sits
   // outside this component's tree) can trigger the same smooth close without
@@ -94,7 +108,6 @@ export default function LandingExperience({ initialSlug }: Props) {
       <Hero
         activeProject={active}
         onOpenProject={openProject}
-        onCloseProject={closeProject}
       />
       {active && (
         <div className="relative z-10 bg-black">

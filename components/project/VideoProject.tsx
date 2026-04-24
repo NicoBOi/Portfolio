@@ -7,6 +7,7 @@ import type { Project } from "@/data/projects";
 import ProjectNav from "./ProjectNav";
 import VideoControls from "./VideoControls";
 import Link from "next/link";
+import Image from "next/image";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -121,19 +122,20 @@ export default function VideoProject({ project, prev, next, mode = "page", onNav
             {project.imageFiles.slice(0, 4).map((f, i) => (
               <motion.figure
                 key={f}
-                className="aspect-video overflow-hidden"
+                className="relative aspect-video overflow-hidden"
                 style={{ backgroundColor: project.coverPlaceholder }}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: "-6%" }}
                 transition={{ duration: 0.6, delay: (i % 2) * 0.08, ease: SOFT }}
               >
-                <img
+                <Image
                   src={`/projects/${project.slug}/${f}`}
                   alt=""
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(min-width: 768px) 50vw, 50vw"
                   loading="lazy"
-                  decoding="async"
+                  className="object-cover"
                 />
               </motion.figure>
             ))}

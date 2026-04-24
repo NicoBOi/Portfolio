@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/build-image-manifest.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "images": "node scripts/build-image-manifest.mjs"
   },
   "dependencies": {
     "@vimeo/player": "^2.30.3",

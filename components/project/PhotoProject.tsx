@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
+import { getImageDims } from "@/lib/image-dims";
 import ProjectNav from "./ProjectNav";
 import Lightbox from "./Lightbox";
 
@@ -91,25 +93,30 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
           className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
           style={{ scrollbarWidth: "none" }}
         >
-          {files.map((f, i) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setLightbox(i)}
-              className="snap-center shrink-0 w-screen relative block"
-              style={{ backgroundColor: bg }}
-              aria-label={`Agrandir la photo ${i + 1}`}
-            >
-              <img
-                src={`/projects/${project.slug}/${f}`}
-                alt=""
-                className="w-full h-auto block"
-                loading={i === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
-              <PlateNumber current={i + 1} total={files.length} />
-            </button>
-          ))}
+          {files.map((f, i) => {
+            const { width, height } = getImageDims(project.slug, f);
+            return (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setLightbox(i)}
+                className="snap-center shrink-0 w-screen relative block"
+                style={{ backgroundColor: bg }}
+                aria-label={`Agrandir la photo ${i + 1}`}
+              >
+                <Image
+                  src={`/projects/${project.slug}/${f}`}
+                  alt=""
+                  width={width}
+                  height={height}
+                  sizes="100vw"
+                  priority={i === 0}
+                  className="w-full h-auto block"
+                />
+                <PlateNumber current={i + 1} total={files.length} />
+              </button>
+            );
+          })}
         </div>
         <div className="flex items-center justify-center gap-2 py-4">
           <span className="label text-white tabular-nums" style={{ opacity: 0.5 }}>
@@ -130,24 +137,28 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: SOFT }}
           >
-            {cover ? (
-              <button
-                type="button"
-                onClick={() => setLightbox(0)}
-                className="w-full block"
-                data-cursor="Agrandir"
-                aria-label="Agrandir"
-              >
-                <img
-                  src={`/projects/${project.slug}/${cover}`}
-                  alt={project.title}
-                  className="w-full h-auto block"
-                  loading="eager"
-                  fetchPriority="high"
-                  decoding="async"
-                />
-              </button>
-            ) : (
+            {cover ? (() => {
+              const { width, height } = getImageDims(project.slug, cover);
+              return (
+                <button
+                  type="button"
+                  onClick={() => setLightbox(0)}
+                  className="w-full block"
+                  data-cursor="Agrandir"
+                  aria-label="Agrandir"
+                >
+                  <Image
+                    src={`/projects/${project.slug}/${cover}`}
+                    alt={project.title}
+                    width={width}
+                    height={height}
+                    sizes="(min-width: 1024px) 72rem, 100vw"
+                    priority
+                    className="w-full h-auto block"
+                  />
+                </button>
+              );
+            })() : (
               <div className="placeholder-img text-white h-full">[01]</div>
             )}
             <PlateNumber current={1} total={files.length} />
@@ -159,6 +170,7 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
           <div className="max-w-6xl mx-auto flex flex-col gap-16 md:gap-28 pt-16 md:pt-24">
             {rest.map((f, i) => {
               const className = LAYOUTS[i % LAYOUTS.length];
+              const { width, height } = getImageDims(project.slug, f);
               return (
                 <motion.figure
                   key={f}
@@ -177,12 +189,14 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
                     data-cursor="Agrandir"
                     aria-label="Agrandir"
                   >
-                    <img
+                    <Image
                       src={`/projects/${project.slug}/${f}`}
                       alt=""
-                      className="w-full h-auto block"
+                      width={width}
+                      height={height}
+                      sizes="(min-width: 1024px) 50vw, 90vw"
                       loading="lazy"
-                      decoding="async"
+                      className="w-full h-auto block"
                     />
                   </button>
                   <PlateNumber current={i + 2} total={files.length} />

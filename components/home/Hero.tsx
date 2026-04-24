@@ -34,13 +34,11 @@ interface HeroProps {
   // scrolls into view below. Null = the normal landing browse experience.
   activeProject?: Project | null;
   onOpenProject?: (slug: string) => void;
-  onCloseProject?: () => void;
 }
 
 export default function Hero({
   activeProject = null,
   onOpenProject,
-  onCloseProject,
 }: HeroProps) {
   const router = useRouter();
   const isProject = !!activeProject;
@@ -147,6 +145,38 @@ export default function Hero({
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
   }, [featuredLen, isProject]);
+
+  // Keyboard navigation on the landing. Arrows cycle the carousel, Enter/Space
+  // opens the currently-highlighted project. Ignored in project mode (that
+  // view has its own ESC-to-close wired at the LandingExperience level).
+  useEffect(() => {
+    if (isProject || featuredLen <= 1) return;
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+        return;
+      }
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        e.preventDefault();
+        setIndex((i) => (i + 1) % featuredLen);
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        setIndex((i) => (i - 1 + featuredLen) % featuredLen);
+      } else if (e.key === "Enter" || e.key === " ") {
+        // Space scroll is irrelevant on the landing (touch-action: none) so
+        // repurposing it as "open" costs nothing and matches keyboard muscle
+        // memory for carousels.
+        e.preventDefault();
+        const target = FEATURED[index];
+        if (target) openProject(target.slug);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // Depend on index so the Enter handler always opens the current slide;
+    // FEATURED is derived from filter so it refreshes on filter changes too.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [featuredLen, isProject, index, filter]);
 
   // Touch swipe — vertical on mobile. Swipe up = next project, swipe down =
   // previous. Horizontal gestures are ignored so the background tap-to-open

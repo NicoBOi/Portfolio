@@ -8,6 +8,37 @@ const TO = "nicosmp.pro@gmail.com";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// In-memory IP rate limit. Survives across requests on the same warm
+// serverless instance; cold starts reset it, which is acceptable for a
+// low-traffic portfolio form. 5 submissions per 10-minute window per IP.
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+const RATE_MAX = 5;
+const rateLimitMap = new Map<string, { count: number; reset: number }>();
+
+function getClientIp(request: Request): string {
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return request.headers.get("x-real-ip") ?? "unknown";
+}
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  // Opportunistic cleanup so the map can't grow unbounded.
+  if (rateLimitMap.size > 500) {
+    for (const [key, value] of rateLimitMap) {
+      if (value.reset < now) rateLimitMap.delete(key);
+    }
+  }
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.reset) {
+    rateLimitMap.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 function sanitize(v: unknown, max: number): string {
   if (typeof v !== "string") return "";
   return v.trim().slice(0, max);
@@ -23,6 +54,21 @@ function escapeHtml(s: string): string {
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "Trop de demandes — réessayez dans quelques minutes" },
+      { status: 429 },
+    );
+  }
+
+  // Refuse anything bigger than ~32KB so a malicious payload can't eat
+  // memory parsing JSON it won't pass validation anyway.
+  const len = Number(request.headers.get("content-length") ?? 0);
+  if (len > 32 * 1024) {
+    return NextResponse.json({ error: "Requête trop volumineuse" }, { status: 413 });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -45,6 +91,12 @@ export async function POST(request: Request) {
       { error: "Nom, email et message requis" },
       { status: 400 }
     );
+  }
+  if (name.length < 2) {
+    return NextResponse.json({ error: "Nom trop court" }, { status: 400 });
+  }
+  if (message.length < 10) {
+    return NextResponse.json({ error: "Message trop court" }, { status: 400 });
   }
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "Email invalide" }, { status: 400 });
