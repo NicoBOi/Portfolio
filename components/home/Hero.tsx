@@ -367,7 +367,7 @@ export default function Hero({
                 <motion.div
                   className="absolute left-0 w-full bg-white"
                   style={{ opacity: 0.7, height: 5 }}
-                  animate={{ y: [-8, 40] }}
+                  animate={{ y: [48, -8] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
                 />
               </div>
@@ -378,7 +378,7 @@ export default function Hero({
                 <motion.div
                   className="absolute left-0 w-full bg-white"
                   style={{ opacity: 0.75, height: 6 }}
-                  animate={{ y: [-8, 52] }}
+                  animate={{ y: [56, -8] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
                 />
               </div>
@@ -665,7 +665,7 @@ export default function Hero({
                 <motion.div
                   className="absolute left-0 w-full bg-white"
                   style={{ opacity: 0.8, height: 6 }}
-                  animate={{ y: [-10, 42] }}
+                  animate={{ y: [42, -10] }}
                   transition={{
                     duration: 1.6,
                     repeat: Infinity,
