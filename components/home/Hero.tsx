@@ -287,22 +287,21 @@ export default function Hero({
         animate={{ scale: isProject ? 1.05 : 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-          {/* Rack focus transition. Both the outgoing and incoming layer are
-              mounted simultaneously (mode="sync"). The old layer defocuses to
-              a soft bokeh (blur 24px) while dimming, the new layer snaps from
-              the same blur back to sharp at full brightness. Reads like a
-              photographer pulling focus between two subjects — no motion,
-              pure optics. */}
+          {/* Soft vertical drift. Both layers mount simultaneously; the
+              outgoing slide lifts a quiet 8vh and fades, the incoming slide
+              rises from +8vh into place. Long 1100ms ease-out-expo so the
+              movement reads as a continuous descent, not a cut — the eye
+              barely registers the swap, only the direction. */}
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
               className="absolute inset-0 overflow-hidden bg-black"
-              initial={{ filter: "blur(24px) brightness(0.55)", opacity: 0 }}
-              animate={{ filter: "blur(0px) brightness(1)", opacity: 1 }}
-              exit={{ filter: "blur(24px) brightness(0.55)", opacity: 0 }}
+              initial={{ y: "8vh", opacity: 0 }}
+              animate={{ y: "0vh", opacity: 1 }}
+              exit={{ y: "-8vh", opacity: 0 }}
               transition={{
-                filter: { duration: 0.75, ease: SOFT },
-                opacity: { duration: 0.6, ease: SOFT },
+                y: { duration: 1.1, ease: SOFT },
+                opacity: { duration: 0.9, ease: SOFT },
               }}
             >
               {(() => {
