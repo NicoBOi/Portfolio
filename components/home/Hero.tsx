@@ -298,7 +298,16 @@ export default function Hero({
           animate={{ opacity: loaded ? 1 : 0 }}
           transition={{ duration: 1, delay: 0.3, ease: SOFT }}
         >
-          <div className="relative flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
+          {/* In project mode on mobile, anchor the title+meta to the bottom of
+              the viewport so the cover image reads clean edge-to-edge. Desktop
+              keeps the center composition — there's room for both. */}
+          <div
+            className={`relative flex-1 flex flex-col items-center px-8 text-center gap-4 ${
+              isProject
+                ? "justify-end pb-28 md:justify-center md:pb-0"
+                : "justify-center"
+            }`}
+          >
             {/* Scroll affordance — desktop only (wheel gesture hint). Hidden in
                 project mode (vertical scroll belongs to the project content). */}
             {!isProject && (<>
@@ -534,14 +543,30 @@ export default function Hero({
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
-              {/* Mobile: outlined pill reads unambiguously as a tap target —
-                  editorial, on-brand, and doesn't need an arrow to say "action".
-                  Desktop keeps the per-slide title + animated morph. */}
+              {/* Mobile: editorial em-dashes flanking the word. Same vocabulary
+                  as the Retour button and the project prev/next rules, which
+                  makes it read as a tap target without the generic-button
+                  pill look. Desktop keeps the per-slide title + morph. */}
               <span
-                className="md:hidden label text-white group-hover:opacity-100 transition-colors duration-300 inline-flex items-center border border-white/40 rounded-full px-6 py-2.5 group-hover:border-white/80"
-                style={{ letterSpacing: "0.4em", fontSize: "11px" }}
+                className="md:hidden inline-flex items-center gap-3 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ opacity: 0.9 }}
               >
-                Open
+                <span
+                  aria-hidden="true"
+                  className="block h-px bg-white"
+                  style={{ width: 28, opacity: 0.7 }}
+                />
+                <span
+                  className="label text-white"
+                  style={{ letterSpacing: "0.42em", fontSize: "11px" }}
+                >
+                  Open
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="block h-px bg-white"
+                  style={{ width: 28, opacity: 0.7 }}
+                />
               </span>
               <AnimatePresence mode="wait">
                 <motion.div

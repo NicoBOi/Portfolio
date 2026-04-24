@@ -43,6 +43,14 @@ export default function LandingExperience({ initialSlug }: Props) {
     }
   }, [active]);
 
+  // Block pull-to-refresh + rubber-band bounce while a project is open on
+  // mobile — otherwise swiping down from the top tears the hero image away
+  // from its frame. Class-based so it cleans up on close + route change.
+  useEffect(() => {
+    document.documentElement.classList.toggle("project-active", !!active);
+    return () => document.documentElement.classList.remove("project-active");
+  }, [active]);
+
   const openProject = useCallback((slug: string) => {
     setActiveSlug(slug);
     window.history.pushState({}, "", `/work/${slug}`);

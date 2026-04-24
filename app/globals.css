@@ -34,6 +34,13 @@ html.lightbox-open .hero-mobile-filter {
   pointer-events: none !important;
 }
 
+/* Project open: kill pull-to-refresh + rubber-band on both axes so the
+   pinned hero never tears away from the top of the viewport. */
+html.project-active,
+html.project-active body {
+  overscroll-behavior: none;
+}
+
 /* Full white on hover for every interactive element (beats inline opacity) */
 a:hover,
 a:hover *,
