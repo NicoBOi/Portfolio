@@ -466,7 +466,7 @@ export default function Hero({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -14 }}
                 transition={{ duration: 0.55, ease: SOFT }}
-                className="w-full flex flex-col items-start md:items-center gap-4 text-left md:text-center"
+                className="w-full flex flex-col items-center gap-4 text-center"
               >
                 <h1
                   className="text-white title whitespace-nowrap"
