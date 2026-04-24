@@ -495,17 +495,25 @@ export default function Hero({
                     ))}
                   </div>
                   <div
-                    className="flex items-center gap-3 pointer-events-none"
+                    className="flex items-center gap-5 pointer-events-none"
                     aria-hidden="true"
                   >
-                    <span className="label text-white" style={{ opacity: 0.55, fontSize: "12px", letterSpacing: 0 }}>←</span>
-                    <span
+                    <motion.span
                       className="label text-white"
-                      style={{ opacity: 0.7, fontSize: "10px", letterSpacing: "0.42em" }}
+                      style={{ opacity: 0.55, fontSize: "13px", letterSpacing: 0 }}
+                      animate={{ x: [0, -5, 0] }}
+                      transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
                     >
-                      Swipe
-                    </span>
-                    <span className="label text-white" style={{ opacity: 0.55, fontSize: "12px", letterSpacing: 0 }}>→</span>
+                      ←
+                    </motion.span>
+                    <motion.span
+                      className="label text-white"
+                      style={{ opacity: 0.55, fontSize: "13px", letterSpacing: 0 }}
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      →
+                    </motion.span>
                   </div>
                 </div>
               </motion.div>
