@@ -374,11 +374,11 @@ export default function Hero({
             </div>
 
             <div className="md:hidden flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center pointer-events-none">
-              <div className="relative h-8 w-px bg-white/15 overflow-hidden">
+              <div className="relative h-14 w-px bg-white/20 overflow-hidden">
                 <motion.div
                   className="absolute left-0 w-full bg-white"
-                  style={{ opacity: 0.6, height: 4 }}
-                  animate={{ y: [-6, 28] }}
+                  style={{ opacity: 0.75, height: 6 }}
+                  animate={{ y: [-8, 52] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
                 />
               </div>
@@ -533,7 +533,7 @@ export default function Hero({
               column, wheel (desktop) or vertical swipe (mobile). */}
           {!isProject && (
           <motion.div
-            className="px-6 md:px-10 pb-24 md:pb-8 flex items-baseline justify-center md:justify-between gap-6"
+            className="px-6 md:px-10 pb-32 md:pb-8 flex items-center justify-center md:justify-between md:items-baseline gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
