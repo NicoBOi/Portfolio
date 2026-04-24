@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -15,6 +16,9 @@ interface Props {
 export default function Lightbox({ slug, files, index, onClose, onChange }: Props) {
   const open = index !== null;
   const [rendered, setRendered] = useState(index);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (index !== null) setRendered(index);
@@ -32,9 +36,14 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Hide the site nav (NS logo + menu) while the lightbox is up — it sits in
+    // its own stacking context and was painting on top of the modal, which
+    // also meant taps on "Fermer" were hitting the Contact link underneath.
+    document.documentElement.classList.add("lightbox-open");
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      document.documentElement.classList.remove("lightbox-open");
     };
   }, [open, rendered, files.length, onClose, onChange]);
 
@@ -42,7 +51,12 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
   const hasPrev = rendered !== null && rendered > 0;
   const hasNext = rendered !== null && rendered < files.length - 1;
 
-  return (
+  if (!mounted) return null;
+
+  // Rendered through a portal on document.body so the modal escapes the
+  // <main> stacking context (which was trapping its z-[200] beneath the
+  // fixed nav at z-50).
+  return createPortal(
     <AnimatePresence>
       {open && current && (
         <motion.div
@@ -140,6 +154,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
           )}
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
