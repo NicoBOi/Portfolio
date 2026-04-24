@@ -75,6 +75,22 @@ export default function Hero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProject?.slug]);
 
+  // Scroll indicator state for project mode — fades once the user starts
+  // scrolling the project content. Reset on project change so the hint
+  // reappears for each opened project.
+  const [hasScrolled, setHasScrolled] = useState(false);
+  useEffect(() => {
+    if (!isProject) {
+      setHasScrolled(false);
+      return;
+    }
+    setHasScrolled(false);
+    const onScroll = () => setHasScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isProject, activeProject?.slug]);
+
   // Reset index when filter changes so we land on the first project of the new set.
   useEffect(() => {
     setIndex(0);
@@ -216,7 +232,9 @@ export default function Hero({
       data-cursor-suppress
     >
 
-      {/* Back — project mode only. Big, fixed, accessible, always on top. */}
+      {/* Back — project mode only. Editorial text (no pill), fixed, always on
+          top. mix-blend-mode: difference keeps it readable against any photo
+          or video frame without needing a backdrop. */}
       <AnimatePresence>
         {isProject && (
           <motion.button
@@ -224,21 +242,31 @@ export default function Hero({
             type="button"
             onClick={() => onCloseProject?.()}
             aria-label="Retour aux projets"
-            className="fixed top-16 left-4 md:top-20 md:left-6 z-[70] flex items-center gap-2 label text-white rounded-full px-4 py-3 min-h-[44px] hover:opacity-100 transition-opacity duration-300"
+            className="fixed top-20 left-6 md:top-24 md:left-10 z-[80] group flex items-center gap-4 py-2 hover:opacity-100 transition-opacity duration-300"
             style={{
+              mixBlendMode: "difference",
+              color: "#fff",
               opacity: 0.95,
-              backgroundColor: "rgba(0,0,0,0.55)",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-              border: "1px solid rgba(255,255,255,0.12)",
             }}
-            initial={{ opacity: 0, x: -12 }}
+            initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 0.95, x: 0 }}
-            exit={{ opacity: 0, x: -12 }}
-            transition={{ duration: 0.35, ease: SOFT }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.4, ease: SOFT }}
           >
-            <span aria-hidden="true" style={{ fontSize: "14px" }}>←</span>
-            Retour
+            <span
+              aria-hidden="true"
+              className="block h-px bg-white transition-all duration-500 group-hover:w-16"
+              style={{ width: 40, opacity: 0.85 }}
+            />
+            <span
+              className="label text-white"
+              style={{
+                fontSize: "13px",
+                letterSpacing: "0.38em",
+              }}
+            >
+              Retour
+            </span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -387,8 +415,10 @@ export default function Hero({
 
             </>)}
 
-            {/* Central title — morphs between the landing name and the active project. */}
-            <div className="relative w-full max-w-4xl mx-auto pointer-events-auto">
+            {/* Central title — morphs between the landing name and the active project.
+                pointer-events-none on the wrapper so a click over the name falls
+                through to the background (which opens the current featured project). */}
+            <div className="relative w-full pointer-events-none">
             <AnimatePresence mode="wait">
             {isProject && activeProject ? (
               <motion.div
@@ -430,7 +460,7 @@ export default function Hero({
                 className="flex flex-col items-center gap-4"
               >
                 <h1
-                  className="text-white title"
+                  className="text-white title whitespace-nowrap"
                   style={{ fontSize: "clamp(2.5rem, 9vw, 11rem)" }}
                 >
               {TITLE.split("").map((char, i) => (
@@ -568,6 +598,40 @@ export default function Hero({
           </div>
         </nav>
         )}
+
+        {/* Scroll affordance in project mode — bottom-center of the pinned hero.
+            Fades the moment the user starts scrolling. */}
+        <AnimatePresence>
+          {isProject && (
+            <motion.div
+              key="project-scroll-indicator"
+              className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center gap-3"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: hasScrolled ? 0 : 0.7, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.5, ease: SOFT }}
+            >
+              <span
+                className="label text-white"
+                style={{ letterSpacing: "0.38em", fontSize: "10px" }}
+              >
+                Scroll
+              </span>
+              <div className="relative h-12 w-px bg-white/20 overflow-hidden">
+                <motion.div
+                  className="absolute left-0 w-full bg-white"
+                  style={{ opacity: 0.8, height: 6 }}
+                  animate={{ y: [-10, 42] }}
+                  transition={{
+                    duration: 1.6,
+                    repeat: Infinity,
+                    ease: [0.45, 0, 0.55, 1],
+                  }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
     </section>
   );
 }
