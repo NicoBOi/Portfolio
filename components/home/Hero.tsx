@@ -264,7 +264,7 @@ export default function Hero() {
             </div>
 
             <motion.div
-              className="flex items-center gap-2 md:gap-4 pointer-events-auto"
+              className="hidden md:flex items-center gap-2 md:gap-4 pointer-events-auto"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: SOFT }}
@@ -337,9 +337,9 @@ export default function Hero() {
             </motion.p>
           </div>
 
-          {/* Bottom nav */}
+          {/* Bottom nav — on mobile, leave room for the fixed filter bar below. */}
           <motion.div
-            className="px-6 md:px-10 pb-8 grid grid-cols-3 items-end gap-4"
+            className="px-6 md:px-10 pb-24 md:pb-8 grid grid-cols-3 items-end gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
@@ -403,6 +403,45 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
+        {/* Mobile-only fixed filter bar — thumb-reachable, overrides the in-hero filter. */}
+        <nav
+          className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-white/10"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.78)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+          }}
+          aria-label="Filtrer par discipline"
+        >
+          <div className="flex items-center justify-around px-2 py-3">
+            {FILTERS.map((f) => {
+              const active = filter === f.value;
+              return (
+                <button
+                  key={f.value}
+                  type="button"
+                  onClick={() => setFilter(f.value)}
+                  className="label text-white relative px-4 py-2 transition-opacity duration-300 focus:outline-none"
+                  style={{
+                    opacity: active ? 0.95 : 0.4,
+                    letterSpacing: "0.24em",
+                    WebkitTapHighlightColor: "transparent",
+                  }}
+                  aria-pressed={active}
+                >
+                  {f.label}
+                  {active && (
+                    <motion.span
+                      layoutId="hero-filter-bottom-underline"
+                      className="absolute left-4 right-4 bottom-1 h-px bg-white"
+                      transition={{ duration: 0.3, ease: SOFT }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
     </section>
   );
 }
