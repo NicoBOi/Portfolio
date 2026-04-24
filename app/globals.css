@@ -17,6 +17,14 @@ html.cursor-ready *::after {
   cursor: none !important;
 }
 
+/* When the mobile nav overlay is open, get fixed UI (back button, filter bar)
+   out of the way so they don't collide with the menu items. */
+html.nav-open .hero-back-button,
+html.nav-open .hero-mobile-filter {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Full white on hover for every interactive element (beats inline opacity) */
 a:hover,
 a:hover *,

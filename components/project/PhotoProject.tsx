@@ -97,14 +97,14 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
               key={f}
               type="button"
               onClick={() => setLightbox(i)}
-              className="snap-center shrink-0 w-screen relative"
-              style={{ aspectRatio: isPortrait ? "4/5" : "3/2", backgroundColor: bg }}
+              className="snap-center shrink-0 w-screen relative block"
+              style={{ backgroundColor: bg }}
               aria-label={`Agrandir la photo ${i + 1}`}
             >
               <img
                 src={`/projects/${project.slug}/${f}`}
                 alt=""
-                className="w-full h-full object-cover block"
+                className="w-full h-auto block"
                 loading={i === 0 ? "eager" : "lazy"}
                 decoding="async"
               />

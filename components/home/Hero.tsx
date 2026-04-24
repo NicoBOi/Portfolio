@@ -448,6 +448,33 @@ export default function Hero({
                 >
               Bordeaux — Paris
                 </p>
+
+                {/* Horizontal swipe hint — mobile only. Signals the carousel
+                    moves sideways (browse mode, landing only). */}
+                <div className="md:hidden mt-6 flex flex-col items-center gap-2 pointer-events-none">
+                  <span
+                    className="label text-white"
+                    style={{
+                      opacity: 0.45,
+                      fontSize: "10px",
+                      letterSpacing: "0.38em",
+                    }}
+                  >
+                    Swipe
+                  </span>
+                  <div className="relative w-16 h-px bg-white/15 overflow-hidden">
+                    <motion.div
+                      className="absolute top-0 h-full bg-white"
+                      style={{ opacity: 0.8, width: 8 }}
+                      animate={{ x: [-10, 64] }}
+                      transition={{
+                        duration: 1.6,
+                        repeat: Infinity,
+                        ease: [0.45, 0, 0.55, 1],
+                      }}
+                    />
+                  </div>
+                </div>
               </motion.div>
             )}
             </AnimatePresence>
@@ -501,14 +528,27 @@ export default function Hero({
                     style={{ fontSize: "clamp(1rem, 1.5vw, 1.25rem)", opacity: 0.9 }}
                   >
                     {current.title}
+                    {/* Mobile keeps only the title + an inline arrow so the
+                        bottom block stays airy. Desktop gets the two extra
+                        lines below for context. */}
+                    <span
+                      aria-hidden="true"
+                      className="md:hidden ml-2"
+                      style={{ opacity: 0.6 }}
+                    >
+                      →
+                    </span>
                   </span>
                   <span
-                    className="label text-white group-hover:opacity-100 transition-opacity duration-300"
+                    className="label text-white group-hover:opacity-100 transition-opacity duration-300 hidden md:inline-block"
                     style={{ opacity: 0.7, letterSpacing: "0.32em" }}
                   >
                     {current.type === "video" ? "Lire" : "Voir"} <span aria-hidden="true">→</span>
                   </span>
-                  <span className="label text-white" style={{ opacity: 0.5 }}>
+                  <span
+                    className="label text-white hidden md:inline-block"
+                    style={{ opacity: 0.5 }}
+                  >
                     {String(index + 1).padStart(2, "0")} / {String(FEATURED.length).padStart(2, "0")}
                   </span>
                 </motion.div>
@@ -538,7 +578,7 @@ export default function Hero({
         {/* Mobile-only fixed filter bar — browse mode only. */}
         {!isProject && (
         <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-white/10"
+          className="hero-mobile-filter md:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-white/10"
           style={{
             backgroundColor: "rgba(0,0,0,0.78)",
             backdropFilter: "blur(10px)",

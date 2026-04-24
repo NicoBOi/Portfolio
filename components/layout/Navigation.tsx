@@ -15,7 +15,13 @@ export default function Navigation() {
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    // Surface the menu state so other fixed elements (landing back button)
+    // can get out of the way via CSS.
+    document.documentElement.classList.toggle("nav-open", open);
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.classList.remove("nav-open");
+    };
   }, [open]);
 
   return (
