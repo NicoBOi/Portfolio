@@ -520,51 +520,44 @@ export default function Hero({
               </AnimatePresence>
             </div>
 
-            {/* Pill CTA with a quiet concentric halo that brightens + expands
-                on hover. Ambient ring breathes at 2.8s so the button is never
-                static; a second ring appears on hover as a "come in" cue, the
-                button lifts (scale 1.04) and softens its fill slightly.
-                whileTap scales to 0.96 for the tactile press feel. */}
+            {/* Pill CTA — editorial. Static at rest, scales on hover while a
+                hairline draws under "Ouvrir" (same underline vocabulary as the
+                active filters / nav links). whileTap scales to 0.96 for press
+                feedback. No halo, no breath — the DA stays in the label. */}
             <motion.button
               type="button"
               onClick={() => openProject(current.slug)}
-              className="relative pointer-events-auto rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3"
+              className="pointer-events-auto rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3"
               initial="rest"
               animate="rest"
               whileHover="hover"
               whileTap="tap"
               variants={{
-                rest: { scale: 1, backgroundColor: "#ffffff" },
-                hover: { scale: 1.04, backgroundColor: "#f4f4f4" },
+                rest: { scale: 1 },
+                hover: { scale: 1.03 },
                 tap: { scale: 0.96 },
               }}
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
-              <motion.span
-                aria-hidden="true"
-                className="absolute rounded-full pointer-events-none"
-                style={{ inset: -3, border: "1px solid rgba(255,255,255,0.32)" }}
-                animate={{ opacity: [0.35, 0.75, 0.35] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <motion.span
-                aria-hidden="true"
-                className="absolute rounded-full pointer-events-none"
-                style={{ inset: -8, border: "1px solid rgba(255,255,255,0.45)" }}
-                variants={{
-                  rest: { opacity: 0, scale: 0.88 },
-                  hover: { opacity: 1, scale: 1 },
-                  tap: { opacity: 0.6, scale: 0.96 },
-                }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              />
-              <span
-                className="relative title italic block leading-none"
-                style={{ fontSize: "clamp(1.05rem, 1.4vw, 1.2rem)" }}
-              >
-                Ouvrir
+              <span className="relative inline-block leading-none">
+                <span
+                  className="title italic block"
+                  style={{ fontSize: "clamp(1.05rem, 1.4vw, 1.2rem)" }}
+                >
+                  Ouvrir
+                </span>
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute left-0 right-0 -bottom-1 h-px bg-black"
+                  style={{ originX: 0 }}
+                  variants={{
+                    rest: { scaleX: 0, opacity: 0 },
+                    hover: { scaleX: 1, opacity: 0.7 },
+                  }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                />
               </span>
             </motion.button>
           </motion.div>
