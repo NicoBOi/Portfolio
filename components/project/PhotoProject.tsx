@@ -48,7 +48,6 @@ const LAYOUTS = [
 
 export default function PhotoProject({ project, prev, next, mode = "page", onNavigate }: Props) {
   const isEmbedded = mode === "embedded";
-  const isPortrait = project.aspectRatio === "portrait";
   const files = project.imageFiles ?? [];
   const bg = project.coverPlaceholder;
   const cover = files[0];
@@ -121,15 +120,12 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
 
       {/* Desktop — cover + editorial sequence */}
       <div className="hidden md:block">
-        {/* Cover — framed, not full-bleed */}
+        {/* Cover — natural ratio. No aspect lock + no object-cover so the image
+            reads exactly as shot, matching the rhythm of the sequence below. */}
         <div className="px-6 md:px-10 lg:px-16 mt-10 md:mt-16">
           <motion.div
-            className="relative w-full max-w-6xl mx-auto overflow-hidden"
-            style={{
-              aspectRatio: isPortrait ? "4/5" : "16/10",
-              backgroundColor: bg,
-              maxHeight: "78vh",
-            }}
+            className="relative w-full max-w-6xl mx-auto"
+            style={{ backgroundColor: bg }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: SOFT }}
@@ -138,14 +134,14 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
               <button
                 type="button"
                 onClick={() => setLightbox(0)}
-                className="w-full h-full block"
+                className="w-full block"
                 data-cursor="Agrandir"
                 aria-label="Agrandir"
               >
                 <img
                   src={`/projects/${project.slug}/${cover}`}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto block"
                   loading="eager"
                   fetchPriority="high"
                   decoding="async"
@@ -184,7 +180,7 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
                     <img
                       src={`/projects/${project.slug}/${f}`}
                       alt=""
-                      className="w-full h-auto object-cover block"
+                      className="w-full h-auto block"
                       loading="lazy"
                       decoding="async"
                     />

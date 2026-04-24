@@ -449,9 +449,10 @@ export default function Hero({
               Bordeaux — Paris
                 </p>
 
-                {/* Horizontal swipe hint — mobile only. Signals the carousel
-                    moves sideways (browse mode, landing only). */}
-                <div className="md:hidden mt-6 flex flex-col items-center gap-2 pointer-events-none">
+                {/* Mobile pagination — one tick per featured project, the
+                    active one grows and brightens. Makes the horizontal
+                    progression obvious without adding a chrome element. */}
+                <div className="md:hidden mt-6 flex flex-col items-center gap-3 pointer-events-none">
                   <span
                     className="label text-white"
                     style={{
@@ -462,17 +463,17 @@ export default function Hero({
                   >
                     Swipe
                   </span>
-                  <div className="relative w-16 h-px bg-white/15 overflow-hidden">
-                    <motion.div
-                      className="absolute top-0 h-full bg-white"
-                      style={{ opacity: 0.8, width: 8 }}
-                      animate={{ x: [-10, 64] }}
-                      transition={{
-                        duration: 1.6,
-                        repeat: Infinity,
-                        ease: [0.45, 0, 0.55, 1],
-                      }}
-                    />
+                  <div className="flex items-center gap-2">
+                    {FEATURED.map((p, i) => (
+                      <span
+                        key={p.slug}
+                        className="block h-px bg-white transition-all duration-500"
+                        style={{
+                          width: i === index ? 20 : 8,
+                          opacity: i === index ? 0.9 : 0.3,
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
               </motion.div>

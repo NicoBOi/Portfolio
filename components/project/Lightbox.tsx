@@ -94,26 +94,30 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
             </motion.div>
           </AnimatePresence>
 
-          {/* Close button */}
+          {/* Chrome — lifted above the zoom wrapper via z-[20] and wired to
+              onPointerUp so the gesture library (which claims pointer/click
+              events during pan/pinch) can't swallow the tap. */}
           <button
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
-            className="absolute top-5 right-6 z-[10] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-2 -mx-3"
-            style={{ opacity: 0.75 }}
+            type="button"
+            onPointerUp={(e) => { e.stopPropagation(); onClose(); }}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute top-5 right-6 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-2 -mx-3"
+            style={{ opacity: 0.75, pointerEvents: "auto" }}
           >
             Fermer
           </button>
 
-          {/* Counter */}
-          <span className="absolute top-5 left-6 z-[10] label text-white" style={{ opacity: 0.55 }}>
+          <span className="absolute top-5 left-6 z-[20] label text-white pointer-events-none" style={{ opacity: 0.55 }}>
             {rendered !== null ? String(rendered + 1).padStart(2, "0") : "00"} / {String(files.length).padStart(2, "0")}
           </span>
 
-          {/* Prev */}
           {hasPrev && (
             <button
-              onClick={(e) => { e.stopPropagation(); onChange(rendered! - 1); }}
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[10] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
-              style={{ opacity: 0.65 }}
+              type="button"
+              onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! - 1); }}
+              onClick={(e) => e.stopPropagation()}
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
+              style={{ opacity: 0.65, pointerEvents: "auto" }}
               data-cursor="Précédent"
               aria-label="Précédent"
             >
@@ -121,12 +125,13 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
             </button>
           )}
 
-          {/* Next */}
           {hasNext && (
             <button
-              onClick={(e) => { e.stopPropagation(); onChange(rendered! + 1); }}
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[10] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
-              style={{ opacity: 0.65 }}
+              type="button"
+              onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! + 1); }}
+              onClick={(e) => e.stopPropagation()}
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
+              style={{ opacity: 0.65, pointerEvents: "auto" }}
               data-cursor="Suivant"
               aria-label="Suivant"
             >

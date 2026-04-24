@@ -116,7 +116,7 @@ export default function LandingExperience({ initialSlug }: Props) {
             type="button"
             onClick={closeProject}
             aria-label="Retour aux projets"
-            className="hero-back-button fixed top-20 left-6 md:top-24 md:left-10 z-[90] group flex items-center gap-4 py-2 hover:opacity-100 transition-opacity duration-300"
+            className="hero-back-button fixed top-28 left-6 md:top-24 md:left-10 z-[90] group flex items-center gap-4 py-2 hover:opacity-100 transition-opacity duration-300"
             style={{
               mixBlendMode: "difference",
               color: "#fff",
