@@ -313,7 +313,7 @@ export default function Hero({
             className={`relative flex-1 flex flex-col items-center px-8 text-center gap-4 ${
               isProject
                 ? "justify-end pb-40 md:justify-center md:pb-0"
-                : "justify-center pb-[18vh] md:pb-0"
+                : "justify-center"
             }`}
           >
             {/* Scroll / swipe affordance — left edge, visible on every size.
@@ -322,22 +322,11 @@ export default function Hero({
                 title can sit centered between two equal-weight edges. */}
             {!isProject && (<>
             <div className="flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
-              <span
-                className="label text-white"
-                style={{
-                  opacity: 0.4,
-                  writingMode: "vertical-rl",
-                  transform: "rotate(180deg)",
-                  letterSpacing: "0.28em",
-                }}
-              >
-                Scroll
-              </span>
-              <div className="relative h-12 w-px bg-white/15 overflow-hidden">
+              <div className="relative h-8 w-px bg-white/15 overflow-hidden">
                 <motion.div
                   className="absolute left-0 w-full bg-white"
-                  style={{ opacity: 0.7, height: 5 }}
-                  animate={{ y: [-8, 40] }}
+                  style={{ opacity: 0.6, height: 4 }}
+                  animate={{ y: [-6, 28] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
                 />
               </div>
@@ -361,7 +350,11 @@ export default function Hero({
                     }
                   }}
                   className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
-                  style={{ opacity: i === index ? 0.95 : 0.45 }}
+                  style={{
+                    opacity: i === index ? 0.95 : 0.4,
+                    fontSize: "10px",
+                    letterSpacing: "0.22em",
+                  }}
                   data-cursor={p.type === "photo" ? "Voir" : "Lire"}
                   aria-label={p.title}
                 >
