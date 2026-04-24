@@ -495,19 +495,17 @@ export default function Hero({
                     ))}
                   </div>
                   <div
-                    className="relative w-24 h-px bg-white/15 overflow-hidden pointer-events-none"
+                    className="flex items-center gap-3 pointer-events-none"
                     aria-hidden="true"
                   >
-                    <motion.div
-                      className="absolute top-0 h-full bg-white"
-                      style={{ opacity: 0.7, width: 10 }}
-                      animate={{ x: [-12, 96] }}
-                      transition={{
-                        duration: 1.8,
-                        repeat: Infinity,
-                        ease: [0.45, 0, 0.55, 1],
-                      }}
-                    />
+                    <span className="label text-white" style={{ opacity: 0.55, fontSize: "12px", letterSpacing: 0 }}>←</span>
+                    <span
+                      className="label text-white"
+                      style={{ opacity: 0.7, fontSize: "10px", letterSpacing: "0.42em" }}
+                    >
+                      Swipe
+                    </span>
+                    <span className="label text-white" style={{ opacity: 0.55, fontSize: "12px", letterSpacing: 0 }}>→</span>
                   </div>
                 </div>
               </motion.div>
@@ -520,14 +518,14 @@ export default function Hero({
               the project's own prev/next nav rendered below the hero. */}
           {!isProject && (
           <motion.div
-            className="px-6 md:px-10 pb-24 md:pb-8 grid grid-cols-3 items-end gap-4"
+            className="px-6 md:px-10 pb-24 md:pb-8 grid grid-cols-1 md:grid-cols-3 items-end justify-items-center md:justify-items-stretch gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
           >
             <button
               onClick={goPrev}
-              className="flex items-center gap-3 group text-left pointer-events-auto px-3 py-3 -mx-3"
+              className="hidden md:flex items-center gap-3 group text-left pointer-events-auto px-3 py-3 -mx-3"
               aria-label="Projet précédent"
             >
               <span
@@ -535,7 +533,7 @@ export default function Hero({
                 style={{ width: 24, opacity: 0.45 }}
               />
               <span
-                className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300"
+                className="label text-white group-hover:opacity-100 transition-opacity duration-300"
                 style={{ opacity: 0.7 }}
               >
                 {FEATURED[(index - 1 + FEATURED.length) % FEATURED.length].title}
@@ -549,31 +547,19 @@ export default function Hero({
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
-              {/* Mobile: editorial em-dashes flanking the word. Same vocabulary
-                  as the Retour button and the project prev/next rules, which
-                  makes it read as a tap target without the generic-button
-                  pill look. Desktop keeps the per-slide title + morph. */}
-              <span
-                className="md:hidden inline-flex items-center gap-3 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ opacity: 0.9 }}
+              {/* Mobile: italic serif "Ouvrir" with a quiet opacity breath.
+                  Different typographic register than the mono chrome elsewhere
+                  (no traits to clash with the left/right rules at the edges),
+                  the breathing signals "live target" without shouting.
+                  Desktop keeps the per-slide title + morph. */}
+              <motion.span
+                className="md:hidden title italic text-white"
+                style={{ fontSize: "clamp(1.15rem, 4.5vw, 1.45rem)" }}
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
               >
-                <span
-                  aria-hidden="true"
-                  className="block h-px bg-white"
-                  style={{ width: 28, opacity: 0.7 }}
-                />
-                <span
-                  className="label text-white"
-                  style={{ letterSpacing: "0.42em", fontSize: "11px" }}
-                >
-                  Open
-                </span>
-                <span
-                  aria-hidden="true"
-                  className="block h-px bg-white"
-                  style={{ width: 28, opacity: 0.7 }}
-                />
-              </span>
+                Ouvrir
+              </motion.span>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={current.slug}
@@ -602,11 +588,11 @@ export default function Hero({
 
             <button
               onClick={goNext}
-              className="flex items-center gap-3 justify-end group text-right pointer-events-auto px-3 py-3 -mx-3"
+              className="hidden md:flex items-center gap-3 justify-end group text-right pointer-events-auto px-3 py-3 -mx-3"
               aria-label="Projet suivant"
             >
               <span
-                className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300"
+                className="label text-white group-hover:opacity-100 transition-opacity duration-300"
                 style={{ opacity: 0.7 }}
               >
                 {FEATURED[(index + 1) % FEATURED.length].title}
