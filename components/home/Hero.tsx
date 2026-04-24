@@ -287,21 +287,22 @@ export default function Hero({
         animate={{ scale: isProject ? 1.05 : 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-          {/* Cinematic dolly-in cut. mode="wait" holds a pure-black frame
-              between shots (old exits fully before new enters), the outgoing
-              image pushes toward the camera (scale 1 -> 1.22) while fading,
-              and the incoming image lands from a tight 1.12 into 1.00. Reads
-              like a hard cut between two shots in a film. */}
-          <AnimatePresence mode="wait">
+          {/* Rack focus transition. Both the outgoing and incoming layer are
+              mounted simultaneously (mode="sync"). The old layer defocuses to
+              a soft bokeh (blur 24px) while dimming, the new layer snaps from
+              the same blur back to sharp at full brightness. Reads like a
+              photographer pulling focus between two subjects — no motion,
+              pure optics. */}
+          <AnimatePresence mode="sync">
             <motion.div
               key={index}
-              className="absolute inset-0 overflow-hidden bg-black will-change-transform"
-              initial={{ scale: 1.12, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.22, opacity: 0 }}
+              className="absolute inset-0 overflow-hidden bg-black"
+              initial={{ filter: "blur(24px) brightness(0.55)", opacity: 0 }}
+              animate={{ filter: "blur(0px) brightness(1)", opacity: 1 }}
+              exit={{ filter: "blur(24px) brightness(0.55)", opacity: 0 }}
               transition={{
-                scale: { duration: 0.55, ease: SOFT },
-                opacity: { duration: 0.36, ease: SOFT },
+                filter: { duration: 0.75, ease: SOFT },
+                opacity: { duration: 0.6, ease: SOFT },
               }}
             >
               {(() => {
@@ -330,21 +331,6 @@ export default function Hero({
               })()}
             </motion.div>
           </AnimatePresence>
-
-          {/* Vignette — tightens on the cut then opens back as the new shot
-              lands. Subtle, never fully black in the centre. */}
-          <motion.div
-            key={`vignette-${index}`}
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
-            initial={{ opacity: 0.55 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: SOFT }}
-            style={{
-              background:
-                "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.85) 100%)",
-            }}
-          />
 
           <div className="absolute inset-0 bg-black/50 pointer-events-none" />
         </motion.div>
