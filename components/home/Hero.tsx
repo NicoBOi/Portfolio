@@ -313,13 +313,15 @@ export default function Hero({
             className={`relative flex-1 flex flex-col items-center px-8 text-center gap-4 ${
               isProject
                 ? "justify-end pb-40 md:justify-center md:pb-0"
-                : "justify-center"
+                : "justify-center pb-[18vh] md:pb-0"
             }`}
           >
-            {/* Scroll affordance — desktop only (wheel gesture hint). Hidden in
-                project mode (vertical scroll belongs to the project content). */}
+            {/* Scroll / swipe affordance — left edge, visible on every size.
+                Desktop: wheel cue. Mobile: vertical-swipe cue. The vertical
+                rule on the left balances the 01-08 column on the right, so the
+                title can sit centered between two equal-weight edges. */}
             {!isProject && (<>
-            <div className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
+            <div className="flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
               <span
                 className="label text-white"
                 style={{
@@ -345,40 +347,27 @@ export default function Hero({
                 to open. Mobile: tap to jump (setIndex only), "Ouvrir" opens.
                 The scroll-hint rule below the numbers is mobile-only — it
                 doubles as the vertical-swipe affordance. */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end gap-4 pointer-events-auto">
-              <div className="flex flex-col items-end">
-                {FEATURED.map((p, i) => (
-                  <button
-                    key={p.slug}
-                    onMouseEnter={() => setIndex(i)}
-                    onFocus={() => setIndex(i)}
-                    onClick={() => {
-                      if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
-                        openProject(p.slug);
-                      } else {
-                        setIndex(i);
-                      }
-                    }}
-                    className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
-                    style={{ opacity: i === index ? 0.95 : 0.45 }}
-                    data-cursor={p.type === "photo" ? "Voir" : "Lire"}
-                    aria-label={p.title}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </button>
-                ))}
-              </div>
-              <div
-                className="md:hidden relative h-10 w-px bg-white/15 overflow-hidden mr-5 pointer-events-none"
-                aria-hidden="true"
-              >
-                <motion.div
-                  className="absolute left-0 w-full bg-white"
-                  style={{ opacity: 0.7, height: 5 }}
-                  animate={{ y: [-8, 44] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
-                />
-              </div>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-auto">
+              {FEATURED.map((p, i) => (
+                <button
+                  key={p.slug}
+                  onMouseEnter={() => setIndex(i)}
+                  onFocus={() => setIndex(i)}
+                  onClick={() => {
+                    if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+                      openProject(p.slug);
+                    } else {
+                      setIndex(i);
+                    }
+                  }}
+                  className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
+                  style={{ opacity: i === index ? 0.95 : 0.45 }}
+                  data-cursor={p.type === "photo" ? "Voir" : "Lire"}
+                  aria-label={p.title}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </button>
+              ))}
             </div>
 
             <motion.div
