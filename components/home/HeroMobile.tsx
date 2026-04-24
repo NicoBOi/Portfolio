@@ -103,16 +103,26 @@ export default function HeroMobile() {
 
   useEffect(() => {
     if (visible.length === 0) return;
+    // Track each card's current visibility ratio so we can always activate the
+    // most-visible one — avoids flip-flopping while scrolling between cards.
+    const ratios = new Map<number, number>();
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
-            const idx = cardRefs.current.indexOf(entry.target as HTMLButtonElement);
-            if (idx >= 0) setActiveIndex(idx);
-          }
+          const idx = cardRefs.current.indexOf(entry.target as HTMLButtonElement);
+          if (idx >= 0) ratios.set(idx, entry.intersectionRatio);
         }
+        let best = -1;
+        let bestRatio = 0;
+        ratios.forEach((r, i) => {
+          if (r > bestRatio) {
+            bestRatio = r;
+            best = i;
+          }
+        });
+        setActiveIndex(bestRatio > 0.3 ? best : -1);
       },
-      { threshold: [0, 0.55, 1] }
+      { threshold: [0, 0.15, 0.3, 0.5, 0.7, 1] }
     );
     cardRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
