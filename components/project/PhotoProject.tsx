@@ -193,19 +193,22 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
         </div>
       </div>
 
-      {/* Metadata — shared between mobile + desktop */}
-      <div className="px-6 md:px-10 lg:px-16 py-14 md:py-24 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16">
+      {/* Metadata — shared between mobile + desktop. Mobile gets a hairline
+          divider between the title and the meta group so the hierarchy reads
+          even when both are left-aligned at 13px/40px. */}
+      <div className="px-6 md:px-10 lg:px-16 pt-10 pb-12 md:py-24 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16">
         <h1
           className="text-white title"
-          style={{ fontSize: "clamp(2rem, 4.5vw, 4.5rem)", lineHeight: 1 }}
+          style={{ fontSize: "clamp(2.5rem, 8vw, 4.5rem)", lineHeight: 1.02 }}
         >
           {project.title}
         </h1>
         <div className="flex flex-col gap-2 md:justify-end">
-          <p className="label text-white" style={{ opacity: 0.95 }}>{project.meta.type}</p>
-          <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.location}</p>
-          <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.credits}</p>
-          <p className="label text-white mt-4" style={{ opacity: 0.6 }}>{project.year}</p>
+          <span aria-hidden="true" className="block md:hidden h-px w-10 bg-white/25 mb-1" />
+          <p className="label text-white leading-relaxed" style={{ opacity: 0.95 }}>{project.meta.type}</p>
+          <p className="label text-white leading-relaxed" style={{ opacity: 0.75 }}>{project.meta.location}</p>
+          <p className="label text-white leading-relaxed" style={{ opacity: 0.75 }}>{project.meta.credits}</p>
+          <p className="label text-white mt-3 md:mt-4" style={{ opacity: 0.6 }}>{project.year}</p>
         </div>
       </div>
 
