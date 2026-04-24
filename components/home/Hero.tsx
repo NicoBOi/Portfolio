@@ -528,28 +528,13 @@ export default function Hero({
                     style={{ fontSize: "clamp(1rem, 1.5vw, 1.25rem)", opacity: 0.9 }}
                   >
                     {current.title}
-                    {/* Mobile keeps only the title + an inline arrow so the
-                        bottom block stays airy. Desktop gets the two extra
-                        lines below for context. */}
                     <span
                       aria-hidden="true"
-                      className="md:hidden ml-2"
-                      style={{ opacity: 0.6 }}
+                      className="ml-2 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ opacity: 0.55 }}
                     >
                       →
                     </span>
-                  </span>
-                  <span
-                    className="label text-white group-hover:opacity-100 transition-opacity duration-300 hidden md:inline-block"
-                    style={{ opacity: 0.7, letterSpacing: "0.32em" }}
-                  >
-                    {current.type === "video" ? "Lire" : "Voir"} <span aria-hidden="true">→</span>
-                  </span>
-                  <span
-                    className="label text-white hidden md:inline-block"
-                    style={{ opacity: 0.5 }}
-                  >
-                    {String(index + 1).padStart(2, "0")} / {String(FEATURED.length).padStart(2, "0")}
                   </span>
                 </motion.div>
               </AnimatePresence>
