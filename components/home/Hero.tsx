@@ -455,28 +455,45 @@ export default function Hero({
               Bordeaux — Paris
                 </p>
 
-                {/* Mobile index — horizontal row of the same 01-08 numbers the
-                    desktop carries vertically on the right edge. Each is
-                    tappable (enlarged hit area via py-3 -my-3) so the index
-                    doubles as jump navigation on top of the swipe gesture. */}
-                <div className="md:hidden mt-8 flex items-center justify-center gap-2 pointer-events-auto">
-                  {FEATURED.map((p, i) => (
-                    <button
-                      key={p.slug}
-                      type="button"
-                      onClick={() => setIndex(i)}
-                      className="label text-white tabular-nums transition-opacity duration-300 px-1 py-3 -my-3"
-                      style={{
-                        opacity: i === index ? 0.95 : 0.35,
-                        fontSize: "11px",
-                        letterSpacing: "0.24em",
+                {/* Mobile index + swipe cue. Numbers on top (tappable, 44pt hit
+                    area) carry position + jump-nav. The animated line below
+                    adds the direction hint — a dot sliding left-to-right
+                    reads as "horizontal gesture lives here" without shouting. */}
+                <div className="md:hidden mt-8 flex flex-col items-center gap-3">
+                  <div className="flex items-center justify-center gap-2 pointer-events-auto">
+                    {FEATURED.map((p, i) => (
+                      <button
+                        key={p.slug}
+                        type="button"
+                        onClick={() => setIndex(i)}
+                        className="label text-white tabular-nums transition-opacity duration-300 px-1 py-3 -my-3"
+                        style={{
+                          opacity: i === index ? 0.95 : 0.35,
+                          fontSize: "11px",
+                          letterSpacing: "0.24em",
+                        }}
+                        aria-label={`Projet ${i + 1}`}
+                        aria-current={i === index ? "true" : undefined}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </button>
+                    ))}
+                  </div>
+                  <div
+                    className="relative w-24 h-px bg-white/15 overflow-hidden pointer-events-none"
+                    aria-hidden="true"
+                  >
+                    <motion.div
+                      className="absolute top-0 h-full bg-white"
+                      style={{ opacity: 0.7, width: 10 }}
+                      animate={{ x: [-12, 96] }}
+                      transition={{
+                        duration: 1.8,
+                        repeat: Infinity,
+                        ease: [0.45, 0, 0.55, 1],
                       }}
-                      aria-label={`Projet ${i + 1}`}
-                      aria-current={i === index ? "true" : undefined}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </button>
-                  ))}
+                    />
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -517,16 +534,14 @@ export default function Hero({
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
-              {/* Mobile: a static "Open" affordance so the tap-to-open action
-                  reads unambiguously. Desktop keeps the per-slide title +
-                  animated morph — space is available and it matches the
-                  editorial chrome. */}
+              {/* Mobile: outlined pill reads unambiguously as a tap target —
+                  editorial, on-brand, and doesn't need an arrow to say "action".
+                  Desktop keeps the per-slide title + animated morph. */}
               <span
-                className="md:hidden label text-white group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-3"
-                style={{ opacity: 0.85, letterSpacing: "0.38em" }}
+                className="md:hidden label text-white group-hover:opacity-100 transition-colors duration-300 inline-flex items-center border border-white/40 rounded-full px-6 py-2.5 group-hover:border-white/80"
+                style={{ letterSpacing: "0.4em", fontSize: "11px" }}
               >
                 Open
-                <span aria-hidden="true" style={{ opacity: 0.6 }}>→</span>
               </span>
               <AnimatePresence mode="wait">
                 <motion.div
