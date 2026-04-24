@@ -217,10 +217,6 @@ export default function Hero({
     });
   };
 
-  const goPrev = () =>
-    featuredLen > 1 && setIndex((i) => (i - 1 + featuredLen) % featuredLen);
-  const goNext = () => featuredLen > 1 && setIndex((i) => (i + 1) % featuredLen);
-
   return (
     <section
       className={`${
@@ -497,93 +493,48 @@ export default function Hero({
             </div>
           </div>
 
-          {/* Bottom nav — browse mode only. In project mode the bottom belongs to
-              the project's own prev/next nav rendered below the hero. */}
+          {/* Bottom row — browse mode only. Desktop pairs the current project
+              title on the left with the Ouvrir CTA on the right; mobile just
+              shows Ouvrir centered. Prev/next are reachable via the 01-08
+              column, wheel (desktop) or vertical swipe (mobile). */}
           {!isProject && (
           <motion.div
-            className="px-6 md:px-10 pb-24 md:pb-8 grid grid-cols-1 md:grid-cols-3 items-end justify-items-center md:justify-items-stretch gap-4"
+            className="px-6 md:px-10 pb-24 md:pb-8 flex items-baseline justify-center md:justify-between gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
           >
-            <button
-              onClick={goPrev}
-              className="hidden md:flex items-center gap-3 group text-left pointer-events-auto px-3 py-3 -mx-3"
-              aria-label="Projet précédent"
-            >
-              <span
-                className="block h-px bg-white group-hover:opacity-80 transition-all duration-500"
-                style={{ width: 24, opacity: 0.45 }}
-              />
-              <span
-                className="label text-white group-hover:opacity-100 transition-opacity duration-300"
-                style={{ opacity: 0.7 }}
-              >
-                {FEATURED[(index - 1 + FEATURED.length) % FEATURED.length].title}
-              </span>
-            </button>
+            <div className="hidden md:block min-w-0 pointer-events-none">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={current.slug}
+                  className="text-white title block truncate"
+                  style={{ fontSize: "clamp(1rem, 1.5vw, 1.25rem)" }}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 0.8, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.35, ease: SOFT }}
+                >
+                  {current.title}
+                </motion.span>
+              </AnimatePresence>
+            </div>
 
             <button
               type="button"
               onClick={() => openProject(current.slug)}
-              className="flex flex-col items-center gap-2 pointer-events-auto group px-4 py-3 -mx-4 -my-3"
+              className="pointer-events-auto group px-4 py-3 -mx-4 -my-3"
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
-              {/* Mobile: italic serif "Ouvrir" with a quiet opacity breath.
-                  Different typographic register than the mono chrome elsewhere
-                  (no traits to clash with the left/right rules at the edges),
-                  the breathing signals "live target" without shouting.
-                  Desktop keeps the per-slide title + morph. */}
               <motion.span
-                className="md:hidden title italic text-white"
-                style={{ fontSize: "clamp(1.15rem, 4.5vw, 1.45rem)" }}
+                className="title italic text-white block"
+                style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.5rem)" }}
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
               >
                 Ouvrir
               </motion.span>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={current.slug}
-                  className="hidden md:flex flex-col items-center gap-2"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.35, ease: SOFT }}
-                >
-                  <span
-                    className="text-white title text-center group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ fontSize: "clamp(1rem, 1.5vw, 1.25rem)", opacity: 0.9 }}
-                  >
-                    {current.title}
-                    <span
-                      aria-hidden="true"
-                      className="ml-2 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ opacity: 0.55 }}
-                    >
-                      →
-                    </span>
-                  </span>
-                </motion.div>
-              </AnimatePresence>
-            </button>
-
-            <button
-              onClick={goNext}
-              className="hidden md:flex items-center gap-3 justify-end group text-right pointer-events-auto px-3 py-3 -mx-3"
-              aria-label="Projet suivant"
-            >
-              <span
-                className="label text-white group-hover:opacity-100 transition-opacity duration-300"
-                style={{ opacity: 0.7 }}
-              >
-                {FEATURED[(index + 1) % FEATURED.length].title}
-              </span>
-              <span
-                className="block h-px bg-white group-hover:opacity-80 transition-all duration-500"
-                style={{ width: 24, opacity: 0.45 }}
-              />
             </button>
           </motion.div>
           )}
