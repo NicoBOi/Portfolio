@@ -241,8 +241,12 @@ export default function Hero({
           over the hero, the button was hidden. It's now rendered at the
           LandingExperience level so it can sit above both layers. */}
 
-      {/* Background */}
-      <div
+      {/* Background. An outer motion.div holds the scale animation so the
+          transition into / out of project mode reads as a subtle push-in on
+          the media — enough to signal "you entered the project" without
+          turning it into an effect. Carousel swaps are still handled by the
+          inner AnimatePresence crossfade. */}
+      <motion.div
         className="absolute inset-0 z-0"
         onClick={() => {
           if (isProject) return;
@@ -251,6 +255,8 @@ export default function Hero({
         }}
         data-cursor={isProject ? undefined : current.type === "video" ? "Lire" : "Voir"}
         data-cursor-silent
+        animate={{ scale: isProject ? 1.05 : 1 }}
+        transition={{ duration: 0.9, ease: SOFT }}
       >
           <AnimatePresence mode="sync">
             <motion.div
@@ -289,7 +295,7 @@ export default function Hero({
           </AnimatePresence>
 
           <div className="absolute inset-0 bg-black/50" />
-        </div>
+        </motion.div>
 
         {/* Foreground */}
         <motion.div
@@ -304,7 +310,7 @@ export default function Hero({
           <div
             className={`relative flex-1 flex flex-col items-center px-8 text-center gap-4 ${
               isProject
-                ? "justify-end pb-28 md:justify-center md:pb-0"
+                ? "justify-end pb-40 md:justify-center md:pb-0"
                 : "justify-center"
             }`}
           >
@@ -663,7 +669,7 @@ export default function Hero({
           {isProject && (
             <motion.div
               key="project-scroll-indicator"
-              className="absolute bottom-16 md:bottom-12 left-0 right-0 z-20 pointer-events-none flex flex-col items-center justify-center gap-3"
+              className="absolute bottom-6 md:bottom-12 left-0 right-0 z-20 pointer-events-none flex flex-col items-center justify-center gap-3"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: hasScrolled ? 0 : 0.7, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
