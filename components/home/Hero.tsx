@@ -229,6 +229,10 @@ export default function Hero({
       } h-screen bg-black overflow-hidden flex flex-col`}
       onMouseMove={isProject ? undefined : handleMouseMove}
       onMouseLeave={isProject ? undefined : handleMouseLeave}
+      // In landing browse mode the only meaningful gesture is horizontal —
+      // locking touch-action to pan-x kills iOS rubber-band + any accidental
+      // vertical pan, so the carousel reads unambiguously.
+      style={!isProject ? { touchAction: "pan-x" } : undefined}
       data-cursor-suppress
     >
 
@@ -320,8 +324,10 @@ export default function Hero({
               </div>
             </div>
 
-            {/* Vertical index — hover to preview, click to open. Same vertical center as the title. */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-auto">
+            {/* Vertical index — hover to preview, click to open. Desktop only;
+                mobile gets a horizontal count below the title so the right edge
+                stays clean and the swipe target can breathe. */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-end pointer-events-auto">
               {FEATURED.map((p, i) => (
                 <button
                   key={p.slug}
@@ -449,32 +455,28 @@ export default function Hero({
               Bordeaux — Paris
                 </p>
 
-                {/* Mobile pagination — one tick per featured project, the
-                    active one grows and brightens. Makes the horizontal
-                    progression obvious without adding a chrome element. */}
-                <div className="md:hidden mt-6 flex flex-col items-center gap-3 pointer-events-none">
-                  <span
-                    className="label text-white"
-                    style={{
-                      opacity: 0.45,
-                      fontSize: "10px",
-                      letterSpacing: "0.38em",
-                    }}
-                  >
-                    Swipe
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {FEATURED.map((p, i) => (
-                      <span
-                        key={p.slug}
-                        className="block h-px bg-white transition-all duration-500"
-                        style={{
-                          width: i === index ? 20 : 8,
-                          opacity: i === index ? 0.9 : 0.3,
-                        }}
-                      />
-                    ))}
-                  </div>
+                {/* Mobile index — horizontal row of the same 01-08 numbers the
+                    desktop carries vertically on the right edge. Each is
+                    tappable (enlarged hit area via py-3 -my-3) so the index
+                    doubles as jump navigation on top of the swipe gesture. */}
+                <div className="md:hidden mt-8 flex items-center justify-center gap-2 pointer-events-auto">
+                  {FEATURED.map((p, i) => (
+                    <button
+                      key={p.slug}
+                      type="button"
+                      onClick={() => setIndex(i)}
+                      className="label text-white tabular-nums transition-opacity duration-300 px-1 py-3 -my-3"
+                      style={{
+                        opacity: i === index ? 0.95 : 0.35,
+                        fontSize: "11px",
+                        letterSpacing: "0.24em",
+                      }}
+                      aria-label={`Projet ${i + 1}`}
+                      aria-current={i === index ? "true" : undefined}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -515,10 +517,21 @@ export default function Hero({
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
+              {/* Mobile: a static "Open" affordance so the tap-to-open action
+                  reads unambiguously. Desktop keeps the per-slide title +
+                  animated morph — space is available and it matches the
+                  editorial chrome. */}
+              <span
+                className="md:hidden label text-white group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-3"
+                style={{ opacity: 0.85, letterSpacing: "0.38em" }}
+              >
+                Open
+                <span aria-hidden="true" style={{ opacity: 0.6 }}>→</span>
+              </span>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={current.slug}
-                  className="flex flex-col items-center gap-2"
+                  className="hidden md:flex flex-col items-center gap-2"
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
