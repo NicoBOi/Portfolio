@@ -569,10 +569,11 @@ export default function Hero({
             backgroundColor: "rgba(0,0,0,0.78)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
           aria-label="Filtrer par discipline"
         >
-          <div className="flex items-center justify-around px-2 py-3">
+          <div className="flex items-center justify-around px-2 py-2">
             {FILTERS.map((f) => {
               const active = filter === f.value;
               return (
@@ -580,7 +581,7 @@ export default function Hero({
                   key={f.value}
                   type="button"
                   onClick={() => setFilter(f.value)}
-                  className="label text-white relative px-4 py-2 transition-opacity duration-300 focus:outline-none"
+                  className="label text-white relative px-4 py-4 transition-opacity duration-300 focus:outline-none"
                   style={{
                     opacity: active ? 1 : 0.6,
                     letterSpacing: "0.24em",

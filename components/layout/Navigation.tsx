@@ -28,21 +28,21 @@ export default function Navigation() {
     <>
       <nav
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-14"
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         data-cursor-suppress
       >
-        {/* Left */}
         <Link
           href="/"
-          className="title text-white transition-opacity duration-300 hover:opacity-100"
+          className="title text-white transition-opacity duration-300 hover:opacity-100 inline-flex items-center px-3 py-3 -mx-3 -my-3"
           style={{
             opacity: isHome ? 0.75 : 0.9,
             fontSize: "1.1rem",
           }}
+          aria-label="Accueil"
         >
           NS
         </Link>
 
-        {/* Right — desktop */}
         <div className="hidden md:flex items-center gap-8">
           {[
             { href: "/about", label: "À propos" },
@@ -51,7 +51,7 @@ export default function Navigation() {
             <Link
               key={href}
               href={href}
-              className="label text-white transition-opacity duration-300 hover:opacity-100"
+              className="label text-white transition-opacity duration-300 hover:opacity-100 px-2 py-3 -my-3"
               style={{ opacity: isActive(href) ? 1 : 0.55 }}
               aria-current={isActive(href) ? "page" : undefined}
             >
@@ -60,12 +60,12 @@ export default function Navigation() {
           ))}
         </div>
 
-        {/* Right — mobile toggle */}
         <button
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden label text-white"
+          className="md:hidden label text-white px-3 py-3 -mx-3 -my-3"
           style={{ opacity: 0.6 }}
           aria-label="Menu"
+          aria-expanded={open}
         >
           {open ? "Fermer" : "Menu"}
         </button>

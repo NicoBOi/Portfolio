@@ -30,7 +30,7 @@ export default function ProjectNav({ prev, next, onNavigate }: Props) {
           <Link
             href={`/work/${prev.slug}`}
             onClick={handlePrev}
-            className="group inline-flex items-center gap-3 hover:opacity-100 transition-opacity"
+            className="group inline-flex items-center gap-3 py-3 -my-3 hover:opacity-100 transition-opacity"
             style={{ opacity: 0.85 }}
           >
             <span
@@ -53,7 +53,7 @@ export default function ProjectNav({ prev, next, onNavigate }: Props) {
           <Link
             href={`/work/${next.slug}`}
             onClick={handleNext}
-            className="group inline-flex items-center gap-3 text-right hover:opacity-100 transition-opacity"
+            className="group inline-flex items-center gap-3 text-right py-3 -my-3 hover:opacity-100 transition-opacity"
             style={{ opacity: 0.85 }}
           >
             <span
