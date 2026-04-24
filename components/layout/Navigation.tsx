@@ -10,6 +10,8 @@ export default function Navigation() {
   const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
 
+  const isActive = (href: string) => (href === "/" ? isHome : pathname.startsWith(href));
+
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -44,7 +46,8 @@ export default function Navigation() {
               key={href}
               href={href}
               className="label text-white transition-opacity duration-300 hover:opacity-100"
-              style={{ opacity: pathname.startsWith(href) ? 1 : 0.55 }}
+              style={{ opacity: isActive(href) ? 1 : 0.55 }}
+              aria-current={isActive(href) ? "page" : undefined}
             >
               {label}
             </Link>
@@ -93,26 +96,55 @@ export default function Navigation() {
                 { href: "/", label: "Projets" },
                 { href: "/about", label: "À propos" },
                 { href: "/contact", label: "Contact" },
-              ].map(({ href, label }, i) => (
-                <motion.div
-                  key={href}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 0.1 + i * 0.07, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
-                >
-                  <Link
-                    href={href}
-                    className="text-white title inline-flex items-baseline gap-3 hover:opacity-100 transition-opacity"
-                    style={{ fontSize: "clamp(2.2rem, 9vw, 3.5rem)", lineHeight: 1 }}
+              ].map(({ href, label }, i) => {
+                const current = isActive(href);
+                return (
+                  <motion.div
+                    key={href}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.1 + i * 0.07, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
                   >
-                    {label}
-                    <span aria-hidden="true" className="label opacity-30" style={{ fontSize: "10px" }}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      aria-current={current ? "page" : undefined}
+                      className="text-white title inline-flex items-baseline gap-3 hover:opacity-100 transition-opacity"
+                      style={{
+                        fontSize: "clamp(2.2rem, 9vw, 3.5rem)",
+                        lineHeight: 1,
+                        opacity: current ? 1 : 0.55,
+                      }}
+                    >
+                      {current && (
+                        <span
+                          aria-hidden="true"
+                          className="inline-block w-2 h-2 rounded-full bg-white"
+                          style={{ opacity: 0.85 }}
+                        />
+                      )}
+                      {label}
+                      <span
+                        aria-hidden="true"
+                        className="label opacity-30"
+                        style={{ fontSize: "10px" }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {current && (
+                        <span
+                          aria-hidden="true"
+                          className="label"
+                          style={{ opacity: 0.5, fontSize: "10px" }}
+                        >
+                          — vous êtes ici
+                        </span>
+                      )}
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </nav>
 
             {/* Bottom band — contact */}
