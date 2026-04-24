@@ -520,22 +520,22 @@ export default function Hero({
               </AnimatePresence>
             </div>
 
-            <button
+            <motion.button
               type="button"
               onClick={() => openProject(current.slug)}
-              className="pointer-events-auto group px-4 py-3 -mx-4 -my-3"
+              className="pointer-events-auto rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3 transition-colors duration-300 hover:bg-white/90"
+              whileTap={{ scale: 0.96 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               data-cursor={current.type === "video" ? "Lire" : "Voir"}
               aria-label={`Ouvrir ${current.title}`}
             >
-              <motion.span
-                className="title italic text-white block"
-                style={{ fontSize: "clamp(1.15rem, 1.7vw, 1.5rem)" }}
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              <span
+                className="title italic block leading-none"
+                style={{ fontSize: "clamp(1.05rem, 1.4vw, 1.2rem)" }}
               >
                 Ouvrir
-              </motion.span>
-            </button>
+              </span>
+            </motion.button>
           </motion.div>
           )}
         </motion.div>
