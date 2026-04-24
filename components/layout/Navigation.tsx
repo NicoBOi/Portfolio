@@ -10,6 +10,19 @@ export default function Navigation() {
   const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
 
+  // LandingExperience drives an in-page project overlay by calling
+  // history.pushState — Next's usePathname doesn't always see that. Track the
+  // html.project-active class (toggled by LandingExperience) so the nav can
+  // swap its left-slot from "NS" to "— Retour" in real time.
+  const [inProject, setInProject] = useState(false);
+  useEffect(() => {
+    const check = () => setInProject(document.documentElement.classList.contains("project-active"));
+    check();
+    const mo = new MutationObserver(check);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => mo.disconnect();
+  }, []);
+
   const isActive = (href: string) => (href === "/" ? isHome : pathname.startsWith(href));
 
   useEffect(() => { setOpen(false); }, [pathname]);
@@ -24,6 +37,12 @@ export default function Navigation() {
     };
   }, [open]);
 
+  const handleRetour = () => {
+    // Let LandingExperience run its smooth close (state reset + pushState to
+    // "/") without coupling components through props.
+    window.dispatchEvent(new Event("portfolio:close-project"));
+  };
+
   return (
     <>
       <nav
@@ -31,17 +50,39 @@ export default function Navigation() {
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         data-cursor-suppress
       >
-        <Link
-          href="/"
-          className="title text-white transition-opacity duration-300 hover:opacity-100 inline-flex items-center px-3 py-3 -mx-3 -my-3"
-          style={{
-            opacity: isHome ? 0.75 : 0.9,
-            fontSize: "1.1rem",
-          }}
-          aria-label="Accueil"
-        >
-          NS
-        </Link>
+        {inProject ? (
+          <button
+            type="button"
+            onClick={handleRetour}
+            aria-label="Retour aux projets"
+            className="group inline-flex items-center gap-3 px-3 py-3 -mx-3 -my-3 text-white hover:opacity-100 transition-opacity duration-300"
+            style={{ opacity: 0.9 }}
+          >
+            <span
+              aria-hidden="true"
+              className="block h-px bg-white transition-all duration-500 group-hover:w-10"
+              style={{ width: 24, opacity: 0.8 }}
+            />
+            <span
+              className="label text-white"
+              style={{ fontSize: "13px", letterSpacing: "0.38em" }}
+            >
+              Retour
+            </span>
+          </button>
+        ) : (
+          <Link
+            href="/"
+            className="title text-white transition-opacity duration-300 hover:opacity-100 inline-flex items-center px-3 py-3 -mx-3 -my-3"
+            style={{
+              opacity: isHome ? 0.75 : 0.9,
+              fontSize: "1.1rem",
+            }}
+            aria-label="Accueil"
+          >
+            NS
+          </Link>
+        )}
 
         <div className="hidden md:flex items-center gap-8">
           {[

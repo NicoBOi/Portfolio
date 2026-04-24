@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { projects } from "@/data/projects";
 import Hero from "@/components/home/Hero";
 import PhotoProject from "@/components/project/PhotoProject";
 import VideoProject from "@/components/project/VideoProject";
-
-const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 interface Props {
   initialSlug: string | null;
@@ -63,14 +60,21 @@ export default function LandingExperience({ initialSlug }: Props) {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, []);
 
-  // ESC to close.
+  // ESC to close, plus a window-level event so the site Navigation (which sits
+  // outside this component's tree) can trigger the same smooth close without
+  // duplicating the pushState + state wiring.
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeProject();
     };
+    const onCloseEvent = () => closeProject();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("portfolio:close-project", onCloseEvent);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("portfolio:close-project", onCloseEvent);
+    };
   }, [active, closeProject]);
 
   const handleNavigate = useCallback(
@@ -113,42 +117,6 @@ export default function LandingExperience({ initialSlug }: Props) {
           )}
         </div>
       )}
-
-      {/* Back button — rendered at the top level (outside Hero's sticky stacking
-          context) so it stays above the project content no matter how far you've
-          scrolled. mix-blend-mode: difference keeps it readable on any frame. */}
-      <AnimatePresence>
-        {active && (
-          <motion.button
-            key="landing-back"
-            type="button"
-            onClick={closeProject}
-            aria-label="Retour aux projets"
-            className="hero-back-button fixed top-28 left-6 md:top-24 md:left-10 z-[90] group flex items-center gap-4 px-3 py-4 -mx-3 -my-4 hover:opacity-100 transition-opacity duration-300"
-            style={{
-              mixBlendMode: "difference",
-              color: "#fff",
-              opacity: 0.95,
-            }}
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 0.95, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.4, ease: SOFT }}
-          >
-            <span
-              aria-hidden="true"
-              className="block h-px bg-white transition-all duration-500 group-hover:w-16"
-              style={{ width: 40, opacity: 0.85 }}
-            />
-            <span
-              className="label text-white"
-              style={{ fontSize: "13px", letterSpacing: "0.38em" }}
-            >
-              Retour
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

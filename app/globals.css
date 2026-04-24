@@ -17,18 +17,16 @@ html.cursor-ready *::after {
   cursor: none !important;
 }
 
-/* When the mobile nav overlay is open, get fixed UI (back button, filter bar)
-   out of the way so they don't collide with the menu items. */
-html.nav-open .hero-back-button,
+/* When the mobile nav overlay is open, get the fixed filter bar out of the
+   way so it doesn't collide with the menu items. */
 html.nav-open .hero-mobile-filter {
   opacity: 0 !important;
   pointer-events: none !important;
 }
 
-/* Lightbox takes over the screen — hide the site nav + back button so their
+/* Lightbox takes over the screen — hide the site nav + filter bar so their
    stacking contexts can't paint (or steal clicks) on top of the modal. */
 html.lightbox-open body > nav,
-html.lightbox-open .hero-back-button,
 html.lightbox-open .hero-mobile-filter {
   opacity: 0 !important;
   pointer-events: none !important;
