@@ -54,8 +54,11 @@ export default function Hero({
   const [loaded, setLoaded] = useState(false);
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
+  // "Tout" keeps the curated featured highlight reel; a discipline filter
+  // opens up to the full catalogue of that type so nothing gets hidden when
+  // the viewer explicitly asks "show me photos / films / 3D".
   const FEATURED =
-    filter === "all" ? ALL_FEATURED : ALL_FEATURED.filter((p) => p.type === filter);
+    filter === "all" ? ALL_FEATURED : projects.filter((p) => p.type === filter);
   // In browse mode the background tracks the carousel index. In project mode
   // it always reflects the active project (even if it's not in FEATURED).
   const current = activeProject ?? FEATURED[index] ?? ALL_FEATURED[0];
