@@ -287,22 +287,14 @@ export default function Hero({
         animate={{ scale: isProject ? 1.05 : 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-          {/* Soft vertical drift. Both layers mount simultaneously; the
-              outgoing slide lifts a quiet 8vh and fades, the incoming slide
-              rises from +8vh into place. Long 1100ms ease-out-expo so the
-              movement reads as a continuous descent, not a cut — the eye
-              barely registers the swap, only the direction. */}
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
               className="absolute inset-0 overflow-hidden bg-black"
-              initial={{ y: "8vh", opacity: 0 }}
-              animate={{ y: "0vh", opacity: 1 }}
-              exit={{ y: "-8vh", opacity: 0 }}
-              transition={{
-                y: { duration: 1.1, ease: SOFT },
-                opacity: { duration: 0.9, ease: SOFT },
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.4, ease: SOFT }}
             >
               {(() => {
                 const vId = getVimeoId(current.videoUrl);
