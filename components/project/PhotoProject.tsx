@@ -84,7 +84,11 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
         </div>
       )}
 
-      {/* Mobile — horizontal swipe gallery. All files in one scroll-snap row. */}
+      {/* Mobile — horizontal swipe gallery. All files in one scroll-snap row.
+          Each slide is capped to ~85vh so even tall portraits fit in the
+          viewport without forcing the page to grow — no more scrolling the
+          image itself and cropping its top off when the user reaches for the
+          meta below. Aspect ratio is preserved via object-contain. */}
       <div className="md:hidden mt-8">
         <div
           ref={mobileScrollerRef}
@@ -96,14 +100,14 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
               key={f}
               type="button"
               onClick={() => setLightbox(i)}
-              className="snap-center shrink-0 w-screen relative block"
-              style={{ backgroundColor: bg }}
+              className="snap-center shrink-0 w-screen relative flex items-center justify-center"
+              style={{ backgroundColor: bg, height: "85vh" }}
               aria-label={`Agrandir la photo ${i + 1}`}
             >
               <img
                 src={`/projects/${project.slug}/${f}`}
                 alt=""
-                className="w-full h-auto block"
+                className="max-w-full max-h-full w-auto h-auto object-contain block"
                 loading={i === 0 ? "eager" : "lazy"}
                 decoding="async"
               />
