@@ -316,12 +316,34 @@ export default function Hero({
                 : "justify-center"
             }`}
           >
-            {/* Scroll / swipe affordance — left edge, visible on every size.
-                Desktop: wheel cue. Mobile: vertical-swipe cue. The vertical
-                rule on the left balances the 01-08 column on the right, so the
-                title can sit centered between two equal-weight edges. */}
+            {/* Scroll / swipe affordance on the left edge. Desktop keeps its
+                "Scroll" label + 48px rule (wheel cue). Mobile gets a smaller,
+                unlabeled 32px rule — just the animation, to balance the
+                right-edge 01-08 column without shouting. */}
             {!isProject && (<>
-            <div className="flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
+            <div className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
+              <span
+                className="label text-white"
+                style={{
+                  opacity: 0.4,
+                  writingMode: "vertical-rl",
+                  transform: "rotate(180deg)",
+                  letterSpacing: "0.28em",
+                }}
+              >
+                Scroll
+              </span>
+              <div className="relative h-12 w-px bg-white/15 overflow-hidden">
+                <motion.div
+                  className="absolute left-0 w-full bg-white"
+                  style={{ opacity: 0.7, height: 5 }}
+                  animate={{ y: [-8, 40] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+                />
+              </div>
+            </div>
+
+            <div className="md:hidden flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center pointer-events-none">
               <div className="relative h-8 w-px bg-white/15 overflow-hidden">
                 <motion.div
                   className="absolute left-0 w-full bg-white"
@@ -349,12 +371,8 @@ export default function Hero({
                       setIndex(i);
                     }
                   }}
-                  className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
-                  style={{
-                    opacity: i === index ? 0.95 : 0.4,
-                    fontSize: "10px",
-                    letterSpacing: "0.22em",
-                  }}
+                  className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
+                  style={{ opacity: i === index ? 0.95 : 0.45 }}
                   data-cursor={p.type === "photo" ? "Voir" : "Lire"}
                   aria-label={p.title}
                 >
