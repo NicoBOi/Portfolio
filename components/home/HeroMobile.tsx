@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { projects, type ProjectType } from "@/data/projects";
+import { projects, type Project, type ProjectType } from "@/data/projects";
 
 const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -22,7 +22,11 @@ function getVimeoId(url?: string): string | null {
   return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
 }
 
-function thumbFor(p: (typeof ALL_FEATURED)[number]): { src: string | null; bg: string } {
+function hasVideo(p: Project): boolean {
+  return Boolean(p.youtubeId || getVimeoId(p.videoUrl));
+}
+
+function thumbFor(p: Project): { src: string | null; bg: string } {
   if (p.imageFiles && p.imageFiles[0]) {
     return { src: `/projects/${p.slug}/${p.imageFiles[0]}`, bg: p.coverPlaceholder };
   }
@@ -40,14 +44,83 @@ function discipline(type: ProjectType): string {
   return "3D";
 }
 
+// Fills the card with a muted, looping, auto-playing video sized to cover.
+function VideoCover({ project }: { project: Project }) {
+  const yt = project.youtubeId;
+  const vId = !yt ? getVimeoId(project.videoUrl) : null;
+
+  if (yt) {
+    const ratio = 16 / 9;
+    return (
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&loop=1&playlist=${yt}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&playsinline=1&vq=hd1080`}
+        className="absolute top-1/2 left-1/2 border-0 pointer-events-none"
+        style={{
+          width: `max(100vw, calc(100vh * ${ratio}))`,
+          height: `max(calc(100vw / ${ratio}), 100vh)`,
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "#000",
+        }}
+        allow="autoplay; encrypted-media; picture-in-picture"
+        title={project.title}
+      />
+    );
+  }
+  if (vId) {
+    const [aw, ah] = (project.videoAspect ?? "16/9").split("/").map(Number);
+    const ratio = aw / ah;
+    return (
+      <iframe
+        src={`https://player.vimeo.com/video/${vId}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p&playsinline=1`}
+        className="absolute top-1/2 left-1/2 border-0 pointer-events-none"
+        style={{
+          width: `max(100vw, calc(100vh * ${ratio}))`,
+          height: `max(calc(100vw / ${ratio}), 100vh)`,
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "#000",
+        }}
+        allow="autoplay; picture-in-picture"
+        title={project.title}
+      />
+    );
+  }
+  return null;
+}
+
 export default function HeroMobile() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const visible = filter === "all" ? ALL_FEATURED : ALL_FEATURED.filter((p) => p.type === filter);
 
+  // Track which card is currently in view so we only mount ONE video iframe at a time.
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, visible.length);
+    setActiveIndex(-1);
+  }, [visible.length, filter]);
+
+  useEffect(() => {
+    if (visible.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
+            const idx = cardRefs.current.indexOf(entry.target as HTMLButtonElement);
+            if (idx >= 0) setActiveIndex(idx);
+          }
+        }
+      },
+      { threshold: [0, 0.55, 1] }
+    );
+    cardRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, [visible]);
+
   return (
     <>
-      {/* Hero identity — shorter than viewport so the first card peeks underneath and signals scrollable content. */}
+      {/* Hero identity — shorter than viewport so the first card peeks underneath. */}
       <section className="bg-black flex flex-col items-center px-6 text-center" style={{ minHeight: "82vh" }}>
         <div className="flex-1 flex flex-col items-center justify-center gap-6 pt-16">
           <motion.h1
@@ -84,15 +157,17 @@ export default function HeroMobile() {
       </section>
 
       {/* Vertical feed — one card per viewport, scroll-snaps */}
-      <section
-        className="bg-black"
-        style={{ scrollSnapType: "y mandatory" }}
-      >
+      <section className="bg-black" style={{ scrollSnapType: "y mandatory" }}>
         {visible.map((p, i) => {
           const thumb = thumbFor(p);
+          const isActive = i === activeIndex;
+          const video = hasVideo(p);
           return (
             <button
               key={p.slug}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
               type="button"
               onClick={() => router.push(`/work/${p.slug}`)}
               className="relative block w-full text-left overflow-hidden"
@@ -103,6 +178,7 @@ export default function HeroMobile() {
               }}
               aria-label={`Ouvrir ${p.title}`}
             >
+              {/* Thumbnail — always present. Works as a poster while the iframe loads. */}
               {thumb.src && (
                 <img
                   src={thumb.src}
@@ -112,6 +188,11 @@ export default function HeroMobile() {
                   decoding="async"
                 />
               )}
+
+              {/* Video iframe — only mounted for the active card so we never have
+                  more than one playing at a time. Autoplays muted + playsinline. */}
+              {video && isActive && <VideoCover project={p} />}
+
               {/* Bottom gradient for legibility */}
               <div
                 className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
