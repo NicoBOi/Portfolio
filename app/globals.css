@@ -94,7 +94,7 @@ body::after {
 /* ── Label (Fragment Mono) ───────────────────────────────── */
 .label {
   font-family: var(--font-fragment), 'Fragment Mono', "Courier New", monospace;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;

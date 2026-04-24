@@ -329,7 +329,7 @@ export default function Hero({
                   onFocus={() => setIndex(i)}
                   onClick={() => openProject(p.slug)}
                   className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
-                  style={{ opacity: i === index ? 0.7 : 0.18 }}
+                  style={{ opacity: i === index ? 0.95 : 0.45 }}
                   data-cursor={p.type === "photo" ? "Voir" : "Lire"}
                   aria-label={p.title}
                 >
@@ -360,7 +360,7 @@ export default function Hero({
                     onClick={() => setFilter(f.value)}
                     className="label text-white transition-opacity duration-300 relative px-2 py-2 rounded"
                     style={{
-                      opacity: filter === f.value ? 0.9 : 0.4,
+                      opacity: filter === f.value ? 1 : 0.6,
                       letterSpacing: "0.32em",
                     }}
                     aria-pressed={filter === f.value}
@@ -444,7 +444,7 @@ export default function Hero({
                 </h1>
                 <p
                   className="label text-white"
-                  style={{ opacity: 0.28, letterSpacing: "0.22em" }}
+                  style={{ opacity: 0.6, letterSpacing: "0.22em" }}
                 >
               Bordeaux — Paris
                 </p>
@@ -474,34 +474,46 @@ export default function Hero({
               />
               <span
                 className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300"
-                style={{ opacity: 0.5 }}
+                style={{ opacity: 0.7 }}
               >
                 {FEATURED[(index - 1 + FEATURED.length) % FEATURED.length].title}
               </span>
             </button>
 
-            <div className="flex flex-col items-center gap-2 pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => openProject(current.slug)}
+              className="flex flex-col items-center gap-2 pointer-events-auto group px-4 py-3 -mx-4 -my-3"
+              data-cursor={current.type === "video" ? "Lire" : "Voir"}
+              aria-label={`Ouvrir ${current.title}`}
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={current.slug}
-                  className="flex flex-col items-center gap-1"
+                  className="flex flex-col items-center gap-2"
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.35, ease: SOFT }}
                 >
                   <span
-                    className="text-white title text-center"
-                    style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)", opacity: 0.75 }}
+                    className="text-white title text-center group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ fontSize: "clamp(1rem, 1.5vw, 1.25rem)", opacity: 0.9 }}
                   >
                     {current.title}
                   </span>
-                  <span className="label text-white" style={{ opacity: 0.45 }}>
+                  <span
+                    className="label text-white group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ opacity: 0.7, letterSpacing: "0.32em" }}
+                  >
+                    {current.type === "video" ? "Lire" : "Voir"} <span aria-hidden="true">→</span>
+                  </span>
+                  <span className="label text-white" style={{ opacity: 0.5 }}>
                     {String(index + 1).padStart(2, "0")} / {String(FEATURED.length).padStart(2, "0")}
                   </span>
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </button>
 
             <button
               onClick={goNext}
@@ -510,7 +522,7 @@ export default function Hero({
             >
               <span
                 className="label text-white hidden md:inline group-hover:opacity-100 transition-opacity duration-300"
-                style={{ opacity: 0.5 }}
+                style={{ opacity: 0.7 }}
               >
                 {FEATURED[(index + 1) % FEATURED.length].title}
               </span>
@@ -544,7 +556,7 @@ export default function Hero({
                   onClick={() => setFilter(f.value)}
                   className="label text-white relative px-4 py-2 transition-opacity duration-300 focus:outline-none"
                   style={{
-                    opacity: active ? 0.95 : 0.4,
+                    opacity: active ? 1 : 0.6,
                     letterSpacing: "0.24em",
                     WebkitTapHighlightColor: "transparent",
                   }}
@@ -571,7 +583,7 @@ export default function Hero({
           {isProject && (
             <motion.div
               key="project-scroll-indicator"
-              className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center gap-3"
+              className="absolute bottom-16 md:bottom-12 left-0 right-0 z-20 pointer-events-none flex flex-col items-center justify-center gap-3"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: hasScrolled ? 0 : 0.7, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
