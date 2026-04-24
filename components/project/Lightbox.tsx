@@ -66,10 +66,13 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           data-cursor="Fermer"
+          onClick={(e) => {
+            // Close on any backdrop click. The image itself stops propagation
+            // below so taps on the photo stay reserved for zoom/pan. Chrome
+            // buttons also stop propagation, so they won't reach here.
+            if ((e.target as HTMLElement).tagName !== "IMG") onClose();
+          }}
         >
-          {/* Tap-to-close layer — below the zoom wrapper so pinch doesn't close the modal */}
-          <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
-
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
@@ -92,15 +95,13 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
                   wrapperStyle={{ width: "100%", height: "100%" }}
                   contentStyle={{ width: "100%", height: "100%" }}
                 >
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className="w-full h-full flex items-center justify-center">
                     <img
                       src={`/projects/${slug}/${current}`}
                       alt=""
                       className="max-w-[94vw] max-h-[92vh] object-contain select-none"
                       draggable={false}
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                 </TransformComponent>
