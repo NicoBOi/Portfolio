@@ -41,9 +41,11 @@ interface Props {
   project: Project;
   prev: Project | null;
   next: Project | null;
+  mode?: "page" | "modal";
 }
 
-export default function VideoProject({ project, prev, next }: Props) {
+export default function VideoProject({ project, prev, next, mode = "page" }: Props) {
+  const isModal = mode === "modal";
   const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
   const youtubeId = vimeoId
     ? null
@@ -57,17 +59,20 @@ export default function VideoProject({ project, prev, next }: Props) {
 
   return (
     <article className="bg-black min-h-screen">
-      {/* Back */}
-      <div className="px-6 md:px-10 pt-20 pb-0">
-        <Link
-          href="/"
-          className="label text-white hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 px-3 py-2 -mx-3 rounded-full"
-          style={{ opacity: 0.7 }}
-        >
-          <span aria-hidden="true">←</span>
-          Accueil
-        </Link>
-      </div>
+      {/* Back — page mode only. Modal mode uses ProjectModal's own back button. */}
+      {!isModal && (
+        <div className="px-6 md:px-10 pt-20 pb-0">
+          <Link
+            href="/"
+            className="label text-white hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 px-3 py-2 -mx-3 rounded-full"
+            style={{ opacity: 0.7 }}
+          >
+            <span aria-hidden="true">←</span>
+            Accueil
+          </Link>
+        </div>
+      )}
+      {isModal && <div className="pt-20" aria-hidden="true" />}
 
       {/* Player */}
       <div
