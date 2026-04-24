@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -15,6 +16,9 @@ interface Props {
 export default function Lightbox({ slug, files, index, onClose, onChange }: Props) {
   const open = index !== null;
   const [rendered, setRendered] = useState(index);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (index !== null) setRendered(index);
@@ -42,7 +46,9 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
   const hasPrev = rendered !== null && rendered > 0;
   const hasNext = rendered !== null && rendered < files.length - 1;
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && current && (
         <motion.div
@@ -135,6 +141,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
           )}
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

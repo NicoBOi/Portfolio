@@ -124,7 +124,7 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
         {/* Cover — framed, not full-bleed */}
         <div className="px-6 md:px-10 lg:px-16 mt-10 md:mt-16">
           <motion.div
-            className="relative w-full max-w-6xl mx-auto overflow-hidden"
+            className="relative w-full max-w-6xl mx-auto overflow-hidden flex items-center justify-center"
             style={{
               aspectRatio: isPortrait ? "4/5" : "16/10",
               backgroundColor: bg,
@@ -138,14 +138,14 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
               <button
                 type="button"
                 onClick={() => setLightbox(0)}
-                className="w-full h-full block"
+                className="w-full h-full flex items-center justify-center"
                 data-cursor="Agrandir"
                 aria-label="Agrandir"
               >
                 <img
                   src={`/projects/${project.slug}/${cover}`}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full w-auto h-auto object-contain"
                   loading="eager"
                   fetchPriority="high"
                   decoding="async"
