@@ -257,7 +257,7 @@ export default function Hero({
         isProject
           ? "sticky top-0 z-0"
           : "relative"
-      } h-screen bg-black overflow-hidden flex flex-col`}
+      } h-screen h-dvh bg-black overflow-hidden flex flex-col`}
       onMouseMove={isProject ? undefined : handleMouseMove}
       onMouseLeave={isProject ? undefined : handleMouseLeave}
       // In landing browse mode every gesture is handled in JS (vertical swipe
