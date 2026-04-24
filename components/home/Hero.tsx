@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion, AnimatePresence, useMotionValue, useTransform, animate as motionAnimate } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects, type Project } from "@/data/projects";
 
 const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const SCROLL_LOCK_MS = 720;
 const TITLE = "Nicolas Sempere";
 const REPEL_RADIUS = 110;
 const REPEL_STRENGTH = 50;
@@ -128,90 +129,21 @@ export default function Hero({
     return () => clearTimeout(t);
   }, []);
 
-  // Scroll-scrub carousel. The landing browse gesture (wheel + touch) drives a
-  // MotionValue (scrub) from -1 → 1 in real time; the background renders
-  // three stacked layers (prev / current / next) that translate with scrub so
-  // the user literally pulls the next project into view. After a short idle
-  // the gesture commits (if past the threshold) or springs back. No discrete
-  // locked-snap feel — weight + inertia, film-reel style.
+  // Wheel — discrete tick advances the carousel, then locks briefly so the
+  // dolly-in cut can finish without being interrupted.
   const featuredLen = FEATURED.length;
-  const scrub = useMotionValue(0);
-  const scrubActiveRef = useRef(false);
-
   useEffect(() => {
     if (isProject || featuredLen <= 1) return;
-
-    const THRESHOLD = 0.32;
-    const COMMIT_MS = 320;
-    const SPRING_MS = 380;
-    let idleTimer: number | null = null;
-
-    const commit = () => {
-      scrubActiveRef.current = false;
-      const p = scrub.get();
-      if (p > THRESHOLD) {
-        // Finish the slide to next, then swap index + reset scrub to 0.
-        motionAnimate(scrub, 1, { duration: COMMIT_MS / 1000, ease: SOFT }).then(() => {
-          setIndex((i) => (i + 1) % featuredLen);
-          scrub.set(0);
-        });
-      } else if (p < -THRESHOLD) {
-        motionAnimate(scrub, -1, { duration: COMMIT_MS / 1000, ease: SOFT }).then(() => {
-          setIndex((i) => (i - 1 + featuredLen) % featuredLen);
-          scrub.set(0);
-        });
-      } else {
-        motionAnimate(scrub, 0, { duration: SPRING_MS / 1000, ease: SOFT });
-      }
-    };
-
-    const scheduleCommit = () => {
-      if (idleTimer) window.clearTimeout(idleTimer);
-      idleTimer = window.setTimeout(commit, 140);
-    };
-
+    let locked = false;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      scrubActiveRef.current = true;
-      const vh = window.innerHeight || 800;
-      // Wheel deltas are coarse — damp so a single tick is ~0.25, two/three
-      // ticks reach commit threshold naturally.
-      const delta = (e.deltaY / vh) * 0.8;
-      const next = Math.max(-1, Math.min(1, scrub.get() + delta));
-      scrub.set(next);
-      scheduleCommit();
+      if (locked || Math.abs(e.deltaY) < 8) return;
+      locked = true;
+      setIndex((i) => (e.deltaY > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
+      setTimeout(() => { locked = false; }, SCROLL_LOCK_MS);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
-
-    let startY = 0;
-    let base = 0;
-    const ts = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-      base = scrub.get();
-      scrubActiveRef.current = true;
-      if (idleTimer) window.clearTimeout(idleTimer);
-    };
-    const tm = (e: TouchEvent) => {
-      const vh = window.innerHeight || 800;
-      const dy = (startY - e.touches[0].clientY) / vh;
-      const next = Math.max(-1, Math.min(1, base + dy * 1.1));
-      scrub.set(next);
-    };
-    const te = () => {
-      commit();
-    };
-    window.addEventListener("touchstart", ts, { passive: true });
-    window.addEventListener("touchmove", tm, { passive: true });
-    window.addEventListener("touchend", te, { passive: true });
-
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", ts);
-      window.removeEventListener("touchmove", tm);
-      window.removeEventListener("touchend", te);
-      if (idleTimer) window.clearTimeout(idleTimer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => window.removeEventListener("wheel", onWheel);
   }, [featuredLen, isProject]);
 
   // Keyboard navigation on the landing. Arrows cycle the carousel, Enter/Space
@@ -246,33 +178,40 @@ export default function Hero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featuredLen, isProject, index, filter]);
 
-  // swipingRef is kept alive for a short window after a scrub gesture so the
-  // synthetic click that follows a touchend can be ignored by the background
-  // tap-to-open handler.
+  // Touch swipe — vertical on mobile. Swipe up = next, swipe down = previous.
+  // Discrete threshold to trigger the dolly-in cut.
   const swipingRef = useRef(false);
   useEffect(() => {
-    const unsub = scrub.on("change", (v) => {
-      if (Math.abs(v) > 0.05) {
-        swipingRef.current = true;
-        window.setTimeout(() => { swipingRef.current = false; }, 180);
+    if (isProject || featuredLen <= 1) return;
+    let sx = 0;
+    let sy = 0;
+    const ts = (e: TouchEvent) => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+      swipingRef.current = false;
+    };
+    const tm = (e: TouchEvent) => {
+      const dx = Math.abs(e.touches[0].clientX - sx);
+      const dy = Math.abs(e.touches[0].clientY - sy);
+      if (dy > 10 && dy > dx) swipingRef.current = true;
+    };
+    const te = (e: TouchEvent) => {
+      const dx = sx - e.changedTouches[0].clientX;
+      const dy = sy - e.changedTouches[0].clientY;
+      if (Math.abs(dy) >= 50 && Math.abs(dy) > Math.abs(dx)) {
+        setIndex((i) => (dy > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
       }
-    });
-    return unsub;
-  }, [scrub]);
-
-  // Three background layers slide as one film-strip driven by scrub. Each
-  // transform is declared at the top level so hooks stay stable across
-  // renders (no useTransform inside a .map).
-  const yPrev = useTransform(scrub, (v) => `${-100 - v * 100}%`);
-  const yCurr = useTransform(scrub, (v) => `${-v * 100}%`);
-  const yNext = useTransform(scrub, (v) => `${100 - v * 100}%`);
-  // Tiny depth cue — active layer zooms a touch as it leaves, incoming layer
-  // settles from a subtle 0.98 back to 1. Reads as a dolly between shots.
-  const scaleCurrent = useTransform(scrub, (v) => 1 + Math.abs(v) * 0.04);
-  const scaleUpcoming = useTransform(scrub, (v) => 0.98 + (1 - Math.abs(v)) * 0.02);
-  // Video iframe fades out the moment the user touches the wheel / finger —
-  // we don't want 3 iframes animating, and the scrub preview is image-only.
-  const videoOpacity = useTransform(scrub, (v) => Math.max(0, 1 - Math.abs(v) * 4));
+      window.setTimeout(() => { swipingRef.current = false; }, 160);
+    };
+    window.addEventListener("touchstart", ts, { passive: true });
+    window.addEventListener("touchmove", tm, { passive: true });
+    window.addEventListener("touchend", te, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", ts);
+      window.removeEventListener("touchmove", tm);
+      window.removeEventListener("touchend", te);
+    };
+  }, [featuredLen, isProject]);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
   const rafRef = useRef<number | null>(null);
@@ -348,69 +287,64 @@ export default function Hero({
         animate={{ scale: isProject ? 1.05 : 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-          {(() => {
-            // Scroll-scrub film reel. Three layers are always mounted; their
-            // y translate is driven by the `scrub` MotionValue so the user's
-            // gesture physically pulls the next slide into view. Project mode
-            // sits at scrub=0 so only the current layer is visible.
-            const prevIdx = isProject ? -1 : (index - 1 + featuredLen) % featuredLen;
-            const nextIdx = isProject ? -1 : (index + 1) % featuredLen;
-            const prev = prevIdx >= 0 ? FEATURED[prevIdx] : null;
-            const nextP = nextIdx >= 0 ? FEATURED[nextIdx] : null;
-            const layer = (project: Project | null, y: typeof yCurr, scale: typeof scaleCurrent, key: string, isCurrent: boolean) => {
-              if (!project) return null;
-              const img = project.imageFiles?.[0];
-              return (
-                <motion.div
-                  key={`${key}-${project.slug}`}
-                  className="absolute inset-0 overflow-hidden bg-black will-change-transform"
-                  style={{ y, scale }}
-                >
-                  {img ? (
+          {/* Cinematic dolly-in cut. mode="wait" holds a pure-black frame
+              between shots (old exits fully before new enters), the outgoing
+              image pushes toward the camera (scale 1 -> 1.22) while fading,
+              and the incoming image lands from a tight 1.12 into 1.00. Reads
+              like a hard cut between two shots in a film. */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={index}
+              className="absolute inset-0 overflow-hidden bg-black will-change-transform"
+              initial={{ scale: 1.12, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.22, opacity: 0 }}
+              transition={{
+                scale: { duration: 0.55, ease: SOFT },
+                opacity: { duration: 0.36, ease: SOFT },
+              }}
+            >
+              {(() => {
+                const vId = getVimeoId(current.videoUrl);
+                if (vId) {
+                  const aspectStr = current.videoAspect ?? "16/9";
+                  const [aw, ah] = aspectStr.split("/").map(Number);
+                  return <HeroVimeo vimeoId={vId} ratio={aw / ah} />;
+                }
+                if (current.youtubeId) {
+                  return <HeroYouTube youtubeId={current.youtubeId} />;
+                }
+                if (current.imageFiles && current.imageFiles.length > 0) {
+                  return (
                     <Image
-                      src={`/projects/${project.slug}/${img}`}
-                      alt={project.title}
+                      src={`/projects/${current.slug}/${current.imageFiles[0]}`}
+                      alt={current.title}
                       fill
-                      priority={isCurrent}
+                      priority
                       sizes="100vw"
                       className="object-cover"
                     />
-                  ) : (
-                    <div className="placeholder-img text-white h-full">Image</div>
-                  )}
-                </motion.div>
-              );
-            };
-            return (
-              <>
-                {layer(prev, yPrev, scaleUpcoming, "prev", false)}
-                {layer(current, yCurr, scaleCurrent, "curr", true)}
-                {layer(nextP, yNext, scaleUpcoming, "next", false)}
-                {/* Video overlay on the current layer only. Fades out the
-                    moment a scrub starts so we never animate iframes. */}
-                {(() => {
-                  const vId = getVimeoId(current.videoUrl);
-                  const yt = current.youtubeId;
-                  if (!vId && !yt) return null;
-                  const aspectStr = current.videoAspect ?? "16/9";
-                  const [aw, ah] = aspectStr.split("/").map(Number);
-                  return (
-                    <motion.div
-                      key={`video-${current.slug}`}
-                      className="absolute inset-0 overflow-hidden pointer-events-none"
-                      style={{ y: yCurr, scale: scaleCurrent, opacity: videoOpacity }}
-                    >
-                      {vId ? (
-                        <HeroVimeo vimeoId={vId} ratio={aw / ah} />
-                      ) : yt ? (
-                        <HeroYouTube youtubeId={yt} />
-                      ) : null}
-                    </motion.div>
                   );
-                })()}
-              </>
-            );
-          })()}
+                }
+                return <div className="placeholder-img text-white h-full">Image</div>;
+              })()}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Vignette — tightens on the cut then opens back as the new shot
+              lands. Subtle, never fully black in the centre. */}
+          <motion.div
+            key={`vignette-${index}`}
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            initial={{ opacity: 0.55 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.7, ease: SOFT }}
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.85) 100%)",
+            }}
+          />
 
           <div className="absolute inset-0 bg-black/50 pointer-events-none" />
         </motion.div>
