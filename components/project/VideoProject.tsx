@@ -41,11 +41,12 @@ interface Props {
   project: Project;
   prev: Project | null;
   next: Project | null;
-  mode?: "page" | "modal";
+  mode?: "page" | "embedded";
+  onNavigate?: (slug: string) => void;
 }
 
-export default function VideoProject({ project, prev, next, mode = "page" }: Props) {
-  const isModal = mode === "modal";
+export default function VideoProject({ project, prev, next, mode = "page", onNavigate }: Props) {
+  const isEmbedded = mode === "embedded";
   const vimeoId = project.videoUrl ? getVimeoId(project.videoUrl) : null;
   const youtubeId = vimeoId
     ? null
@@ -59,8 +60,8 @@ export default function VideoProject({ project, prev, next, mode = "page" }: Pro
 
   return (
     <article className="bg-black min-h-screen">
-      {/* Back — page mode only. Modal mode uses ProjectModal's own back button. */}
-      {!isModal && (
+      {/* Back — page mode only. Embedded mode relies on the Hero's own back affordance. */}
+      {!isEmbedded && (
         <div className="px-6 md:px-10 pt-20 pb-0">
           <Link
             href="/"
@@ -72,7 +73,6 @@ export default function VideoProject({ project, prev, next, mode = "page" }: Pro
           </Link>
         </div>
       )}
-      {isModal && <div className="pt-20" aria-hidden="true" />}
 
       {/* Player */}
       <div
@@ -141,7 +141,7 @@ export default function VideoProject({ project, prev, next, mode = "page" }: Pro
         </div>
       )}
 
-      <ProjectNav prev={prev} next={next} />
+      <ProjectNav prev={prev} next={next} onNavigate={onNavigate} />
     </article>
   );
 }

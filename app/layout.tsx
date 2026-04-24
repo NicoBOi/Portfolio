@@ -131,10 +131,8 @@ const personJsonLd = {
 
 export default function RootLayout({
   children,
-  modal,
 }: {
   children: React.ReactNode;
-  modal: React.ReactNode;
 }) {
   // Warm up the sockets for the media origins so the first iframe/thumbnail
   // request doesn't pay the DNS + TCP + TLS handshake cost.
@@ -150,7 +148,6 @@ export default function RootLayout({
         <CustomCursor />
         <Navigation />
         <main>{children}</main>
-        {modal}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}

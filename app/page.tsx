@@ -1,5 +1,5 @@
-import Hero from "@/components/home/Hero";
+import LandingExperience from "@/components/home/LandingExperience";
 
 export default function Home() {
-  return <Hero />;
+  return <LandingExperience initialSlug={null} />;
 }

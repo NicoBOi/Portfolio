@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
-import { projects } from "@/data/projects";
+import { projects, type Project } from "@/data/projects";
 
 const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -26,16 +26,54 @@ function getVimeoId(url?: string): string | null {
   return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
 }
 
-export default function Hero() {
+interface HeroProps {
+  // When set, the hero enters "project mode": filters/index/prev-next fade
+  // out, the central title morphs to the project's name + description, the
+  // section becomes position:sticky so it pins while the project content
+  // scrolls into view below. Null = the normal landing browse experience.
+  activeProject?: Project | null;
+  onOpenProject?: (slug: string) => void;
+  onCloseProject?: () => void;
+}
+
+export default function Hero({
+  activeProject = null,
+  onOpenProject,
+  onCloseProject,
+}: HeroProps) {
   const router = useRouter();
+  const isProject = !!activeProject;
   const [filter, setFilter] = useState<HeroFilter>("all");
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() => {
+    if (activeProject) {
+      const i = ALL_FEATURED.findIndex((p) => p.slug === activeProject.slug);
+      if (i !== -1) return i;
+    }
+    return 0;
+  });
   const [loaded, setLoaded] = useState(false);
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   const FEATURED =
     filter === "all" ? ALL_FEATURED : ALL_FEATURED.filter((p) => p.type === filter);
-  const current = FEATURED[index] ?? ALL_FEATURED[0];
+  // In browse mode the background tracks the carousel index. In project mode
+  // it always reflects the active project (even if it's not in FEATURED).
+  const current = activeProject ?? FEATURED[index] ?? ALL_FEATURED[0];
+
+  const openProject = (slug: string) => {
+    if (onOpenProject) onOpenProject(slug);
+    else router.push(`/work/${slug}`);
+  };
+
+  // Keep the internal carousel index in sync with an externally-driven
+  // activeProject so the background continues to match when opening a project
+  // via URL / prev-next.
+  useEffect(() => {
+    if (!activeProject) return;
+    const i = ALL_FEATURED.findIndex((p) => p.slug === activeProject.slug);
+    if (i !== -1 && i !== index) setIndex(i);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject?.slug]);
 
   // Reset index when filter changes so we land on the first project of the new set.
   useEffect(() => {
@@ -74,9 +112,10 @@ export default function Hero() {
   }, []);
 
   // Wheel — rebind when FEATURED length changes so the modulo sees the right count.
+  // Skip entirely in project mode: vertical scrolling must reach the project content.
   const featuredLen = FEATURED.length;
   useEffect(() => {
-    if (featuredLen <= 1) return;
+    if (isProject || featuredLen <= 1) return;
     let locked = false;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -87,13 +126,13 @@ export default function Hero() {
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [featuredLen]);
+  }, [featuredLen, isProject]);
 
   // Touch swipe — horizontal (carousel feel on mobile). Vertical gestures are left
   // alone so the browser's native handling stays intact and swipes up/down are ignored.
   const swipingRef = useRef(false);
   useEffect(() => {
-    if (featuredLen <= 1) return;
+    if (isProject || featuredLen <= 1) return;
     let sx = 0;
     let sy = 0;
     const ts = (e: TouchEvent) => {
@@ -124,7 +163,7 @@ export default function Hero() {
       window.removeEventListener("touchmove", tm);
       window.removeEventListener("touchend", te);
     };
-  }, [featuredLen]);
+  }, [featuredLen, isProject]);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
   const rafRef = useRef<number | null>(null);
@@ -167,20 +206,52 @@ export default function Hero() {
 
   return (
     <section
-      className="relative h-screen bg-black overflow-hidden flex flex-col"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      className={`${
+        isProject
+          ? "sticky top-0 z-0"
+          : "relative"
+      } h-screen bg-black overflow-hidden flex flex-col`}
+      onMouseMove={isProject ? undefined : handleMouseMove}
+      onMouseLeave={isProject ? undefined : handleMouseLeave}
       data-cursor-suppress
     >
+
+      {/* Back — project mode only. Big, fixed, accessible, always on top. */}
+      <AnimatePresence>
+        {isProject && (
+          <motion.button
+            key="hero-back"
+            type="button"
+            onClick={() => onCloseProject?.()}
+            aria-label="Retour aux projets"
+            className="fixed top-16 left-4 md:top-20 md:left-6 z-[70] flex items-center gap-2 label text-white rounded-full px-4 py-3 min-h-[44px] hover:opacity-100 transition-opacity duration-300"
+            style={{
+              opacity: 0.95,
+              backgroundColor: "rgba(0,0,0,0.55)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.12)",
+            }}
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 0.95, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.35, ease: SOFT }}
+          >
+            <span aria-hidden="true" style={{ fontSize: "14px" }}>←</span>
+            Retour
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Background */}
       <div
         className="absolute inset-0 z-0"
         onClick={() => {
+          if (isProject) return;
           if (swipingRef.current) return;
-          router.push(`/work/${current.slug}`);
+          openProject(current.slug);
         }}
-        data-cursor={current.type === "video" ? "Lire" : "Voir"}
+        data-cursor={isProject ? undefined : current.type === "video" ? "Lire" : "Voir"}
         data-cursor-silent
       >
           <AnimatePresence mode="sync">
@@ -230,8 +301,9 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.3, ease: SOFT }}
         >
           <div className="relative flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
-            {/* Scroll affordance — desktop only (wheel gesture hint).
-                Mobile users discover horizontal swipe naturally, no label needed. */}
+            {/* Scroll affordance — desktop only (wheel gesture hint). Hidden in
+                project mode (vertical scroll belongs to the project content). */}
+            {!isProject && (<>
             <div className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4 pointer-events-none">
               <span
                 className="label text-white"
@@ -261,7 +333,7 @@ export default function Hero() {
                   key={p.slug}
                   onMouseEnter={() => setIndex(i)}
                   onFocus={() => setIndex(i)}
-                  onClick={() => router.push(`/work/${p.slug}`)}
+                  onClick={() => openProject(p.slug)}
                   className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2"
                   style={{ opacity: i === index ? 0.7 : 0.18 }}
                   data-cursor={p.type === "photo" ? "Voir" : "Lire"}
@@ -313,14 +385,54 @@ export default function Hero() {
               ))}
             </motion.div>
 
-            {/* Magnetic title */}
-            <motion.h1
-              className="text-white title"
-              style={{ fontSize: "clamp(2.5rem, 9vw, 11rem)" }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.62, ease: SOFT }}
-            >
+            </>)}
+
+            {/* Central title — morphs between the landing name and the active project. */}
+            <div className="relative w-full max-w-4xl mx-auto pointer-events-auto">
+            <AnimatePresence mode="wait">
+            {isProject && activeProject ? (
+              <motion.div
+                key="project-title"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -14 }}
+                transition={{ duration: 0.55, ease: SOFT }}
+                className="flex flex-col items-center gap-4 md:gap-6"
+              >
+                <h1
+                  className="text-white title text-center"
+                  style={{ fontSize: "clamp(2rem, 6.5vw, 6rem)", lineHeight: 1.02 }}
+                >
+                  {activeProject.title}
+                </h1>
+                {activeProject.description && (
+                  <p
+                    className="text-white text-center max-w-2xl px-4"
+                    style={{ fontSize: "clamp(0.85rem, 1.05vw, 0.95rem)", lineHeight: 1.55, opacity: 0.7 }}
+                  >
+                    {activeProject.description}
+                  </p>
+                )}
+                <p
+                  className="label text-white"
+                  style={{ opacity: 0.45, letterSpacing: "0.28em" }}
+                >
+                  {activeProject.year} — {activeProject.role}
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="landing-title"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -14 }}
+                transition={{ duration: 0.55, ease: SOFT }}
+                className="flex flex-col items-center gap-4"
+              >
+                <h1
+                  className="text-white title"
+                  style={{ fontSize: "clamp(2.5rem, 9vw, 11rem)" }}
+                >
               {TITLE.split("").map((char, i) => (
                 <span
                   key={i}
@@ -333,20 +445,22 @@ export default function Hero() {
                   {char === " " ? " " : char}
                 </span>
               ))}
-            </motion.h1>
-
-            <motion.p
-              className="label text-white"
-              style={{ opacity: 0.28, letterSpacing: "0.22em" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.28 }}
-              transition={{ duration: 0.8, delay: 0.92 }}
-            >
+                </h1>
+                <p
+                  className="label text-white"
+                  style={{ opacity: 0.28, letterSpacing: "0.22em" }}
+                >
               Bordeaux — Paris
-            </motion.p>
+                </p>
+              </motion.div>
+            )}
+            </AnimatePresence>
+            </div>
           </div>
 
-          {/* Bottom nav — on mobile, leave room for the fixed filter bar below. */}
+          {/* Bottom nav — browse mode only. In project mode the bottom belongs to
+              the project's own prev/next nav rendered below the hero. */}
+          {!isProject && (
           <motion.div
             className="px-6 md:px-10 pb-24 md:pb-8 grid grid-cols-3 items-end gap-4"
             initial={{ opacity: 0 }}
@@ -410,9 +524,11 @@ export default function Hero() {
               />
             </button>
           </motion.div>
+          )}
         </motion.div>
 
-        {/* Mobile-only fixed filter bar — thumb-reachable, overrides the in-hero filter. */}
+        {/* Mobile-only fixed filter bar — browse mode only. */}
+        {!isProject && (
         <nav
           className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-white/10"
           style={{
@@ -451,6 +567,7 @@ export default function Hero() {
             })}
           </div>
         </nav>
+        )}
     </section>
   );
 }
