@@ -239,58 +239,76 @@ function PhotoCarousel({ project }: { project: Project }) {
 
   return (
     <>
-      <motion.div
-        // Mobile: edge-to-edge (w-screen). Desktop: capped at 1100px.
-        className="relative flex items-center justify-center w-screen md:w-[min(80vw,1100px)]"
-        style={{ height: "62vh" }}
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.97 }}
-        transition={{ duration: 0.55, delay: 0.05, ease: SOFT }}
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.button
-            key={current}
-            type="button"
-            onClick={() => setLightbox(idx)}
-            className="absolute inset-0 flex items-center justify-center"
-            data-cursor="Agrandir"
-            aria-label={`Agrandir la photo ${idx + 1}`}
-            initial={{ opacity: 0, x: direction * 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -24 }}
-            transition={{ duration: 0.4, ease: SOFT }}
-          >
-            <div className="relative w-full h-full">
-              <Image
-                src={`/projects/${project.slug}/${current}`}
-                alt=""
-                fill
-                priority
-                sizes="(min-width: 768px) 80vw, 100vw"
-                className="object-contain"
-              />
-            </div>
-          </motion.button>
-        </AnimatePresence>
+      <div className="flex flex-col items-center gap-5 md:gap-6">
+        <motion.div
+          // Mobile: edge-to-edge (w-screen). Desktop: capped at 1100px.
+          className="relative flex items-center justify-center w-screen md:w-[min(80vw,1100px)]"
+          style={{ height: "62vh" }}
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.55, delay: 0.05, ease: SOFT }}
+          onClick={(e) => e.stopPropagation()}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.button
+              key={current}
+              type="button"
+              onClick={() => setLightbox(idx)}
+              className="absolute inset-0 flex items-center justify-center"
+              data-cursor="Agrandir"
+              aria-label={`Agrandir la photo ${idx + 1}`}
+              initial={{ opacity: 0, x: direction * 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -24 }}
+              transition={{ duration: 0.4, ease: SOFT }}
+            >
+              <div className="relative w-full h-full">
+                <Image
+                  src={`/projects/${project.slug}/${current}`}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(min-width: 768px) 80vw, 100vw"
+                  className="object-contain"
+                />
+              </div>
+            </motion.button>
+          </AnimatePresence>
+
+          {files.length > 1 && (
+            <>
+              <CarouselArrow side="prev" onClick={prev} />
+              <CarouselArrow side="next" onClick={next} />
+            </>
+          )}
+        </motion.div>
 
         {files.length > 1 && (
-          <>
-            <CarouselArrow side="prev" onClick={prev} />
-            <CarouselArrow side="next" onClick={next} />
-
-            <span
-              className="label text-white tabular-nums absolute -bottom-7 left-1/2 -translate-x-1/2"
-              style={{ opacity: 0.55, letterSpacing: "0.3em" }}
-            >
-              {String(idx + 1).padStart(2, "0")} / {String(files.length).padStart(2, "0")}
-            </span>
-          </>
+          <div
+            className="flex items-center pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {files.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onMouseEnter={() => goTo(i)}
+                onFocus={() => goTo(i)}
+                onClick={() => goTo(i)}
+                className="label text-white tabular-nums transition-opacity duration-300 px-3 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
+                style={{ opacity: i === idx ? 0.95 : 0.45 }}
+                aria-label={`Photo ${i + 1}`}
+                aria-current={i === idx ? "true" : undefined}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </button>
+            ))}
+          </div>
         )}
-      </motion.div>
+      </div>
 
       <Lightbox
         slug={project.slug}
@@ -303,10 +321,8 @@ function PhotoCarousel({ project }: { project: Project }) {
   );
 }
 
-// Editorial chevron — same vocabulary as the Navigation Retour: a hairline
-// rule that grows on hover, paired with a thin chevron stroke. No fill,
-// no pill button. Mobile sits flush to the edge; desktop floats outside
-// the carousel frame.
+// Plain chevron stroke. No background, no underline rule — just the arrow,
+// in keeping with the editorial DA.
 function CarouselArrow({ side, onClick }: { side: "prev" | "next"; onClick: () => void }) {
   const isPrev = side === "prev";
   return (
@@ -315,18 +331,11 @@ function CarouselArrow({ side, onClick }: { side: "prev" | "next"; onClick: () =
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       aria-label={isPrev ? "Précédent" : "Suivant"}
       data-cursor={isPrev ? "Précédent" : "Suivant"}
-      className={`group absolute top-1/2 -translate-y-1/2 z-10 flex items-center gap-3 px-4 py-6 text-white transition-opacity duration-300 ${
-        isPrev
-          ? "left-3 md:-left-16 flex-row"
-          : "right-3 md:-right-16 flex-row-reverse"
+      className={`absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center px-4 py-6 text-white transition-opacity duration-300 hover:opacity-100 ${
+        isPrev ? "left-3 md:-left-12" : "right-3 md:-right-12"
       }`}
       style={{ opacity: 0.65 }}
     >
-      <span
-        aria-hidden="true"
-        className="block h-px bg-white transition-all duration-500 group-hover:w-10"
-        style={{ width: 18, opacity: 0.85 }}
-      />
       <svg
         width="11"
         height="14"
