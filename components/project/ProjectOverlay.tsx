@@ -253,12 +253,13 @@ function PhotoCarousel({ project }: { project: Project }) {
     );
   }
 
-  // Slide takes ~72% of the container on mobile (≈12% peek per side), ~58%
-  // on desktop (≈18% peek per side). Generous peeks so the neighbours read
-  // as part of the same set and pull the eye toward the next photo.
+  // Slide takes ~70% of the viewport on mobile, ~50% on desktop. The big
+  // peeks (~15% mobile, ~25% desktop per side) plus the mask-image fade
+  // below make neighbours visibly run off the edges of the screen — the
+  // eye reads "more photos this way" without thinking about it.
   const isDesktop = containerW >= 768;
-  const slideRatio = isDesktop ? 0.58 : 0.72;
-  const gapRatio = 0.025;
+  const slideRatio = isDesktop ? 0.5 : 0.7;
+  const gapRatio = isDesktop ? 0.04 : 0.05;
   const slideW = containerW * slideRatio;
   const gap = containerW * gapRatio;
   const offset = (containerW - slideW) / 2;
@@ -268,7 +269,16 @@ function PhotoCarousel({ project }: { project: Project }) {
     <>
       <motion.div
         ref={containerRef}
-        className="relative w-screen md:w-[min(85vw,1280px)] flex-1 min-h-0 max-h-[58vh] overflow-hidden"
+        // Carousel spans the full viewport so neighbours can run all the way
+        // off the screen edge. The mask-image fades the leftmost/rightmost
+        // 6% so they melt into the page background instead of cutting hard.
+        className="relative w-screen flex-1 min-h-0 max-h-[58vh] overflow-hidden"
+        style={{
+          maskImage:
+            "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -297,14 +307,32 @@ function PhotoCarousel({ project }: { project: Project }) {
                 aria-current={isCurrent ? "true" : undefined}
                 tabIndex={isCurrent ? 0 : -1}
               >
+                {/* Editorial dash sits in the gap before each slide except
+                    the first — same vocabulary as the hero filter "—"
+                    separators. */}
+                {i > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="label text-white absolute pointer-events-none select-none"
+                    style={{
+                      top: "50%",
+                      left: -gap / 2,
+                      transform: "translate(-50%, -50%)",
+                      opacity: 0.4,
+                      letterSpacing: "0.3em",
+                    }}
+                  >
+                    —
+                  </span>
+                )}
                 <Image
                   src={`/projects/${project.slug}/${f}`}
                   alt=""
                   fill
                   priority={i === 0}
-                  sizes="(min-width: 768px) 58vw, 72vw"
+                  sizes="(min-width: 768px) 50vw, 70vw"
                   className="object-contain transition-opacity duration-500"
-                  style={{ opacity: isCurrent ? 1 : 0.6 }}
+                  style={{ opacity: isCurrent ? 1 : 0.55 }}
                 />
               </button>
             );
