@@ -88,10 +88,13 @@ export default function LandingExperience({ initialSlug }: Props) {
   // shuffle the carousel underneath. The Hero's visible chrome is fully
   // covered by the overlay, so the morphed-title side effect happens off
   // screen and doesn't matter.
-  // Cycle through projects in array order. The "Projet suivant" affordance
-  // wraps to the first project once we reach the last, so the visitor always
-  // has somewhere to go from inside an open project.
+  // Cycle through projects in array order. Prev wraps to the last project
+  // at index 0, next wraps back to the first at the end — the visitor
+  // always has somewhere to go in either direction.
   const idx = active ? projects.indexOf(active) : -1;
+  const prevProject = active
+    ? projects[(idx - 1 + projects.length) % projects.length] ?? null
+    : null;
   const nextProject = active
     ? projects[(idx + 1) % projects.length] ?? null
     : null;
@@ -101,8 +104,10 @@ export default function LandingExperience({ initialSlug }: Props) {
       <Hero activeProject={active} onOpenProject={openProject} />
       <ProjectOverlay
         project={active}
+        prevProject={prevProject}
         nextProject={nextProject}
         onClose={closeProject}
+        onOpenPrev={() => prevProject && openProject(prevProject.slug)}
         onOpenNext={() => nextProject && openProject(nextProject.slug)}
       />
     </div>

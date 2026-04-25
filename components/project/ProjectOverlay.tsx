@@ -17,8 +17,10 @@ const PREMIUM: [number, number, number, number] = [0.4, 0, 0.15, 1];
 
 interface Props {
   project: Project | null;
+  prevProject: Project | null;
   nextProject: Project | null;
   onClose: () => void;
+  onOpenPrev: () => void;
   onOpenNext: () => void;
 }
 
@@ -29,8 +31,10 @@ interface Props {
 // listens to the html.project-active class set by LandingExperience).
 export default function ProjectOverlay({
   project,
+  prevProject,
   nextProject,
   onClose,
+  onOpenPrev,
   onOpenNext,
 }: Props) {
   const [mounted, setMounted] = useState(false);
@@ -56,8 +60,10 @@ export default function ProjectOverlay({
         <Overlay
           key="project-overlay"
           project={rendered}
+          prevProject={prevProject}
           nextProject={nextProject}
           onClose={onClose}
+          onOpenPrev={onOpenPrev}
           onOpenNext={onOpenNext}
         />
       )}
@@ -68,13 +74,17 @@ export default function ProjectOverlay({
 
 function Overlay({
   project,
+  prevProject,
   nextProject,
   onClose,
+  onOpenPrev,
   onOpenNext,
 }: {
   project: Project;
+  prevProject: Project | null;
   nextProject: Project | null;
   onClose: () => void;
+  onOpenPrev: () => void;
   onOpenNext: () => void;
 }) {
   const isVideo =
@@ -170,22 +180,44 @@ function Overlay({
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
           </div>
-          {/* Mobile: "Projet suivant" sits at the very bottom of the flow,
-              after the meta. Desktop renders the same affordance bottom-right
-              (see below) and hides this copy. */}
-          {nextProject && (
-            <NextProjectButton
-              next={nextProject}
-              onClick={onOpenNext}
-              className="md:hidden mt-3 pointer-events-auto"
-            />
+          {/* Mobile: prev / next sit side-by-side at the very bottom of
+              the footer flow, after the meta. Desktop hides this row and
+              renders the two buttons absolutely-positioned in the corners
+              (see below). */}
+          {(prevProject || nextProject) && (
+            <div className="md:hidden mt-3 flex items-center gap-8 pointer-events-auto">
+              {prevProject && (
+                <NavProjectButton
+                  side="prev"
+                  target={prevProject}
+                  onClick={onOpenPrev}
+                />
+              )}
+              {nextProject && (
+                <NavProjectButton
+                  side="next"
+                  target={nextProject}
+                  onClick={onOpenNext}
+                />
+              )}
+            </div>
           )}
         </motion.footer>
 
-        {/* Desktop: bottom-right, mirroring the Retour pill at top-left. */}
+        {/* Desktop: prev bottom-left, next bottom-right — mirrors of the
+            Retour pill at top-left. */}
+        {prevProject && (
+          <NavProjectButton
+            side="prev"
+            target={prevProject}
+            onClick={onOpenPrev}
+            className="hidden md:inline-flex absolute bottom-10 left-10 z-20 pointer-events-auto"
+          />
+        )}
         {nextProject && (
-          <NextProjectButton
-            next={nextProject}
+          <NavProjectButton
+            side="next"
+            target={nextProject}
             onClick={onOpenNext}
             className="hidden md:inline-flex absolute bottom-10 right-10 z-20 pointer-events-auto"
           />
@@ -195,21 +227,24 @@ function Overlay({
   );
 }
 
-function NextProjectButton({
-  next,
+function NavProjectButton({
+  side,
+  target,
   onClick,
   className,
 }: {
-  next: Project;
+  side: "prev" | "next";
+  target: Project;
   onClick: () => void;
   className?: string;
 }) {
+  const isPrev = side === "prev";
   return (
     <motion.button
       type="button"
       onClick={(e) => { e.stopPropagation(); onClick(); }}
-      aria-label={`Projet suivant : ${next.title}`}
-      data-cursor={next.type === "video" || next.videoUrl ? "Lire" : "Voir"}
+      aria-label={`${isPrev ? "Projet précédent" : "Projet suivant"} : ${target.title}`}
+      data-cursor={target.type === "video" || target.videoUrl ? "Lire" : "Voir"}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 0.85, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
@@ -217,27 +252,46 @@ function NextProjectButton({
       whileHover={{ opacity: 1 }}
       className={`group inline-flex items-center gap-3 text-white ${className ?? ""}`}
     >
+      {isPrev && (
+        <svg
+          width="11"
+          height="14"
+          viewBox="0 0 11 14"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M9 1L1 7L9 13"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
       <span
         className="label whitespace-nowrap"
         style={{ letterSpacing: "0.32em", fontSize: "11px" }}
       >
-        Projet suivant
+        {isPrev ? "Projet précédent" : "Projet suivant"}
       </span>
-      <svg
-        width="11"
-        height="14"
-        viewBox="0 0 11 14"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M1 1L9 7L1 13"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      {!isPrev && (
+        <svg
+          width="11"
+          height="14"
+          viewBox="0 0 11 14"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M1 1L9 7L1 13"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
     </motion.button>
   );
 }
