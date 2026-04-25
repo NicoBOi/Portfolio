@@ -19,6 +19,10 @@ export interface Project {
   images?: number;
   imageFiles?: string[];
   videoUrl?: string;
+  /** Self-hosted hero loop, filename in /public/projects/<slug>/. Used as
+      the landing background when present — falls back to videoUrl /
+      youtubeId / first image otherwise. */
+  videoFile?: string;
   /** Native aspect ratio of the source video as a CSS aspect-ratio string, e.g. "2.35/1" for cinemascope. Defaults to "16/9". */
   videoAspect?: string;
   youtubeId?: string;
@@ -41,6 +45,7 @@ export const projects: Project[] = [
       credits: "Réalisation & post-prod",
     },
     videoUrl: "https://vimeo.com/722586890",
+    videoFile: "hero.webm",
     videoAspect: "2.39/1",
     aspectRatio: "landscape",
     featured: true,
@@ -59,6 +64,7 @@ export const projects: Project[] = [
       credits: "Réalisation & montage",
     },
     youtubeId: "ypJkTv3gFX8",
+    videoFile: "hero.webm",
     aspectRatio: "landscape",
     featured: true,
   },
@@ -76,6 +82,7 @@ export const projects: Project[] = [
       credits: "Réalisation 3D & post-prod",
     },
     videoUrl: "https://vimeo.com/1033824012",
+    videoFile: "hero.webm",
     videoAspect: "4/5",
     aspectRatio: "portrait",
     featured: true,

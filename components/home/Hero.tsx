@@ -305,6 +305,19 @@ export default function Hero({
               }}
             >
               {(() => {
+                // Self-hosted hero loop wins — direct <video>, no SDK.
+                if (current.videoFile) {
+                  const poster = current.imageFiles?.[0]
+                    ? `/projects/${current.slug}/${current.imageFiles[0]}`
+                    : undefined;
+                  return (
+                    <HeroLocalVideo
+                      key={current.slug}
+                      src={`/projects/${current.slug}/${current.videoFile}`}
+                      poster={poster}
+                    />
+                  );
+                }
                 const vId = getVimeoId(current.videoUrl);
                 if (vId) {
                   const aspectStr = current.videoAspect ?? "16/9";
@@ -682,6 +695,59 @@ export default function Hero({
           )}
         </AnimatePresence>
     </section>
+  );
+}
+
+// Self-hosted hero loop. Plain <video>, no SDK overhead. The poster (project's
+// first imageFile) shows instantly so the swap to a video slide never blinks
+// black; once the video has actually decoded a frame the poster fades out.
+function HeroLocalVideo({ src, poster }: { src: string; poster?: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const onPlaying = () => setReady(true);
+    v.addEventListener("playing", onPlaying);
+    // Some browsers fire `loadeddata` before they actually composite the
+    // first frame — playing is the safest signal.
+    return () => v.removeEventListener("playing", onPlaying);
+  }, []);
+
+  return (
+    <>
+      {poster && (
+        <Image
+          src={poster}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          aria-hidden="true"
+        />
+      )}
+      <video
+        ref={ref}
+        className="absolute inset-0 w-full h-full object-cover"
+        src={src}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
+      {/* Holds the poster visible until the real video commits a frame. */}
+      <motion.div
+        className="absolute inset-0 bg-black pointer-events-none z-[1]"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: ready ? 0 : 1 }}
+        transition={{ duration: 0.35, ease: SOFT }}
+        style={{ display: poster ? "none" : "block" }}
+      />
+    </>
   );
 }
 
