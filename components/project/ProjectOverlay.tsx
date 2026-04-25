@@ -217,19 +217,12 @@ function NextProjectButton({
         className="block h-px bg-white transition-all duration-500 group-hover:w-12"
         style={{ width: 28, opacity: 0.8 }}
       />
-      <span
-        className="title italic whitespace-nowrap"
-        style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.05rem)" }}
-      >
-        {next.title}
-      </span>
       <svg
         width="11"
         height="14"
         viewBox="0 0 11 14"
         fill="none"
         aria-hidden="true"
-        className="ml-1"
       >
         <path
           d="M1 1L9 7L1 13"
