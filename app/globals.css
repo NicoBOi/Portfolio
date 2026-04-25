@@ -84,6 +84,22 @@ video:-webkit-full-screen {
   background: #000;
 }
 
+/* Restore the native cursor inside any fullscreen element. The custom
+   cursor div lives outside the fullscreen subtree (the browser only
+   paints the fullscreen element + its descendants) so without this rule
+   the user is left with no pointer at all over Vimeo / YouTube
+   fullscreen. */
+:fullscreen,
+:fullscreen *,
+:fullscreen *::before,
+:fullscreen *::after,
+:-webkit-full-screen,
+:-webkit-full-screen *,
+:-webkit-full-screen *::before,
+:-webkit-full-screen *::after {
+  cursor: auto !important;
+}
+
 /* View Transitions (Chromium, Safari TP). Let the browser crossfade the
    root on project open/close for a smoother in-page pivot. Framer still
    drives the Hero morphs; this just softens the overall reflow. */
