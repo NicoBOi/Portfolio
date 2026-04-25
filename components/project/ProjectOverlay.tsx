@@ -212,11 +212,6 @@ function NextProjectButton({
       >
         Projet suivant
       </span>
-      <span
-        aria-hidden="true"
-        className="block h-px bg-white transition-all duration-500 group-hover:w-12"
-        style={{ width: 28, opacity: 0.8 }}
-      />
       <svg
         width="11"
         height="14"
