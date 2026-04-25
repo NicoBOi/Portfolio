@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects, type Project } from "@/data/projects";
+import { CATEGORY_MARK } from "@/lib/category";
 
 const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -438,11 +439,14 @@ export default function Hero({
                       setIndex(i);
                     }
                   }}
-                  className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
+                  className="label text-white tabular-nums transition-opacity duration-300 px-4 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em] inline-flex items-center gap-2"
                   style={{ opacity: i === index ? 0.95 : 0.45 }}
                   data-cursor={p.type === "photo" ? "Voir" : "Lire"}
-                  aria-label={p.title}
+                  aria-label={`${p.title} — ${p.type}`}
                 >
+                  <span aria-hidden="true" style={{ fontSize: "0.7em", opacity: 0.7 }}>
+                    {CATEGORY_MARK[p.type]}
+                  </span>
                   {String(i + 1).padStart(2, "0")}
                 </button>
               ))}
@@ -468,13 +472,21 @@ export default function Hero({
                   <button
                     type="button"
                     onClick={() => setFilter(f.value)}
-                    className="label text-white transition-opacity duration-300 relative px-2 py-2 rounded"
+                    className="label text-white transition-opacity duration-300 relative px-2 py-2 rounded inline-flex items-center gap-2"
                     style={{
                       opacity: filter === f.value ? 1 : 0.6,
                       letterSpacing: "0.32em",
                     }}
                     aria-pressed={filter === f.value}
                   >
+                    {f.value !== "all" && (
+                      <span
+                        aria-hidden="true"
+                        style={{ fontSize: "0.7em", opacity: 0.75 }}
+                      >
+                        {CATEGORY_MARK[f.value]}
+                      </span>
+                    )}
                     {f.label}
                     {filter === f.value && (
                       <motion.span
@@ -586,6 +598,13 @@ export default function Hero({
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.35, ease: SOFT }}
                 >
+                  <span
+                    aria-hidden="true"
+                    className="label mr-3 align-middle"
+                    style={{ fontSize: "0.55em", opacity: 0.55, letterSpacing: 0 }}
+                  >
+                    {CATEGORY_MARK[current.type]}
+                  </span>
                   {current.title}
                 </motion.span>
               </AnimatePresence>
@@ -655,7 +674,7 @@ export default function Hero({
                   key={f.value}
                   type="button"
                   onClick={() => setFilter(f.value)}
-                  className="label text-white relative px-3 py-3 transition-opacity duration-300"
+                  className="label text-white relative px-3 py-3 transition-opacity duration-300 inline-flex items-center gap-1.5"
                   style={{
                     opacity: active ? 0.95 : 0.5,
                     fontSize: "10px",
@@ -664,6 +683,14 @@ export default function Hero({
                   }}
                   aria-pressed={active}
                 >
+                  {f.value !== "all" && (
+                    <span
+                      aria-hidden="true"
+                      style={{ fontSize: "0.85em", opacity: 0.75 }}
+                    >
+                      {CATEGORY_MARK[f.value]}
+                    </span>
+                  )}
                   {f.label}
                   {active && (
                     <motion.span

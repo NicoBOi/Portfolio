@@ -4,6 +4,7 @@ import Player from "@vimeo/player";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
+import { CATEGORY_MARK } from "@/lib/category";
 import ProjectNav from "./ProjectNav";
 import VideoControls from "./VideoControls";
 import Link from "next/link";
@@ -108,7 +109,12 @@ export default function VideoProject({ project, prev, next, mode = "page", onNav
           {project.title}
         </h1>
         <div className="flex flex-col gap-2 self-center">
-          <p className="label text-white" style={{ opacity: 0.95 }}>{project.meta.type}</p>
+          <p className="label text-white inline-flex items-center gap-2" style={{ opacity: 0.95 }}>
+            <span aria-hidden="true" style={{ fontSize: "0.75em", opacity: 0.7 }}>
+              {CATEGORY_MARK[project.type]}
+            </span>
+            {project.meta.type}
+          </p>
           <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.location}</p>
           <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.credits}</p>
           <p className="label text-white mt-3" style={{ opacity: 0.6 }}>{project.year}</p>

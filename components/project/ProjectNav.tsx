@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Project } from "@/data/projects";
+import { CATEGORY_MARK } from "@/lib/category";
 
 interface Props {
   prev: Project | null;
@@ -39,9 +40,16 @@ export default function ProjectNav({ prev, next, onNavigate }: Props) {
               style={{ width: 24, opacity: 0.7 }}
             />
             <span
-              className="text-white title"
+              className="text-white title inline-flex items-baseline gap-2"
               style={{ fontSize: "clamp(1rem, 1.6vw, 1.3rem)" }}
             >
+              <span
+                aria-hidden="true"
+                className="label"
+                style={{ fontSize: "0.55em", opacity: 0.55, letterSpacing: 0 }}
+              >
+                {CATEGORY_MARK[prev.type]}
+              </span>
               {prev.title}
             </span>
           </Link>
@@ -57,10 +65,17 @@ export default function ProjectNav({ prev, next, onNavigate }: Props) {
             style={{ opacity: 0.85 }}
           >
             <span
-              className="text-white title"
+              className="text-white title inline-flex items-baseline gap-2"
               style={{ fontSize: "clamp(1rem, 1.6vw, 1.3rem)" }}
             >
               {next.title}
+              <span
+                aria-hidden="true"
+                className="label"
+                style={{ fontSize: "0.55em", opacity: 0.55, letterSpacing: 0 }}
+              >
+                {CATEGORY_MARK[next.type]}
+              </span>
             </span>
             <span
               aria-hidden="true"

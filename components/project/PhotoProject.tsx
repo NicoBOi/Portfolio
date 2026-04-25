@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
+import { CATEGORY_MARK } from "@/lib/category";
 import { getImageDims } from "@/lib/image-dims";
 import ProjectNav from "./ProjectNav";
 import Lightbox from "./Lightbox";
@@ -219,9 +220,15 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
         <div className="flex flex-col gap-4 md:gap-2 md:justify-end">
           <span aria-hidden="true" className="block md:hidden h-px w-10 bg-white/25 mb-2" />
           <p
-            className="label text-white"
+            className="label text-white inline-flex items-center gap-2"
             style={{ opacity: 0.95, lineHeight: 1.7 }}
           >
+            <span
+              aria-hidden="true"
+              style={{ fontSize: "0.75em", opacity: 0.7 }}
+            >
+              {CATEGORY_MARK[project.type]}
+            </span>
             {project.meta.type}
           </p>
           <p
