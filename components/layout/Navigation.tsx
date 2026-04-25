@@ -9,6 +9,10 @@ export default function Navigation() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
+  // Any inner page (about, contact, …) gets the same Retour treatment as a
+  // project overlay — the NS slot is replaced by a back affordance, the
+  // in-page "Accueil" link is gone, the chrome is one bar.
+  const isInnerPage = !isHome && !pathname.startsWith("/work/");
 
   // LandingExperience drives an in-page project overlay by calling
   // history.pushState — Next's usePathname doesn't always see that. Track the
@@ -22,6 +26,8 @@ export default function Navigation() {
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => mo.disconnect();
   }, []);
+
+  const showRetour = inProject || isInnerPage;
 
   const isActive = (href: string) => (href === "/" ? isHome : pathname.startsWith(href));
 
@@ -50,26 +56,47 @@ export default function Navigation() {
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         data-cursor-suppress
       >
-        {inProject ? (
-          <button
-            type="button"
-            onClick={handleRetour}
-            aria-label="Retour aux projets"
-            className="group inline-flex items-center gap-3 px-3 py-3 -mx-3 -my-3 text-white hover:opacity-100 transition-opacity duration-300"
-            style={{ opacity: 0.9 }}
-          >
-            <span
-              aria-hidden="true"
-              className="block h-px bg-white transition-all duration-500 group-hover:w-10"
-              style={{ width: 24, opacity: 0.8 }}
-            />
-            <span
-              className="label text-white"
-              style={{ fontSize: "13px", letterSpacing: "0.38em" }}
+        {showRetour ? (
+          inProject ? (
+            <button
+              type="button"
+              onClick={handleRetour}
+              aria-label="Retour aux projets"
+              className="group inline-flex items-center gap-3 px-3 py-3 -mx-3 -my-3 text-white hover:opacity-100 transition-opacity duration-300"
+              style={{ opacity: 0.9 }}
             >
-              Retour
-            </span>
-          </button>
+              <span
+                aria-hidden="true"
+                className="block h-px bg-white transition-all duration-500 group-hover:w-10"
+                style={{ width: 24, opacity: 0.8 }}
+              />
+              <span
+                className="label text-white"
+                style={{ fontSize: "13px", letterSpacing: "0.38em" }}
+              >
+                Retour
+              </span>
+            </button>
+          ) : (
+            <Link
+              href="/"
+              aria-label="Retour à l'accueil"
+              className="group inline-flex items-center gap-3 px-3 py-3 -mx-3 -my-3 text-white hover:opacity-100 transition-opacity duration-300"
+              style={{ opacity: 0.9 }}
+            >
+              <span
+                aria-hidden="true"
+                className="block h-px bg-white transition-all duration-500 group-hover:w-10"
+                style={{ width: 24, opacity: 0.8 }}
+              />
+              <span
+                className="label text-white"
+                style={{ fontSize: "13px", letterSpacing: "0.38em" }}
+              >
+                Retour
+              </span>
+            </Link>
+          )
         ) : (
           <Link
             href="/"

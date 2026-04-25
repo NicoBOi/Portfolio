@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import ContactForm from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = {
@@ -26,20 +25,9 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="bg-black min-h-screen flex flex-col">
-      {/* Back */}
-      <div className="px-6 md:px-10 pt-20 pb-0">
-        <Link
-          href="/"
-          className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-2"
-          style={{ opacity: 0.3 }}
-        >
-          <span aria-hidden="true">←</span>
-          Accueil
-        </Link>
-      </div>
-
-      {/* Main — two columns */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 px-6 md:px-10 pt-14 pb-24 gap-16 md:gap-24">
+      {/* Main — two columns. The back-to-home affordance lives in the top
+          nav (replaces the NS slot on inner pages), no need to duplicate. */}
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 px-6 md:px-10 pt-32 md:pt-28 pb-24 gap-16 md:gap-24">
 
         {/* Left — identity */}
         <div className="flex flex-col justify-between gap-12">
