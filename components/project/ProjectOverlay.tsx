@@ -244,7 +244,7 @@ function VideoMedia({ project }: { project: Project }) {
 
   return (
     <motion.div
-      className="relative bg-black overflow-hidden w-screen md:w-[var(--media-w)]"
+      className="relative bg-black overflow-hidden rounded-2xl md:rounded-3xl w-screen md:w-[var(--media-w)]"
       style={{
         aspectRatio: aspectStr,
         ["--media-w" as string]: `min(76vw, calc(58vh * ${ratio}))`,
@@ -433,7 +433,7 @@ function PhotoCarousel({ project }: { project: Project }) {
                 key={f}
                 type="button"
                 onClick={() => (isCurrent ? setLightbox(i) : goTo(i))}
-                className="shrink-0 h-full relative block"
+                className="shrink-0 h-full relative block overflow-hidden rounded-2xl md:rounded-3xl"
                 style={{ width: slideW || 1 }}
                 data-cursor={isCurrent ? "Agrandir" : i < idx ? "Précédent" : "Suivant"}
                 aria-label={isCurrent ? `Agrandir la photo ${i + 1}` : `Photo ${i + 1}`}
