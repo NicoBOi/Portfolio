@@ -229,6 +229,37 @@ function PhotoCarousel({ project }: { project: Project }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, files.length, lightbox]);
 
+  // Wheel / trackpad scroll → navigate. Same gesture-end + min-swap-gap
+  // pacing the hero uses for its featured carousel: one swap per intentional
+  // scroll, then a 250ms quiet period before the next swap, so a fling
+  // doesn't fire ten transitions in a row.
+  useEffect(() => {
+    if (lightbox !== null) return;
+    const GESTURE_END_MS = 100;
+    const MIN_SWAP_GAP_MS = 250;
+    let lastWheel = 0;
+    let lastSwap = 0;
+    let inGesture = false;
+    const onWheel = (e: WheelEvent) => {
+      const delta =
+        Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (Math.abs(delta) < 8) return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheel > GESTURE_END_MS) inGesture = false;
+      lastWheel = now;
+      if (!inGesture && now - lastSwap >= MIN_SWAP_GAP_MS) {
+        inGesture = true;
+        lastSwap = now;
+        if (delta > 0 && canNext) next();
+        else if (delta < 0 && canPrev) prev();
+      }
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, files.length, lightbox, canPrev, canNext]);
+
   const startX = useRef<number | null>(null);
   const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; };
   const onTouchEnd = (e: React.TouchEvent) => {
@@ -387,7 +418,7 @@ function CarouselArrow({ side, onClick }: { side: "prev" | "next"; onClick: () =
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       aria-label={isPrev ? "Précédent" : "Suivant"}
       data-cursor={isPrev ? "Précédent" : "Suivant"}
-      className={`absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center px-4 py-6 text-white transition-opacity duration-300 hover:opacity-100 ${
+      className={`absolute top-1/2 -translate-y-1/2 z-10 hidden md:flex items-center justify-center px-4 py-6 text-white transition-opacity duration-300 hover:opacity-100 ${
         isPrev ? "left-3 md:left-6" : "right-3 md:right-6"
       }`}
       style={{ opacity: 0.65 }}
