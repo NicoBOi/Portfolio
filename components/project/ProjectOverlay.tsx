@@ -16,7 +16,9 @@ const PREMIUM: [number, number, number, number] = [0.4, 0, 0.15, 1];
 
 interface Props {
   project: Project | null;
+  nextProject: Project | null;
   onClose: () => void;
+  onOpenNext: () => void;
 }
 
 // Editorial in-place project view. The landing stays mounted underneath; this
@@ -24,7 +26,12 @@ interface Props {
 // punched-through window with the title / role / meta arranged around it.
 // The site Navigation provides the Retour affordance at the top-left (it
 // listens to the html.project-active class set by LandingExperience).
-export default function ProjectOverlay({ project, onClose }: Props) {
+export default function ProjectOverlay({
+  project,
+  nextProject,
+  onClose,
+  onOpenNext,
+}: Props) {
   const [mounted, setMounted] = useState(false);
   const [rendered, setRendered] = useState<Project | null>(project);
   useEffect(() => { setMounted(true); }, []);
@@ -45,14 +52,30 @@ export default function ProjectOverlay({ project, onClose }: Props) {
   return createPortal(
     <AnimatePresence>
       {project && rendered && (
-        <Overlay key="project-overlay" project={rendered} onClose={onClose} />
+        <Overlay
+          key="project-overlay"
+          project={rendered}
+          nextProject={nextProject}
+          onClose={onClose}
+          onOpenNext={onOpenNext}
+        />
       )}
     </AnimatePresence>,
     document.body,
   );
 }
 
-function Overlay({ project, onClose }: { project: Project; onClose: () => void }) {
+function Overlay({
+  project,
+  nextProject,
+  onClose,
+  onOpenNext,
+}: {
+  project: Project;
+  nextProject: Project | null;
+  onClose: () => void;
+  onOpenNext: () => void;
+}) {
   const isVideo =
     project.type === "video" ||
     !!project.videoUrl ||
@@ -136,9 +159,87 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
           </div>
+          {/* Mobile: "Projet suivant" sits at the very bottom of the flow,
+              after the meta. Desktop renders the same affordance bottom-right
+              (see below) and hides this copy. */}
+          {nextProject && (
+            <NextProjectButton
+              next={nextProject}
+              onClick={onOpenNext}
+              className="md:hidden mt-3 pointer-events-auto"
+            />
+          )}
         </motion.footer>
+
+        {/* Desktop: bottom-right, mirroring the Retour pill at top-left. */}
+        {nextProject && (
+          <NextProjectButton
+            next={nextProject}
+            onClick={onOpenNext}
+            className="hidden md:inline-flex absolute bottom-10 right-10 z-20 pointer-events-auto"
+          />
+        )}
       </div>
     </motion.div>
+  );
+}
+
+function NextProjectButton({
+  next,
+  onClick,
+  className,
+}: {
+  next: Project;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <motion.button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      aria-label={`Projet suivant : ${next.title}`}
+      data-cursor={next.type === "video" || next.videoUrl ? "Lire" : "Voir"}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 0.85, y: 0 }}
+      exit={{ opacity: 0, y: 8 }}
+      transition={{ duration: 0.55, delay: 0.18, ease: SOFT }}
+      whileHover={{ opacity: 1 }}
+      className={`group inline-flex items-center gap-3 text-white ${className ?? ""}`}
+    >
+      <span
+        className="label whitespace-nowrap"
+        style={{ letterSpacing: "0.32em", fontSize: "11px" }}
+      >
+        Projet suivant
+      </span>
+      <span
+        aria-hidden="true"
+        className="block h-px bg-white transition-all duration-500 group-hover:w-12"
+        style={{ width: 28, opacity: 0.8 }}
+      />
+      <span
+        className="title italic whitespace-nowrap"
+        style={{ fontSize: "clamp(0.95rem, 1.15vw, 1.05rem)" }}
+      >
+        {next.title}
+      </span>
+      <svg
+        width="11"
+        height="14"
+        viewBox="0 0 11 14"
+        fill="none"
+        aria-hidden="true"
+        className="ml-1"
+      >
+        <path
+          d="M1 1L9 7L1 13"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </motion.button>
   );
 }
 
