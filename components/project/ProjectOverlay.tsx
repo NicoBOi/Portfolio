@@ -185,12 +185,13 @@ function Overlay({
               renders the two buttons absolutely-positioned in the corners
               (see below). */}
           {(prevProject || nextProject) && (
-            <div className="md:hidden mt-3 flex items-center gap-8 pointer-events-auto">
+            <div className="md:hidden mt-2 flex items-center gap-6 pointer-events-auto">
               {prevProject && (
                 <NavProjectButton
                   side="prev"
                   target={prevProject}
                   onClick={onOpenPrev}
+                  compact
                 />
               )}
               {nextProject && (
@@ -198,6 +199,7 @@ function Overlay({
                   side="next"
                   target={nextProject}
                   onClick={onOpenNext}
+                  compact
                 />
               )}
             </div>
@@ -232,13 +234,16 @@ function NavProjectButton({
   target,
   onClick,
   className,
+  compact = false,
 }: {
   side: "prev" | "next";
   target: Project;
   onClick: () => void;
   className?: string;
+  compact?: boolean;
 }) {
   const isPrev = side === "prev";
+  const chevronSize = compact ? 9 : 11;
   return (
     <motion.button
       type="button"
@@ -250,12 +255,14 @@ function NavProjectButton({
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.55, delay: 0.18, ease: SOFT }}
       whileHover={{ opacity: 1 }}
-      className={`group inline-flex items-center gap-3 text-white ${className ?? ""}`}
+      className={`group inline-flex items-center text-white ${
+        compact ? "gap-2" : "gap-3"
+      } ${className ?? ""}`}
     >
       {isPrev && (
         <svg
-          width="11"
-          height="14"
+          width={chevronSize}
+          height={chevronSize + 3}
           viewBox="0 0 11 14"
           fill="none"
           aria-hidden="true"
@@ -271,14 +278,19 @@ function NavProjectButton({
       )}
       <span
         className="label whitespace-nowrap"
-        style={{ letterSpacing: "0.32em", fontSize: "11px" }}
+        style={{
+          letterSpacing: compact ? "0.24em" : "0.32em",
+          fontSize: compact ? "9px" : "11px",
+        }}
       >
-        {isPrev ? "Projet précédent" : "Projet suivant"}
+        {compact
+          ? (isPrev ? "Précédent" : "Suivant")
+          : (isPrev ? "Projet précédent" : "Projet suivant")}
       </span>
       {!isPrev && (
         <svg
-          width="11"
-          height="14"
+          width={chevronSize}
+          height={chevronSize + 3}
           viewBox="0 0 11 14"
           fill="none"
           aria-hidden="true"
@@ -469,9 +481,10 @@ function PhotoCarousel({ project }: { project: Project }) {
 
   const isDesktop = container.w >= 768;
   const slideH = container.h;
-  // Cap slide width so a wide pano doesn't overflow the visible carousel —
-  // the photo just sits a touch shorter than its neighbours when that hits.
-  const maxSlideW = container.w * (isDesktop ? 0.62 : 0.78);
+  // Mobile: photos are full-width edge-to-edge (cap = full container width).
+  // Landscape shots fill the screen; portraits naturally constrain to fit
+  // the carousel's height. Desktop keeps a generous cap so neighbours peek.
+  const maxSlideW = container.w * (isDesktop ? 0.62 : 1);
   const slideDims = aspects.map((a) => {
     let w = slideH * a;
     let h = slideH;
@@ -481,7 +494,9 @@ function PhotoCarousel({ project }: { project: Project }) {
     }
     return { w, h };
   });
-  const gap = container.w * 0.05;
+  // No gap on mobile (slides are full-width so neighbours stay off-screen);
+  // editorial gap on desktop where neighbours peek in.
+  const gap = isDesktop ? container.w * 0.05 : 0;
   // Cumulative left positions of each slide on the track.
   const positions: number[] = [];
   let runningX = 0;
@@ -536,8 +551,10 @@ function PhotoCarousel({ project }: { project: Project }) {
                 tabIndex={isCurrent ? 0 : -1}
               >
                 {/* Editorial dash in the gap before each slide except the
-                    first — same vocabulary as the hero filter "—" rule. */}
-                {i > 0 && (
+                    first — same vocabulary as the hero filter "—" rule.
+                    Desktop only: mobile slides are full-width with no gap,
+                    so a dash here would never be visible. */}
+                {i > 0 && isDesktop && (
                   <span
                     aria-hidden="true"
                     className="label text-white absolute pointer-events-none select-none"
