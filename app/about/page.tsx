@@ -26,212 +26,167 @@ export const metadata: Metadata = {
 
 const CLIENTS = [
   "A Better Feeling",
-  "Philips",
-  "Sephora",
-  "Showroom Privé",
   "Double Salto",
   "Felkin",
   "Made in Paris",
+  "Philips",
+  "Sephora",
+  "Showroom Privé",
 ];
 
-const INFLUENCES = ["Lars von Trier", "Ash Thorp", "Zdzisław Beksiński"];
+const INFLUENCES = [
+  { name: "Lars von Trier", note: "Tension narrative" },
+  { name: "Ash Thorp", note: "Rigueur du motion" },
+  { name: "Zdzisław Beksiński", note: "Élégance sombre" },
+];
 
-// Section index — small mono prefix, same vocabulary as the landing's
-// 01-08 column. Keeps every block of the page editorially numbered.
-function SectionLabel({ index, children }: { index: string; children: React.ReactNode }) {
+// Small mono label that anchors each section. One consistent treatment
+// across the whole page so the eye knows where it is at a glance.
+function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-baseline gap-4">
-      <span
-        className="label text-white tabular-nums"
-        style={{ opacity: 0.4, letterSpacing: "0.32em" }}
-      >
-        {index}
-      </span>
-      <span
-        aria-hidden="true"
-        className="block h-px bg-white"
-        style={{ width: 22, opacity: 0.25 }}
-      />
-      <span
-        className="label text-white"
-        style={{ opacity: 0.55, letterSpacing: "0.32em" }}
-      >
-        {children}
-      </span>
-    </div>
+    <p
+      className="label text-white mb-8"
+      style={{ opacity: 0.5, letterSpacing: "0.36em", fontSize: "11px" }}
+    >
+      {children}
+    </p>
   );
 }
 
 export default function AboutPage() {
   return (
-    <div className="bg-black min-h-screen">
+    <article className="bg-black min-h-screen">
       {/* Header */}
-      <div className="px-6 md:px-10 pt-32 md:pt-28 pb-12 border-b border-white/10">
+      <header className="px-6 md:px-10 pt-32 md:pt-28 pb-12 border-b border-white/10">
+        <p
+          className="label text-white mb-6"
+          style={{ opacity: 0.4, letterSpacing: "0.36em", fontSize: "11px" }}
+        >
+          Bordeaux · Photo · Film · 3D
+        </p>
         <h1
           className="text-white title"
-          style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
+          style={{ fontSize: "clamp(3rem, 7vw, 7rem)", lineHeight: 1 }}
         >
           À propos
         </h1>
-      </div>
+      </header>
 
-      {/* 01 — Bio */}
-      <section className="px-6 md:px-10 pt-14 pb-16 md:pb-20">
-        <SectionLabel index="01">Biographie</SectionLabel>
-
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
+      {/* Bio */}
+      <section className="px-6 md:px-10 py-16 md:py-20 border-b border-white/10">
+        <SectionTitle>Biographie</SectionTitle>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
           <div className="md:col-span-4">
             <div
               className="relative w-full overflow-hidden"
-              style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 400 }}
+              style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 380 }}
             >
               <Image
                 src="/about/portrait.avif"
                 alt="Nicolas Sempere"
                 fill
                 priority
-                sizes="(min-width: 768px) 400px, 100vw"
+                sizes="(min-width: 768px) 380px, 100vw"
                 className="object-cover"
               />
             </div>
-            <p className="label text-white mt-3" style={{ opacity: 0.2 }}>
-              Bordeaux — Paris
-            </p>
           </div>
 
-          <div className="md:col-span-8 flex flex-col gap-5 max-w-xl">
+          <div className="md:col-span-8 flex flex-col gap-5 max-w-2xl">
             <p
-              className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.9, lineHeight: 1.9 }}
+              className="text-white font-light"
+              style={{ fontSize: "1rem", lineHeight: 1.85, opacity: 0.9 }}
             >
-              Photographe et réalisateur à Bordeaux, 28 ans. Je crée
-              des images pour les marques et les projets qui refusent
-              de ressembler aux autres — campagnes, éditoriaux, films,
-              quand l&apos;image doit dire quelque chose de précis.
+              Photographe et réalisateur à Bordeaux, 28 ans. Je crée des
+              images pour les marques et les projets qui refusent de
+              ressembler aux autres — campagnes, éditoriaux, films, quand
+              l&apos;image doit dire quelque chose de précis.
             </p>
             <p
-              className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
+              className="text-white font-light"
+              style={{ fontSize: "1rem", lineHeight: 1.85, opacity: 0.75 }}
             >
               Photographe depuis mes 15 ans, réalisateur depuis 23.
-              Autodidacte pendant longtemps, puis diplômé de MJM
-              Graphic Design en webdesign et motion.
+              Autodidacte pendant longtemps, puis diplômé de MJM Graphic
+              Design en webdesign et motion.
             </p>
             <p
-              className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
+              className="text-white font-light"
+              style={{ fontSize: "1rem", lineHeight: 1.85, opacity: 0.6 }}
             >
-              Seul ou avec une équipe, selon le projet. Trois
-              références reviennent toujours : Lars von Trier pour
-              la tension, Ash Thorp pour la rigueur du motion,
-              Beksiński pour l&apos;élégance sombre.
+              Seul ou avec une équipe, selon le projet.
             </p>
+          </div>
+        </div>
+      </section>
 
-            <Link
-              href="/contact"
-              className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-4"
-              style={{ opacity: 0.85, letterSpacing: "0.34em" }}
+      {/* Clients — clean two-column list, alphabetical. */}
+      <section className="px-6 md:px-10 py-16 md:py-20 border-b border-white/10">
+        <SectionTitle>Clients</SectionTitle>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 max-w-3xl">
+          {CLIENTS.map((c) => (
+            <li
+              key={c}
+              className="text-white font-light flex items-baseline gap-3"
+              style={{ fontSize: "1rem", opacity: 0.85, lineHeight: 1.6 }}
             >
-              Écrivez-moi
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Editorial pull-quote — italic Cormorant, full-bleed band */}
-      <section className="px-6 md:px-10 py-20 md:py-28 border-y border-white/10">
-        <blockquote className="max-w-5xl mx-auto text-center">
-          <p
-            className="title italic text-white"
-            style={{
-              fontSize: "clamp(1.6rem, 4.5vw, 3.4rem)",
-              lineHeight: 1.18,
-              opacity: 0.95,
-            }}
-          >
-            « Refuser de ressembler aux autres. »
-          </p>
-        </blockquote>
-      </section>
-
-      {/* 02 — Clients (full-width marquee) */}
-      <section className="pt-14 pb-10 md:pb-14">
-        <div className="px-6 md:px-10 mb-8">
-          <SectionLabel index="02">Clients</SectionLabel>
-        </div>
-        <div
-          className="marquee-host relative overflow-hidden"
-          aria-label="Clients"
-          role="list"
-        >
-          {/* Edge fade so names don't pop in/out abruptly. */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10"
-            style={{
-              background:
-                "linear-gradient(to right, #000 0%, rgba(0,0,0,0) 100%)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10"
-            style={{
-              background:
-                "linear-gradient(to left, #000 0%, rgba(0,0,0,0) 100%)",
-            }}
-          />
-          <div
-            className="marquee-track flex items-center gap-12 md:gap-20 whitespace-nowrap"
-            style={{ width: "max-content" }}
-          >
-            {[...CLIENTS, ...CLIENTS].map((c, i) => (
               <span
-                key={`${c}-${i}`}
-                role={i < CLIENTS.length ? "listitem" : undefined}
-                aria-hidden={i >= CLIENTS.length}
-                className="title text-white"
-                style={{
-                  fontSize: "clamp(1.4rem, 3vw, 2.4rem)",
-                  opacity: 0.65,
-                  letterSpacing: "0.01em",
-                }}
-              >
-                {c}
-                <span
-                  aria-hidden="true"
-                  className="inline-block ml-12 md:ml-20 align-middle h-px bg-white"
-                  style={{ width: 28, opacity: 0.3 }}
-                />
-              </span>
-            ))}
-          </div>
-        </div>
+                aria-hidden="true"
+                className="block h-px bg-white"
+                style={{ width: 12, opacity: 0.3 }}
+              />
+              {c}
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {/* 03 — Influences */}
-      <section className="px-6 md:px-10 pt-10 pb-24 md:pb-32">
-        <SectionLabel index="03">Influences</SectionLabel>
-        <ul className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-10 max-w-4xl">
-          {INFLUENCES.map((i, idx) => (
-            <li key={i} className="flex items-baseline gap-4">
+      {/* Influences — name + role, table-like rhythm. */}
+      <section className="px-6 md:px-10 py-16 md:py-20 border-b border-white/10">
+        <SectionTitle>Influences</SectionTitle>
+        <ul className="flex flex-col divide-y divide-white/10 max-w-3xl">
+          {INFLUENCES.map((inf) => (
+            <li
+              key={inf.name}
+              className="grid grid-cols-12 items-baseline py-4 gap-4"
+            >
               <span
-                className="label text-white tabular-nums"
-                style={{ opacity: 0.3, letterSpacing: "0.28em", fontSize: "10px" }}
+                className="col-span-12 sm:col-span-6 text-white font-light"
+                style={{ fontSize: "1rem", opacity: 0.9 }}
               >
-                {String(idx + 1).padStart(2, "0")}
+                {inf.name}
               </span>
               <span
-                className="text-white font-light"
-                style={{ fontSize: "1rem", opacity: 0.85, letterSpacing: "0.01em" }}
+                className="col-span-12 sm:col-span-6 text-white font-light sm:text-right"
+                style={{ fontSize: "0.9rem", opacity: 0.55 }}
               >
-                {i}
+                {inf.note}
               </span>
             </li>
           ))}
         </ul>
       </section>
-    </div>
+
+      {/* CTA */}
+      <section className="px-6 md:px-10 py-16 md:py-20">
+        <Link
+          href="/contact"
+          className="inline-flex items-center gap-4 group"
+          style={{ opacity: 0.85 }}
+        >
+          <span
+            aria-hidden="true"
+            className="block h-px bg-white transition-all duration-500 group-hover:w-16"
+            style={{ width: 32, opacity: 0.6 }}
+          />
+          <span
+            className="label text-white group-hover:opacity-100 transition-opacity duration-300"
+            style={{ letterSpacing: "0.36em" }}
+          >
+            Écrivez-moi
+          </span>
+        </Link>
+      </section>
+    </article>
   );
 }

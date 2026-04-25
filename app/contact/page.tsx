@@ -23,144 +23,115 @@ export const metadata: Metadata = {
   },
 };
 
-// Editorial line item for the contact list — small mono index, hairline,
-// label, then the value below. Same vocabulary as the About page sections.
-function Field({
-  index,
-  label,
-  href,
-  external,
-  children,
-}: {
-  index: string;
-  label: string;
-  href?: string;
-  external?: boolean;
-  children: React.ReactNode;
-}) {
-  const value = (
-    <span
-      className="text-white font-light"
-      style={{
-        fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)",
-        opacity: 0.85,
-        letterSpacing: "0.02em",
-      }}
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="label text-white mb-6"
+      style={{ opacity: 0.5, letterSpacing: "0.36em", fontSize: "11px" }}
     >
       {children}
+    </p>
+  );
+}
+
+function InfoRow({
+  label,
+  value,
+  href,
+  external,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  external?: boolean;
+}) {
+  const content = (
+    <span
+      className="text-white font-light"
+      style={{ fontSize: "1rem", opacity: 0.9 }}
+    >
+      {value}
     </span>
   );
   return (
-    <div>
-      <div className="flex items-baseline gap-4 mb-2">
-        <span
-          className="label text-white tabular-nums"
-          style={{ opacity: 0.4, letterSpacing: "0.32em" }}
-        >
-          {index}
-        </span>
-        <span
-          aria-hidden="true"
-          className="block h-px bg-white"
-          style={{ width: 22, opacity: 0.25 }}
-        />
-        <span
-          className="label text-white"
-          style={{ opacity: 0.55, letterSpacing: "0.32em" }}
-        >
-          {label}
-        </span>
-      </div>
-      {href ? (
-        <a
-          href={href}
-          target={external ? "_blank" : undefined}
-          rel={external ? "noopener noreferrer" : undefined}
-          className="hover:opacity-100 transition-opacity duration-300"
-        >
-          {value}
-        </a>
-      ) : (
-        value
-      )}
+    <div className="grid grid-cols-12 items-baseline py-4 gap-4">
+      <span
+        className="col-span-5 sm:col-span-4 label text-white"
+        style={{ opacity: 0.5, letterSpacing: "0.32em", fontSize: "11px" }}
+      >
+        {label}
+      </span>
+      <span className="col-span-7 sm:col-span-8">
+        {href ? (
+          <a
+            href={href}
+            target={external ? "_blank" : undefined}
+            rel={external ? "noopener noreferrer" : undefined}
+            className="hover:opacity-100 transition-opacity duration-300"
+          >
+            {content}
+          </a>
+        ) : (
+          content
+        )}
+      </span>
     </div>
   );
 }
 
 export default function ContactPage() {
   return (
-    <div className="bg-black min-h-screen flex flex-col">
-      {/* Header — title + live status badge so the page feels alive even
-          before the viewer interacts. */}
-      <div className="px-6 md:px-10 pt-32 md:pt-28 pb-10 md:pb-12 border-b border-white/10">
-        <div className="flex flex-col gap-6">
+    <article className="bg-black min-h-screen">
+      {/* Header */}
+      <header className="px-6 md:px-10 pt-32 md:pt-28 pb-12 border-b border-white/10">
+        <div className="mb-6">
           <LiveStatus />
-          <h1
-            className="text-white title"
-            style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
-          >
-            Contact
-          </h1>
         </div>
-      </div>
+        <h1
+          className="text-white title"
+          style={{ fontSize: "clamp(3rem, 7vw, 7rem)", lineHeight: 1 }}
+        >
+          Contact
+        </h1>
+      </header>
 
-      {/* Two columns: numbered fiche on the left, italic pull-quote +
-          form on the right. */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 px-6 md:px-10 pt-14 pb-24 gap-16 md:gap-24">
-        <div className="flex flex-col gap-10">
-          <div className="flex flex-col gap-2 max-w-md">
-            <p
-              className="text-white font-light"
-              style={{ fontSize: "0.95rem", opacity: 0.85, lineHeight: 1.9 }}
-            >
-              Parlez-moi du projet. Insta, mail, ou le formulaire — comme
-              vous préférez. Je réponds dans les 24 heures.
-            </p>
-          </div>
+      {/* Intro */}
+      <section className="px-6 md:px-10 py-16 md:py-20 border-b border-white/10">
+        <p
+          className="text-white font-light max-w-2xl"
+          style={{ fontSize: "1.05rem", lineHeight: 1.85, opacity: 0.9 }}
+        >
+          Parlez-moi du projet — campagne, éditorial, clip, ou 3D. Insta,
+          mail ou le formulaire ci-dessous. Je réponds dans les 24 heures.
+        </p>
+      </section>
 
-          <div className="flex flex-col gap-7">
-            <Field index="01" label="Email" href="mailto:nicosmp.pro@gmail.com">
-              nicosmp.pro@gmail.com
-            </Field>
-            <Field
-              index="02"
+      {/* Two columns: coordonnées | brief */}
+      <div className="grid grid-cols-1 md:grid-cols-12 px-6 md:px-10 py-16 md:py-20 gap-12 md:gap-16">
+        <aside className="md:col-span-5">
+          <SectionTitle>Coordonnées</SectionTitle>
+          <div className="flex flex-col divide-y divide-white/10 max-w-md">
+            <InfoRow
+              label="Email"
+              value="nicosmp.pro@gmail.com"
+              href="mailto:nicosmp.pro@gmail.com"
+            />
+            <InfoRow
               label="Instagram"
+              value="@nicolas_Sempere"
               href="https://instagram.com/nicolas_Sempere"
               external
-            >
-              @nicolas_Sempere
-            </Field>
-            <Field index="03" label="Basé à">
-              Bordeaux — Paris
-            </Field>
-            <Field index="04" label="Délai de réponse">
-              Sous 24 heures
-            </Field>
+            />
+            <InfoRow label="Basé à" value="Bordeaux — Paris" />
+            <InfoRow label="Délai de réponse" value="Sous 24 heures" />
           </div>
-        </div>
+        </aside>
 
-        <div className="flex flex-col gap-12 md:gap-16">
-          <blockquote className="max-w-md">
-            <p
-              className="title italic text-white"
-              style={{
-                fontSize: "clamp(1.4rem, 2.6vw, 2.1rem)",
-                lineHeight: 1.25,
-                opacity: 0.95,
-              }}
-            >
-              « Une idée suffit à commencer. »
-            </p>
-            <footer
-              className="label text-white mt-4"
-              style={{ opacity: 0.45, letterSpacing: "0.32em" }}
-            >
-              Brief — formulaire
-            </footer>
-          </blockquote>
+        <div className="md:col-span-7">
+          <SectionTitle>Brief — formulaire</SectionTitle>
           <ContactForm />
         </div>
       </div>
-    </div>
+    </article>
   );
 }
