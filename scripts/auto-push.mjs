@@ -1,6 +1,15 @@
 #!/usr/bin/env node
 import { execSync } from "node:child_process";
 
+// Skip in CI environments. Vercel / GitHub Actions / etc. pull from origin
+// and build — pushing back from inside the build would loop or fail (the
+// CI checkout doesn't have push credentials anyway). Local builds still run
+// normally.
+if (process.env.CI || process.env.VERCEL || process.env.GITHUB_ACTIONS) {
+  console.log("[auto-push] CI build detected, skipping push.");
+  process.exit(0);
+}
+
 function run(cmd, opts = {}) {
   return execSync(cmd, { stdio: "pipe", encoding: "utf8", ...opts }).trim();
 }
