@@ -9,7 +9,6 @@ import { projects, type Project } from "@/data/projects";
 
 const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const SCROLL_LOCK_MS = 720;
 const TITLE = "Nicolas Sempere";
 const REPEL_RADIUS = 110;
 const REPEL_STRENGTH = 50;
@@ -129,21 +128,39 @@ export default function Hero({
     return () => clearTimeout(t);
   }, []);
 
-  // Wheel — discrete tick advances the carousel, then locks briefly so the
-  // dolly-in cut can finish without being interrupted.
+  // Wheel — one swap per gesture, regardless of how long the trackpad /
+  // wheel keeps firing momentum events. We mark a gesture as "in progress"
+  // on the first event and only release it after a quiet window
+  // (GESTURE_END_MS) of zero wheel activity. That way an aggressive
+  // trackpad fling can't queue up two cuts during the rack-focus
+  // transition.
   const featuredLen = FEATURED.length;
   useEffect(() => {
     if (isProject || featuredLen <= 1) return;
-    let locked = false;
+    const GESTURE_END_MS = 220;
+    let inGesture = false;
+    let endTimer: number | null = null;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      if (locked || Math.abs(e.deltaY) < 8) return;
-      locked = true;
-      setIndex((i) => (e.deltaY > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
-      setTimeout(() => { locked = false; }, SCROLL_LOCK_MS);
+      if (Math.abs(e.deltaY) < 8) return;
+      if (!inGesture) {
+        inGesture = true;
+        setIndex((i) =>
+          e.deltaY > 0
+            ? (i + 1) % featuredLen
+            : (i - 1 + featuredLen) % featuredLen,
+        );
+      }
+      if (endTimer) window.clearTimeout(endTimer);
+      endTimer = window.setTimeout(() => {
+        inGesture = false;
+      }, GESTURE_END_MS);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
-    return () => window.removeEventListener("wheel", onWheel);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      if (endTimer) window.clearTimeout(endTimer);
+    };
   }, [featuredLen, isProject]);
 
   // Keyboard navigation on the landing. Arrows cycle the carousel, Enter/Space
