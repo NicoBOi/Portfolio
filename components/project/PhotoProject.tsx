@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import { getImageDims } from "@/lib/image-dims";
-import ProjectNav from "./ProjectNav";
+import BackPill from "./BackPill";
 import Lightbox from "./Lightbox";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -242,10 +242,11 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
           >
             {project.year}
           </p>
+          <div className="mt-8 md:mt-10 flex justify-end">
+            <BackPill onNavigate={onNavigate} />
+          </div>
         </div>
       </div>
-
-      <ProjectNav prev={prev} next={next} onNavigate={onNavigate} />
 
       <Lightbox
         slug={project.slug}

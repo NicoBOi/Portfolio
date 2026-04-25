@@ -4,7 +4,7 @@ import Player from "@vimeo/player";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/projects";
-import ProjectNav from "./ProjectNav";
+import BackPill from "./BackPill";
 import VideoControls from "./VideoControls";
 import Link from "next/link";
 import Image from "next/image";
@@ -113,6 +113,9 @@ export default function VideoProject({ project, prev, next, mode = "page", onNav
           <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.location}</p>
           <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.credits}</p>
           <p className="label text-white mt-3" style={{ opacity: 0.6 }}>{project.year}</p>
+          <div className="mt-6 flex justify-end">
+            <BackPill onNavigate={onNavigate} />
+          </div>
         </div>
       </div>
 
@@ -144,7 +147,6 @@ export default function VideoProject({ project, prev, next, mode = "page", onNav
         </div>
       )}
 
-      <ProjectNav prev={prev} next={next} onNavigate={onNavigate} />
     </article>
   );
 }
@@ -162,16 +164,10 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   const [ready, setReady] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  // Brief black flash on loop boundaries — YT's `loop=1` quirk lets a frame
-  // of the end-screen / title overlay slip through before the video restarts.
-  // We detect state 0 (ended), seek-to-0 + playVideo immediately, and cover
-  // the swap with a 320ms mask so nothing of YT's chrome ever shows.
-  const [loopMask, setLoopMask] = useState(false);
   const iframeId = `yt-vp-${youtubeId}`;
 
   useEffect(() => {
     let player: YTPlayer | null = null;
-    let loopTimer: number | null = null;
 
     const createPlayer = () => {
       const yt = (window as unknown as YTWindow).YT!;
@@ -179,7 +175,6 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
         events: {
           onReady: () => {
             setReady(true);
-            // Force 1080p (or highest available >= hd1080). YT honors this as a preference.
             try {
               player?.setPlaybackQuality("hd1080");
             } catch {}
@@ -192,17 +187,6 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
               try {
                 player?.setPlaybackQuality("hd1080");
               } catch {}
-            }
-            // Manual loop — YT's built-in loop=1 still flashes its end UI for
-            // a frame; cover with a mask + force restart.
-            if (e.data === 0) {
-              setLoopMask(true);
-              try {
-                player?.seekTo(0, true);
-                player?.playVideo();
-              } catch {}
-              if (loopTimer) window.clearTimeout(loopTimer);
-              loopTimer = window.setTimeout(() => setLoopMask(false), 320);
             }
           },
           onPlaybackQualityChange: () => {
@@ -235,13 +219,11 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
     }
 
     return () => {
-      if (loopTimer) window.clearTimeout(loopTimer);
       player?.destroy();
       playerRef.current = null;
       setReady(false);
       setPlaying(false);
       setHasPlayed(false);
-      setLoopMask(false);
     };
   }, [iframeId]);
 
@@ -333,14 +315,6 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
             style={{ borderTopColor: "rgba(255,255,255,0.55)" }}
           />
         </div>
-      )}
-      {/* Loop boundary mask — covers the brief YT end-screen flash between
-          the last frame and the seek-to-0 restart. */}
-      {hasPlayed && loopMask && (
-        <div
-          className="absolute inset-0 z-20 bg-black pointer-events-none"
-          aria-hidden="true"
-        />
       )}
     </div>
   );
