@@ -71,11 +71,11 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="relative w-full h-full flex flex-col items-center justify-between px-5 md:px-10 py-20 md:py-24"
+        className="relative w-full h-full flex flex-col items-center justify-between py-20 md:py-24"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.header
-          className="w-full max-w-6xl text-center pointer-events-none"
+          className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
@@ -103,7 +103,7 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
         )}
 
         <motion.footer
-          className="w-full max-w-6xl flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-10 pointer-events-none"
+          className="w-full max-w-6xl flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-10 pointer-events-none px-5 md:px-10"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
@@ -148,10 +148,12 @@ function VideoMedia({ project }: { project: Project }) {
 
   return (
     <motion.div
-      className="relative bg-black overflow-hidden"
+      // Mobile: edge-to-edge (w-screen). Desktop: capped width via the
+      // --media-w variable so the letterbox keeps breathing room around it.
+      className="relative bg-black overflow-hidden w-screen md:w-[var(--media-w)]"
       style={{
         aspectRatio: aspectStr,
-        width: `min(76vw, calc(62vh * ${ratio}))`,
+        ["--media-w" as string]: `min(76vw, calc(62vh * ${ratio}))`,
         maxHeight: "62vh",
       }}
       initial={{ opacity: 0, scale: 0.96 }}
@@ -238,8 +240,9 @@ function PhotoCarousel({ project }: { project: Project }) {
   return (
     <>
       <motion.div
-        className="relative flex items-center justify-center"
-        style={{ width: "min(80vw, 1100px)", height: "62vh" }}
+        // Mobile: edge-to-edge (w-screen). Desktop: capped at 1100px.
+        className="relative flex items-center justify-center w-screen md:w-[min(80vw,1100px)]"
+        style={{ height: "62vh" }}
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.97 }}
@@ -276,30 +279,8 @@ function PhotoCarousel({ project }: { project: Project }) {
 
         {files.length > 1 && (
           <>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); prev(); }}
-              aria-label="Précédent"
-              data-cursor="Précédent"
-              className="absolute left-1 md:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full text-white"
-              style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M9 1L3 7L9 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); next(); }}
-              aria-label="Suivant"
-              data-cursor="Suivant"
-              className="absolute right-1 md:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full text-white"
-              style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M5 1L11 7L5 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+            <CarouselArrow side="prev" onClick={prev} />
+            <CarouselArrow side="next" onClick={next} />
 
             <span
               className="label text-white tabular-nums absolute -bottom-7 left-1/2 -translate-x-1/2"
@@ -319,5 +300,49 @@ function PhotoCarousel({ project }: { project: Project }) {
         onChange={setLightbox}
       />
     </>
+  );
+}
+
+// Editorial chevron — same vocabulary as the Navigation Retour: a hairline
+// rule that grows on hover, paired with a thin chevron stroke. No fill,
+// no pill button. Mobile sits flush to the edge; desktop floats outside
+// the carousel frame.
+function CarouselArrow({ side, onClick }: { side: "prev" | "next"; onClick: () => void }) {
+  const isPrev = side === "prev";
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      aria-label={isPrev ? "Précédent" : "Suivant"}
+      data-cursor={isPrev ? "Précédent" : "Suivant"}
+      className={`group absolute top-1/2 -translate-y-1/2 z-10 flex items-center gap-3 px-4 py-6 text-white transition-opacity duration-300 ${
+        isPrev
+          ? "left-3 md:-left-16 flex-row"
+          : "right-3 md:-right-16 flex-row-reverse"
+      }`}
+      style={{ opacity: 0.65 }}
+    >
+      <span
+        aria-hidden="true"
+        className="block h-px bg-white transition-all duration-500 group-hover:w-10"
+        style={{ width: 18, opacity: 0.85 }}
+      />
+      <svg
+        width="11"
+        height="14"
+        viewBox="0 0 11 14"
+        fill="none"
+        aria-hidden="true"
+        style={{ transform: isPrev ? "rotate(180deg)" : undefined }}
+      >
+        <path
+          d="M1 1L9 7L1 13"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
   );
 }
