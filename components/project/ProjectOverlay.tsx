@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import type { Project } from "@/data/projects";
 import { VimeoPlayer, YouTubePlayer, getVimeoId, getYoutubeId } from "./VideoPlayers";
 import Lightbox from "./Lightbox";
+import { getImageDims } from "@/lib/image-dims";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 // Snappy ease-in-out for the carousel slide. Quick wind-up so the swap
@@ -244,7 +245,7 @@ function VideoMedia({ project }: { project: Project }) {
 
   return (
     <motion.div
-      className="relative bg-black overflow-hidden rounded-2xl md:rounded-3xl w-screen md:w-[var(--media-w)]"
+      className="relative bg-black overflow-hidden md:rounded-[20px] w-screen md:w-[var(--media-w)] isolate"
       style={{
         aspectRatio: aspectStr,
         ["--media-w" as string]: `min(76vw, calc(58vh * ${ratio}))`,
@@ -287,17 +288,21 @@ function VideoMedia({ project }: { project: Project }) {
 // No wrap-around: arrows disabled at the ends, plain prev / next.
 // ─────────────────────────────────────────────────────────────
 function PhotoCarousel({ project }: { project: Project }) {
-  const files = project.imageFiles ?? [];
+  const files = useMemo(() => project.imageFiles ?? [], [project.imageFiles]);
   const [idx, setIdx] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerW, setContainerW] = useState(0);
+  const [container, setContainer] = useState({ w: 0, h: 0 });
 
   useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    setContainerW(el.clientWidth);
-    const ro = new ResizeObserver(([entry]) => setContainerW(entry.contentRect.width));
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      setContainer({ w: r.width, h: r.height });
+    };
+    update();
+    const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -374,6 +379,18 @@ function PhotoCarousel({ project }: { project: Project }) {
     startX.current = null;
   };
 
+  // Each slide matches the photo's natural aspect ratio (no letterboxing).
+  // That way the visible image fills the whole slide and the rounded corners
+  // (desktop only) actually show on the photo's edges instead of on a black
+  // bg that's invisible against the page.
+  const aspects = useMemo(
+    () => files.map((f) => {
+      const d = getImageDims(project.slug, f);
+      return d.width / d.height;
+    }),
+    [files, project.slug],
+  );
+
   if (files.length === 0) {
     return (
       <div
@@ -386,17 +403,30 @@ function PhotoCarousel({ project }: { project: Project }) {
     );
   }
 
-  // Slide takes ~70% of the viewport on mobile, ~50% on desktop. The big
-  // peeks (~15% mobile, ~25% desktop per side) plus the mask-image fade
-  // below make neighbours visibly run off the edges of the screen — the
-  // eye reads "more photos this way" without thinking about it.
-  const isDesktop = containerW >= 768;
-  const slideRatio = isDesktop ? 0.5 : 0.7;
-  const gapRatio = isDesktop ? 0.04 : 0.05;
-  const slideW = containerW * slideRatio;
-  const gap = containerW * gapRatio;
-  const offset = (containerW - slideW) / 2;
-  const x = offset - idx * (slideW + gap);
+  const isDesktop = container.w >= 768;
+  const slideH = container.h;
+  // Cap slide width so a wide pano doesn't overflow the visible carousel —
+  // the photo just sits a touch shorter than its neighbours when that hits.
+  const maxSlideW = container.w * (isDesktop ? 0.62 : 0.78);
+  const slideDims = aspects.map((a) => {
+    let w = slideH * a;
+    let h = slideH;
+    if (w > maxSlideW) {
+      w = maxSlideW;
+      h = w / a;
+    }
+    return { w, h };
+  });
+  const gap = container.w * 0.05;
+  // Cumulative left positions of each slide on the track.
+  const positions: number[] = [];
+  let runningX = 0;
+  for (let i = 0; i < slideDims.length; i++) {
+    positions.push(runningX);
+    runningX += slideDims[i].w + gap;
+  }
+  const activeCenter = (positions[idx] ?? 0) + (slideDims[idx]?.w ?? 0) / 2;
+  const x = container.w / 2 - activeCenter;
 
   return (
     <>
@@ -428,21 +458,21 @@ function PhotoCarousel({ project }: { project: Project }) {
         >
           {files.map((f, i) => {
             const isCurrent = i === idx;
+            const dim = slideDims[i] ?? { w: 1, h: 1 };
             return (
               <button
                 key={f}
                 type="button"
                 onClick={() => (isCurrent ? setLightbox(i) : goTo(i))}
-                className="shrink-0 h-full relative block overflow-hidden rounded-2xl md:rounded-3xl"
-                style={{ width: slideW || 1 }}
+                className="shrink-0 relative block overflow-hidden md:rounded-[20px] isolate"
+                style={{ width: dim.w || 1, height: dim.h || 1 }}
                 data-cursor={isCurrent ? "Agrandir" : i < idx ? "Précédent" : "Suivant"}
                 aria-label={isCurrent ? `Agrandir la photo ${i + 1}` : `Photo ${i + 1}`}
                 aria-current={isCurrent ? "true" : undefined}
                 tabIndex={isCurrent ? 0 : -1}
               >
-                {/* Editorial dash sits in the gap before each slide except
-                    the first — same vocabulary as the hero filter "—"
-                    separators. */}
+                {/* Editorial dash in the gap before each slide except the
+                    first — same vocabulary as the hero filter "—" rule. */}
                 {i > 0 && (
                   <span
                     aria-hidden="true"
@@ -463,8 +493,8 @@ function PhotoCarousel({ project }: { project: Project }) {
                   alt=""
                   fill
                   priority={i === 0}
-                  sizes="(min-width: 768px) 50vw, 70vw"
-                  className="object-contain transition-opacity duration-500"
+                  sizes="(min-width: 768px) 60vw, 80vw"
+                  className="object-cover transition-opacity duration-500"
                   style={{ opacity: isCurrent ? 1 : 0.55 }}
                 />
               </button>
