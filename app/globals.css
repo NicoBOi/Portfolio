@@ -66,6 +66,24 @@ html.project-active body {
   overscroll-behavior: none;
 }
 
+/* Fullscreen backdrop — when an iframe (Vimeo, YouTube) goes fullscreen
+   the browser paints a default-white area behind any letterbox the
+   player needs. Make sure that backdrop is black so the cinema bars
+   never break the dark frame. */
+::backdrop {
+  background: #000;
+}
+:fullscreen,
+:-webkit-full-screen {
+  background: #000;
+}
+iframe:fullscreen,
+iframe:-webkit-full-screen,
+video:fullscreen,
+video:-webkit-full-screen {
+  background: #000;
+}
+
 /* View Transitions (Chromium, Safari TP). Let the browser crossfade the
    root on project open/close for a smoother in-page pivot. Framer still
    drives the Hero morphs; this just softens the overall reflow. */
