@@ -84,8 +84,11 @@ function Overlay({
     !!project.videoFile;
 
   return (
+    // No key on the overlay shell — switching projects in-place must NOT
+    // remount this div, otherwise React tears down the black backdrop for a
+    // frame between unmount and mount and the landing flashes through. The
+    // AnimatePresence at the portal level still drives open/close.
     <motion.div
-      key={project.slug}
       className="fixed inset-0 z-[150] bg-black"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -127,7 +130,14 @@ function Overlay({
           </h1>
         </motion.header>
 
-        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-7 md:gap-9">
+        {/* Key on the media wrapper resets the carousel idx + measurements
+            (and forces video iframes to reload) when switching projects.
+            The outer overlay shell stays mounted so the backdrop never
+            blinks off. */}
+        <div
+          key={project.slug}
+          className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-7 md:gap-9"
+        >
           {isVideo ? (
             <VideoMedia project={project} />
           ) : (
