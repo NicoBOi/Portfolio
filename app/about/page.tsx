@@ -43,20 +43,6 @@ export default function AboutPage() {
       </div>
       <div className="hero-grain z-[1]" aria-hidden="true" />
 
-      {/* Right-edge vertical kicker — same vocabulary as the landing's 01-08
-          column: small mono labels stacked vertically. Discipline list. */}
-      <div className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 flex-col items-end pointer-events-none">
-        {["Photo", "Film", "3D"].map((d) => (
-          <span
-            key={d}
-            className="label text-white px-4 py-2"
-            style={{ opacity: 0.45, letterSpacing: "0.36em" }}
-          >
-            {d}
-          </span>
-        ))}
-      </div>
-
       {/* Foreground — centered axis. */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 md:px-10 text-center gap-8">
         <p
@@ -106,9 +92,8 @@ export default function AboutPage() {
         </p>
       </div>
 
-      {/* Bottom row — same pattern as the landing: small kicker on the left,
-          pill CTA on the right. */}
-      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 flex items-center justify-between gap-6">
+      {/* Bottom row — name kicker (left), disciplines list (center), pill CTA (right). */}
+      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 grid grid-cols-3 items-center gap-4">
         <span
           className="label text-white"
           style={{ opacity: 0.45, letterSpacing: "0.32em", fontSize: "11px" }}
@@ -116,9 +101,23 @@ export default function AboutPage() {
           Nicolas Sempere · 2024
         </span>
 
+        <span
+          className="label text-white inline-flex items-center justify-center gap-3 flex-wrap"
+          style={{ opacity: 0.6, letterSpacing: "0.36em", fontSize: "11px" }}
+        >
+          {["Photo", "Film", "3D"].map((d, i) => (
+            <span key={d} className="inline-flex items-center gap-3">
+              {i > 0 && (
+                <span aria-hidden="true" style={{ opacity: 0.4 }}>·</span>
+              )}
+              {d}
+            </span>
+          ))}
+        </span>
+
         <Link
           href="/contact"
-          className="inline-flex items-center rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3 transition-colors duration-300 hover:bg-white/90"
+          className="inline-flex items-center rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3 transition-colors duration-300 hover:bg-white/90 justify-self-end"
         >
           <span
             className="title italic block leading-none"

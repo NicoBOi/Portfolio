@@ -29,25 +29,6 @@ export default function ContactPage() {
       {/* Same chrome stack as the landing — black field with the animated grain. */}
       <div className="hero-grain z-[1]" aria-hidden="true" />
 
-      {/* Right-edge vertical kicker — channels list, mirrors the landing index. */}
-      <div className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 flex-col items-end pointer-events-auto">
-        {[
-          { label: "Email", href: "mailto:nicosmp.pro@gmail.com" },
-          { label: "Instagram", href: "https://instagram.com/nicolas_Sempere" },
-        ].map((c) => (
-          <a
-            key={c.label}
-            href={c.href}
-            target={c.href.startsWith("http") ? "_blank" : undefined}
-            rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="label text-white px-4 py-2 transition-opacity duration-300 hover:opacity-100"
-            style={{ opacity: 0.45, letterSpacing: "0.36em" }}
-          >
-            {c.label}
-          </a>
-        ))}
-      </div>
-
       {/* Foreground — centered axis: status, title, italic intro, compact form. */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 md:px-10 py-10 md:py-14 text-center gap-6 md:gap-7 overflow-y-auto">
         <LiveStatus />
@@ -75,17 +56,38 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Bottom row — email + handle in plain mono so the chrome echoes the landing. */}
-      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 flex items-center justify-between gap-6">
-        <a
-          href="mailto:nicosmp.pro@gmail.com"
-          className="label text-white hover:opacity-100 transition-opacity duration-300"
-          style={{ opacity: 0.55, letterSpacing: "0.32em", fontSize: "11px" }}
-        >
-          nicosmp.pro@gmail.com
-        </a>
+      {/* Bottom row — name kicker (left), channels (center), location (right). */}
+      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 grid grid-cols-3 items-center gap-4">
         <span
           className="label text-white"
+          style={{ opacity: 0.45, letterSpacing: "0.32em", fontSize: "11px" }}
+        >
+          Nicolas Sempere · 2024
+        </span>
+
+        <span
+          className="label text-white inline-flex items-center justify-center gap-3 flex-wrap pointer-events-auto"
+          style={{ opacity: 0.6, letterSpacing: "0.36em", fontSize: "11px" }}
+        >
+          <a
+            href="mailto:nicosmp.pro@gmail.com"
+            className="hover:opacity-100 transition-opacity duration-300"
+          >
+            Email
+          </a>
+          <span aria-hidden="true" style={{ opacity: 0.4 }}>·</span>
+          <a
+            href="https://instagram.com/nicolas_Sempere"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-100 transition-opacity duration-300"
+          >
+            Instagram
+          </a>
+        </span>
+
+        <span
+          className="label text-white justify-self-end"
           style={{ opacity: 0.4, letterSpacing: "0.32em", fontSize: "11px" }}
         >
           Bordeaux · 2024
