@@ -229,19 +229,26 @@ function PhotoCarousel({ project }: { project: Project }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, files.length, lightbox]);
 
-  // Wheel / trackpad scroll → one photo per gesture. A trackpad fling fires
-  // events for a second+ with brief inertia pauses; we treat a 220ms quiet
-  // window as the gesture's end, and enforce a hard 600ms cooldown after
-  // each swap so a single fling can never traverse multiple photos even
-  // when its inertia momentarily dips below the 220ms threshold.
+  // Wheel / trackpad scroll → one photo per gesture. We mount the listener
+  // ONCE and keep all timing state in refs / module-scope locals so a swap
+  // never resets the cooldown. (Previous bug: idx was a dep, so each swap
+  // re-bound the listener with lastSwap=0 and the rest of the fling's wheel
+  // events instantly traversed the whole gallery.)
+  const idxRef = useRef(idx);
+  const filesLenRef = useRef(files.length);
+  const lightboxRef = useRef(lightbox);
+  useEffect(() => { idxRef.current = idx; }, [idx]);
+  useEffect(() => { filesLenRef.current = files.length; }, [files.length]);
+  useEffect(() => { lightboxRef.current = lightbox; }, [lightbox]);
+
   useEffect(() => {
-    if (lightbox !== null) return;
     const GESTURE_END_MS = 220;
     const SWAP_COOLDOWN_MS = 600;
     let lastWheel = 0;
     let lastSwap = 0;
     let inGesture = false;
     const onWheel = (e: WheelEvent) => {
+      if (lightboxRef.current !== null) return;
       const delta =
         Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (Math.abs(delta) < 8) return;
@@ -252,14 +259,15 @@ function PhotoCarousel({ project }: { project: Project }) {
       if (!inGesture && now - lastSwap >= SWAP_COOLDOWN_MS) {
         inGesture = true;
         lastSwap = now;
-        if (delta > 0 && canNext) next();
-        else if (delta < 0 && canPrev) prev();
+        const i = idxRef.current;
+        const len = filesLenRef.current;
+        if (delta > 0 && i < len - 1) setIdx(i + 1);
+        else if (delta < 0 && i > 0) setIdx(i - 1);
       }
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, files.length, lightbox, canPrev, canNext]);
+  }, []);
 
   const startX = useRef<number | null>(null);
   const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; };
