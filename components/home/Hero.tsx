@@ -128,39 +128,39 @@ export default function Hero({
     return () => clearTimeout(t);
   }, []);
 
-  // Wheel — one swap per gesture, regardless of how long the trackpad /
-  // wheel keeps firing momentum events. We mark a gesture as "in progress"
-  // on the first event and only release it after a quiet window
-  // (GESTURE_END_MS) of zero wheel activity. That way an aggressive
-  // trackpad fling can't queue up two cuts during the rack-focus
-  // transition.
+  // Wheel — one swap per intentional gesture. A gesture is closed as soon
+  // as 100ms passes between two wheel events (Mac trackpad inertia fires
+  // every 16-50ms while flinging, so the 100ms gate cleanly catches the
+  // end). A separate 200ms minimum between swaps protects against pure
+  // spam without making the chain feel locked. Between two deliberate
+  // scroll gestures with normal human pacing (>200ms apart) the user
+  // gets one swap each, immediately.
   const featuredLen = FEATURED.length;
   useEffect(() => {
     if (isProject || featuredLen <= 1) return;
-    const GESTURE_END_MS = 220;
+    const GESTURE_END_MS = 100;
+    const MIN_SWAP_GAP_MS = 200;
+    let lastWheel = 0;
+    let lastSwap = 0;
     let inGesture = false;
-    let endTimer: number | null = null;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (Math.abs(e.deltaY) < 8) return;
-      if (!inGesture) {
+      const now = performance.now();
+      if (now - lastWheel > GESTURE_END_MS) inGesture = false;
+      lastWheel = now;
+      if (!inGesture && now - lastSwap >= MIN_SWAP_GAP_MS) {
         inGesture = true;
+        lastSwap = now;
         setIndex((i) =>
           e.deltaY > 0
             ? (i + 1) % featuredLen
             : (i - 1 + featuredLen) % featuredLen,
         );
       }
-      if (endTimer) window.clearTimeout(endTimer);
-      endTimer = window.setTimeout(() => {
-        inGesture = false;
-      }, GESTURE_END_MS);
     };
     window.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      if (endTimer) window.clearTimeout(endTimer);
-    };
+    return () => window.removeEventListener("wheel", onWheel);
   }, [featuredLen, isProject]);
 
   // Keyboard navigation on the landing. Arrows cycle the carousel, Enter/Space
