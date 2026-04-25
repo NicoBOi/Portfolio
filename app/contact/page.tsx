@@ -40,10 +40,11 @@ function Field({
 }) {
   const value = (
     <span
-      className="title text-white"
+      className="text-white font-light"
       style={{
-        fontSize: "clamp(1.05rem, 1.9vw, 1.45rem)",
-        opacity: 0.9,
+        fontSize: "clamp(0.95rem, 1.8vw, 1.35rem)",
+        opacity: 0.85,
+        letterSpacing: "0.02em",
       }}
     >
       {children}
@@ -106,31 +107,14 @@ export default function ContactPage() {
       {/* Two columns: numbered fiche on the left, italic pull-quote +
           form on the right. */}
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 px-6 md:px-10 pt-14 pb-24 gap-16 md:gap-24">
-        <div className="flex flex-col gap-12">
-          {/* Lead — Cormorant, larger. Manifeste. */}
-          <div className="flex flex-col gap-3 max-w-md">
-            <p
-              className="title text-white"
-              style={{
-                fontSize: "clamp(1.3rem, 2.2vw, 1.8rem)",
-                lineHeight: 1.35,
-                opacity: 0.95,
-              }}
-            >
-              Parlez-moi du projet.
-            </p>
+        <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-2 max-w-md">
             <p
               className="text-white font-light"
-              style={{
-                fontFamily: "var(--font-fragment), monospace",
-                fontSize: "0.8rem",
-                lineHeight: 1.85,
-                opacity: 0.6,
-                letterSpacing: "0.02em",
-              }}
+              style={{ fontSize: "0.95rem", opacity: 0.85, lineHeight: 1.9 }}
             >
-              Insta, mail, ou le formulaire — comme vous préférez. Je
-              réponds dans les 24 heures.
+              Parlez-moi du projet. Insta, mail, ou le formulaire — comme
+              vous préférez. Je réponds dans les 24 heures.
             </p>
           </div>
 
