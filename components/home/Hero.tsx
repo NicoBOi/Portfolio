@@ -782,16 +782,17 @@ function HeroVimeo({ vimeoId, ratio }: { vimeoId: string; ratio: number }) {
     };
   }, [vimeoId]);
 
-  const ratioStyle = { "--video-ratio": ratio } as React.CSSProperties;
+  const ratioStyle = { "--video-ratio": ratio, backgroundColor: "#000" } as React.CSSProperties;
 
   return (
     <>
       <iframe
         ref={iframeRef}
-        src={`https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p`}
+        src={`https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&muted=1&dnt=1&quality=1080p&transparent=0`}
         className="hero-video"
         style={ratioStyle}
-        allow="autoplay"
+        allow="autoplay; fullscreen"
+        allowFullScreen
       />
       <motion.div
         className="absolute inset-0 bg-black pointer-events-none z-10"
@@ -811,8 +812,9 @@ function HeroYouTube({ youtubeId }: { youtubeId: string }) {
       <iframe
         src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&vq=hd1080&playsinline=1&playlist=${youtubeId}`}
         className="hero-video"
-        style={{ "--video-ratio": 16 / 9 } as React.CSSProperties}
-        allow="autoplay; encrypted-media"
+        style={{ "--video-ratio": 16 / 9, backgroundColor: "#000" } as React.CSSProperties}
+        allow="autoplay; encrypted-media; fullscreen"
+        allowFullScreen
       />
       <motion.div
         className="absolute inset-0 bg-black pointer-events-none z-10"

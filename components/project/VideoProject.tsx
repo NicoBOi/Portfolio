@@ -268,7 +268,7 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0"
+      className="absolute inset-0 bg-black"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
     >
@@ -400,13 +400,14 @@ function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
   };
 
   // background=1 hides every native Vimeo control / overlay (works on free accounts).
-  // We drive playback through the Player SDK instead. quality=1080p requests HD.
-  const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1&quality=1080p`;
+  // We drive playback through the Player SDK instead. transparent=0 forces a
+  // black player background so fullscreen letterbox bars don't flash white.
+  const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1&quality=1080p&transparent=0`;
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0"
+      className="absolute inset-0 bg-black"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
     >
