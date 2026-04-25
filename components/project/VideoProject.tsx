@@ -103,18 +103,22 @@ export default function VideoProject({ project, prev, next, mode = "page", onNav
         )}
       </div>
 
-      {/* Info + meta */}
-      <div className="px-6 md:px-10 py-8 border-b border-white/10 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <h1 className="text-white title" style={{ fontSize: "clamp(1.8rem, 3.5vw, 3.5rem)", lineHeight: 1 }}>
-          {project.title}
-        </h1>
-        <div className="flex flex-col gap-2 self-center">
-          <p className="label text-white" style={{ opacity: 0.95 }}>{project.meta.type}</p>
-          <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.location}</p>
-          <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.credits}</p>
-          <p className="label text-white mt-3" style={{ opacity: 0.6 }}>{project.year}</p>
-          <div className="mt-6 flex justify-end">
-            <BackPill onNavigate={onNavigate} />
+      {/* Info + meta — title and Retour pill on the same baseline, meta
+          column tucked underneath. */}
+      <div className="px-6 md:px-10 py-8 border-b border-white/10">
+        <div className="flex items-baseline justify-between gap-6 flex-wrap md:flex-nowrap">
+          <h1 className="text-white title" style={{ fontSize: "clamp(1.8rem, 3.5vw, 3.5rem)", lineHeight: 1 }}>
+            {project.title}
+          </h1>
+          <BackPill onNavigate={onNavigate} />
+        </div>
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="hidden md:block" />
+          <div className="flex flex-col gap-2">
+            <p className="label text-white" style={{ opacity: 0.95 }}>{project.meta.type}</p>
+            <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.location}</p>
+            <p className="label text-white" style={{ opacity: 0.75 }}>{project.meta.credits}</p>
+            <p className="label text-white mt-3" style={{ opacity: 0.6 }}>{project.year}</p>
           </div>
         </div>
       </div>

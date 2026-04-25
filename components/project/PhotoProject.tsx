@@ -206,44 +206,47 @@ export default function PhotoProject({ project, prev, next, mode = "page", onNav
         </div>
       </div>
 
-      {/* Metadata — shared between mobile + desktop. Mobile gets extra breathing
-          room between the lines + a stronger hairline/gap so the editorial
-          info reads like a caption, not a dense block. */}
-      <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 md:py-24 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
-        <h1
-          className="text-white title"
-          style={{ fontSize: "clamp(2.5rem, 8vw, 4.5rem)", lineHeight: 1.02 }}
-        >
-          {project.title}
-        </h1>
-        <div className="flex flex-col gap-4 md:gap-2 md:justify-end">
-          <span aria-hidden="true" className="block md:hidden h-px w-10 bg-white/25 mb-2" />
-          <p
-            className="label text-white"
-            style={{ opacity: 0.95, lineHeight: 1.7 }}
+      {/* Metadata — title row paired with the Retour pill on the same baseline,
+          meta column underneath. The pill becomes the conversational right-end
+          of the title instead of a stranded block at the bottom. */}
+      <div className="px-6 md:px-10 lg:px-16 pt-10 pb-14 md:py-24 max-w-6xl mx-auto">
+        <div className="flex items-baseline justify-between gap-6 flex-wrap md:flex-nowrap">
+          <h1
+            className="text-white title"
+            style={{ fontSize: "clamp(2.5rem, 8vw, 4.5rem)", lineHeight: 1.02 }}
           >
-            {project.meta.type}
-          </p>
-          <p
-            className="label text-white"
-            style={{ opacity: 0.75, lineHeight: 1.7 }}
-          >
-            {project.meta.location}
-          </p>
-          <p
-            className="label text-white"
-            style={{ opacity: 0.75, lineHeight: 1.7 }}
-          >
-            {project.meta.credits}
-          </p>
-          <p
-            className="label text-white mt-6 md:mt-4"
-            style={{ opacity: 0.55, lineHeight: 1.7 }}
-          >
-            {project.year}
-          </p>
-          <div className="mt-8 md:mt-10 flex justify-end">
-            <BackPill onNavigate={onNavigate} />
+            {project.title}
+          </h1>
+          <BackPill onNavigate={onNavigate} />
+        </div>
+        <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+          <div className="hidden md:block" />
+          <div className="flex flex-col gap-4 md:gap-2">
+            <span aria-hidden="true" className="block md:hidden h-px w-10 bg-white/25 mb-2" />
+            <p
+              className="label text-white"
+              style={{ opacity: 0.95, lineHeight: 1.7 }}
+            >
+              {project.meta.type}
+            </p>
+            <p
+              className="label text-white"
+              style={{ opacity: 0.75, lineHeight: 1.7 }}
+            >
+              {project.meta.location}
+            </p>
+            <p
+              className="label text-white"
+              style={{ opacity: 0.75, lineHeight: 1.7 }}
+            >
+              {project.meta.credits}
+            </p>
+            <p
+              className="label text-white mt-6 md:mt-4"
+              style={{ opacity: 0.55, lineHeight: 1.7 }}
+            >
+              {project.year}
+            </p>
           </div>
         </div>
       </div>
