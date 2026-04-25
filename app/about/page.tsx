@@ -34,167 +34,156 @@ const CLIENTS = [
   "Made in Paris",
 ];
 
-const INFLUENCES = [
-  { name: "Lars von Trier", note: "Tension" },
-  { name: "Ash Thorp", note: "Rigueur du motion" },
-  { name: "Zdzisław Beksiński", note: "Élégance sombre" },
-];
+const INFLUENCES = ["Lars von Trier", "Ash Thorp", "Zdzisław Beksiński"];
 
-// Decorative oversized section index — Cormorant italic, very low opacity,
-// sits like a pulled-back chapter opener on a printed page. Purely visual,
-// aria-hidden so screen readers skip it.
-function PlateIndex({ value }: { value: string }) {
+// Section index — small mono prefix, same vocabulary as the landing's
+// 01-08 column. Keeps every block of the page editorially numbered.
+function SectionLabel({ index, children }: { index: string; children: React.ReactNode }) {
   return (
-    <span
-      aria-hidden="true"
-      className="title italic text-white tabular-nums select-none pointer-events-none"
-      style={{
-        fontSize: "clamp(5rem, 10vw, 10rem)",
-        lineHeight: 0.85,
-        opacity: 0.07,
-        letterSpacing: "-0.02em",
-      }}
-    >
-      {value}
-    </span>
+    <div className="flex items-baseline gap-4">
+      <span
+        className="label text-white tabular-nums"
+        style={{ opacity: 0.4, letterSpacing: "0.32em" }}
+      >
+        {index}
+      </span>
+      <span
+        aria-hidden="true"
+        className="block h-px bg-white"
+        style={{ width: 22, opacity: 0.25 }}
+      />
+      <span
+        className="label text-white"
+        style={{ opacity: 0.55, letterSpacing: "0.32em" }}
+      >
+        {children}
+      </span>
+    </div>
   );
 }
 
 export default function AboutPage() {
   return (
     <div className="bg-black min-h-screen">
-      {/* Header — title only. No section label, no border noise. */}
-      <header className="px-6 md:px-10 pt-32 md:pt-32 pb-24 md:pb-32">
-        <p
-          className="label text-white mb-8"
-          style={{ opacity: 0.4, letterSpacing: "0.4em", fontSize: "11px" }}
-        >
-          Nicolas Sempere — Bordeaux
-        </p>
+      {/* Header */}
+      <div className="px-6 md:px-10 pt-32 md:pt-28 pb-12 border-b border-white/10">
         <h1
           className="text-white title"
-          style={{
-            fontSize: "clamp(3.5rem, 12vw, 11rem)",
-            lineHeight: 0.95,
-            letterSpacing: "-0.01em",
-          }}
+          style={{ fontSize: "clamp(3rem, 7vw, 8rem)", lineHeight: 1 }}
         >
           À propos
         </h1>
-      </header>
+      </div>
 
-      {/* Portrait + manifeste — asymmetric grid with hanging plate. */}
-      <section className="relative px-6 md:px-10 pb-24 md:pb-40">
-        <div className="absolute -top-12 right-6 md:right-10 pointer-events-none">
-          <PlateIndex value="01" />
-        </div>
+      {/* 01 — Bio */}
+      <section className="px-6 md:px-10 pt-14 pb-16 md:pb-20">
+        <SectionLabel index="01">Biographie</SectionLabel>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
-          <div className="md:col-span-5 md:col-start-1">
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
+          <div className="md:col-span-4">
             <div
               className="relative w-full overflow-hidden"
-              style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 460 }}
+              style={{ aspectRatio: "4/5", backgroundColor: "#1A1A1A", maxWidth: 400 }}
             >
               <Image
                 src="/about/portrait.avif"
                 alt="Nicolas Sempere"
                 fill
                 priority
-                sizes="(min-width: 768px) 460px, 100vw"
+                sizes="(min-width: 768px) 400px, 100vw"
                 className="object-cover"
               />
             </div>
-            <p className="label text-white mt-4" style={{ opacity: 0.35, letterSpacing: "0.32em", fontSize: "11px" }}>
-              Portrait — 2024
+            <p className="label text-white mt-3" style={{ opacity: 0.2 }}>
+              Bordeaux — Paris
             </p>
           </div>
 
-          <div className="md:col-span-6 md:col-start-7 flex flex-col justify-end gap-8 max-w-xl">
+          <div className="md:col-span-8 flex flex-col gap-5 max-w-xl">
             <p
-              className="text-white font-light"
-              style={{
-                fontSize: "clamp(1rem, 1.4vw, 1.15rem)",
-                opacity: 0.9,
-                lineHeight: 1.85,
-              }}
+              className="text-white font-light leading-relaxed"
+              style={{ fontSize: "0.95rem", opacity: 0.9, lineHeight: 1.9 }}
             >
               Photographe et réalisateur à Bordeaux, 28 ans. Je crée
               des images pour les marques et les projets qui refusent
               de ressembler aux autres — campagnes, éditoriaux, films,
               quand l&apos;image doit dire quelque chose de précis.
+            </p>
+            <p
+              className="text-white font-light leading-relaxed"
+              style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
+            >
               Photographe depuis mes 15 ans, réalisateur depuis 23.
+              Autodidacte pendant longtemps, puis diplômé de MJM
+              Graphic Design en webdesign et motion.
+            </p>
+            <p
+              className="text-white font-light leading-relaxed"
+              style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
+            >
+              Seul ou avec une équipe, selon le projet. Trois
+              références reviennent toujours : Lars von Trier pour
+              la tension, Ash Thorp pour la rigueur du motion,
+              Beksiński pour l&apos;élégance sombre.
             </p>
 
             <Link
               href="/contact"
-              className="inline-flex items-center gap-4 group max-w-fit"
-              style={{ opacity: 0.85 }}
+              className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-4"
+              style={{ opacity: 0.85, letterSpacing: "0.34em" }}
             >
-              <span
-                aria-hidden="true"
-                className="block h-px bg-white transition-all duration-500 group-hover:w-16"
-                style={{ width: 32, opacity: 0.6 }}
-              />
-              <span
-                className="label text-white group-hover:opacity-100 transition-opacity duration-300"
-                style={{ letterSpacing: "0.36em" }}
-              >
-                Écrivez-moi
-              </span>
+              Écrivez-moi
+              <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Pull-quote — full-bleed, large italic Cormorant. The keystone. */}
-      <section className="px-6 md:px-10 py-24 md:py-32">
+      {/* Editorial pull-quote — italic Cormorant, full-bleed band */}
+      <section className="px-6 md:px-10 py-20 md:py-28 border-y border-white/10">
         <blockquote className="max-w-5xl mx-auto text-center">
           <p
             className="title italic text-white"
             style={{
-              fontSize: "clamp(2rem, 6vw, 4.5rem)",
-              lineHeight: 1.1,
+              fontSize: "clamp(1.6rem, 4.5vw, 3.4rem)",
+              lineHeight: 1.18,
               opacity: 0.95,
-              letterSpacing: "-0.005em",
             }}
           >
-            Refuser de ressembler aux autres.
+            « Refuser de ressembler aux autres. »
           </p>
         </blockquote>
       </section>
 
-      {/* Clients — full-bleed marquee, no chrome. */}
-      <section className="relative pt-24 md:pt-32 pb-12 md:pb-16">
-        <div className="absolute -top-8 left-6 md:left-10 pointer-events-none">
-          <PlateIndex value="02" />
+      {/* 02 — Clients (full-width marquee) */}
+      <section className="pt-14 pb-10 md:pb-14">
+        <div className="px-6 md:px-10 mb-8">
+          <SectionLabel index="02">Clients</SectionLabel>
         </div>
-        <p
-          className="label text-white px-6 md:px-10 mb-10"
-          style={{ opacity: 0.45, letterSpacing: "0.4em", fontSize: "11px" }}
-        >
-          Clients
-        </p>
         <div
           className="marquee-host relative overflow-hidden"
           aria-label="Clients"
           role="list"
         >
+          {/* Edge fade so names don't pop in/out abruptly. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 w-20 z-10"
+            className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10"
             style={{
-              background: "linear-gradient(to right, #000 0%, rgba(0,0,0,0) 100%)",
+              background:
+                "linear-gradient(to right, #000 0%, rgba(0,0,0,0) 100%)",
             }}
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 w-20 z-10"
+            className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10"
             style={{
-              background: "linear-gradient(to left, #000 0%, rgba(0,0,0,0) 100%)",
+              background:
+                "linear-gradient(to left, #000 0%, rgba(0,0,0,0) 100%)",
             }}
           />
           <div
-            className="marquee-track flex items-center gap-16 md:gap-24 whitespace-nowrap"
+            className="marquee-track flex items-center gap-12 md:gap-20 whitespace-nowrap"
             style={{ width: "max-content" }}
           >
             {[...CLIENTS, ...CLIENTS].map((c, i) => (
@@ -202,48 +191,42 @@ export default function AboutPage() {
                 key={`${c}-${i}`}
                 role={i < CLIENTS.length ? "listitem" : undefined}
                 aria-hidden={i >= CLIENTS.length}
-                className="title italic text-white"
+                className="title text-white"
                 style={{
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.8rem)",
-                  opacity: 0.7,
+                  fontSize: "clamp(1.4rem, 3vw, 2.4rem)",
+                  opacity: 0.65,
+                  letterSpacing: "0.01em",
                 }}
               >
                 {c}
+                <span
+                  aria-hidden="true"
+                  className="inline-block ml-12 md:ml-20 align-middle h-px bg-white"
+                  style={{ width: 28, opacity: 0.3 }}
+                />
               </span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Influences — annotated list, two columns: name + the note that reads
-          almost as a marginalia. Each line a single editorial phrase. */}
-      <section className="relative px-6 md:px-10 pt-24 md:pt-32 pb-32 md:pb-40">
-        <div className="absolute -top-8 right-6 md:right-10 pointer-events-none">
-          <PlateIndex value="03" />
-        </div>
-        <p
-          className="label text-white mb-10"
-          style={{ opacity: 0.45, letterSpacing: "0.4em", fontSize: "11px" }}
-        >
-          Influences
-        </p>
-        <ul className="flex flex-col divide-y divide-white/10 max-w-3xl">
-          {INFLUENCES.map((inf) => (
-            <li
-              key={inf.name}
-              className="grid grid-cols-12 items-baseline py-6 gap-6"
-            >
+      {/* 03 — Influences */}
+      <section className="px-6 md:px-10 pt-10 pb-24 md:pb-32">
+        <SectionLabel index="03">Influences</SectionLabel>
+        <ul className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-10 max-w-4xl">
+          {INFLUENCES.map((i, idx) => (
+            <li key={i} className="flex items-baseline gap-4">
               <span
-                className="col-span-7 title text-white"
-                style={{ fontSize: "clamp(1.2rem, 2vw, 1.7rem)", opacity: 0.95 }}
+                className="label text-white tabular-nums"
+                style={{ opacity: 0.3, letterSpacing: "0.28em", fontSize: "10px" }}
               >
-                {inf.name}
+                {String(idx + 1).padStart(2, "0")}
               </span>
               <span
-                className="col-span-5 label text-white text-right"
-                style={{ opacity: 0.55, letterSpacing: "0.32em", fontSize: "11px" }}
+                className="text-white font-light"
+                style={{ fontSize: "1rem", opacity: 0.85, letterSpacing: "0.01em" }}
               >
-                {inf.note}
+                {i}
               </span>
             </li>
           ))}
