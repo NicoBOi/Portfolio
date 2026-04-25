@@ -253,13 +253,12 @@ function PhotoCarousel({ project }: { project: Project }) {
     );
   }
 
-  // Slide takes ~85% of the container width on mobile (15% peek), ~78% on
-  // desktop (22% peek = 11% on each side). The remaining 4% of the gap is
-  // empty space between adjacent slides so the peeks don't merge into one
-  // continuous strip.
+  // Slide takes ~72% of the container on mobile (≈12% peek per side), ~58%
+  // on desktop (≈18% peek per side). Generous peeks so the neighbours read
+  // as part of the same set and pull the eye toward the next photo.
   const isDesktop = containerW >= 768;
-  const slideRatio = isDesktop ? 0.78 : 0.86;
-  const gapRatio = 0.03;
+  const slideRatio = isDesktop ? 0.58 : 0.72;
+  const gapRatio = 0.025;
   const slideW = containerW * slideRatio;
   const gap = containerW * gapRatio;
   const offset = (containerW - slideW) / 2;
@@ -303,9 +302,9 @@ function PhotoCarousel({ project }: { project: Project }) {
                   alt=""
                   fill
                   priority={i === 0}
-                  sizes="(min-width: 768px) 78vw, 86vw"
+                  sizes="(min-width: 768px) 58vw, 72vw"
                   className="object-contain transition-opacity duration-500"
-                  style={{ opacity: isCurrent ? 1 : 0.35 }}
+                  style={{ opacity: isCurrent ? 1 : 0.6 }}
                 />
               </button>
             );
