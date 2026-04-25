@@ -27,7 +27,25 @@ export default function Navigation() {
     return () => mo.disconnect();
   }, []);
 
+  // In project mode the top Retour fades out once the viewer scrolls past
+  // the pinned hero — by then the bottom-of-project Retour is the natural
+  // way back. On inner pages (about, contact) the top Retour stays put.
+  const [scrolledPast, setScrolledPast] = useState(false);
+  useEffect(() => {
+    if (!inProject) {
+      setScrolledPast(false);
+      return;
+    }
+    const onScroll = () => {
+      setScrolledPast(window.scrollY > window.innerHeight * 0.7);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [inProject]);
+
   const showRetour = inProject || isInnerPage;
+  const retourHidden = inProject && scrolledPast;
 
   const isActive = (href: string) => (href === "/" ? isHome : pathname.startsWith(href));
 
@@ -62,8 +80,12 @@ export default function Navigation() {
               type="button"
               onClick={handleRetour}
               aria-label="Retour aux projets"
-              className="group inline-flex items-center gap-3 px-3 py-3 -mx-3 -my-3 text-white hover:opacity-100 transition-opacity duration-300"
-              style={{ opacity: 0.9 }}
+              tabIndex={retourHidden ? -1 : 0}
+              className="group inline-flex items-center gap-3 px-3 py-3 -mx-3 -my-3 text-white hover:opacity-100 transition-opacity duration-500"
+              style={{
+                opacity: retourHidden ? 0 : 0.9,
+                pointerEvents: retourHidden ? "none" : "auto",
+              }}
             >
               <span
                 aria-hidden="true"
