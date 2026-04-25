@@ -40,11 +40,65 @@ export default function CustomCursor() {
     let visible = false;
     let moved = false;
 
+    // Smooth-trailing cursor. We track the "target" mouse position on every
+    // mousemove and lerp the rendered cursor towards it on each rAF tick.
+    // The interpolation is delta-time aware so the settle time feels the
+    // same on a 60Hz monitor as on a 120Hz ProMotion display — the cursor
+    // is just rendered more often on the latter.
+    //
+    //   x_new = x + (target - x) * (1 - e^(-dt / TAU_MS))
+    //
+    // TAU controls the perceived weight: lower = snappier, higher = more
+    // trailing. 28ms feels premium without ever feeling laggy.
+    const TAU_MS = 28;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let last = 0;
+    let rafId: number | null = null;
+
+    const paint = () => {
+      el.style.transform = `translate3d(${currentX - 5}px, ${currentY - 5}px, 0)`;
+    };
+
+    const tick = (now: number) => {
+      const dt = last === 0 ? 16 : Math.min(64, now - last);
+      last = now;
+      const factor = 1 - Math.exp(-dt / TAU_MS);
+      currentX += (targetX - currentX) * factor;
+      currentY += (targetY - currentY) * factor;
+      paint();
+      if (
+        Math.abs(targetX - currentX) > 0.4 ||
+        Math.abs(targetY - currentY) > 0.4
+      ) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        // Snap to exact target so the next gesture starts from the truth.
+        currentX = targetX;
+        currentY = targetY;
+        paint();
+        rafId = null;
+        last = 0;
+      }
+    };
+
     const show = (x: number, y: number) => {
-      el.style.transform = `translate3d(${x - 5}px, ${y - 5}px, 0)`;
+      targetX = x;
+      targetY = y;
+      // First show: snap into place so the cursor doesn't sweep in from
+      // 0,0 the very first time the mouse enters the page.
       if (!visible) {
+        currentX = x;
+        currentY = y;
+        paint();
         el.style.opacity = "1";
         visible = true;
+      }
+      if (rafId === null) {
+        last = 0;
+        rafId = requestAnimationFrame(tick);
       }
     };
 
@@ -94,6 +148,7 @@ export default function CustomCursor() {
 
     return () => {
       window.clearTimeout(fallbackTimer);
+      if (rafId !== null) cancelAnimationFrame(rafId);
       document.removeEventListener("mousemove", onMove, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseout", onWindowOut);
