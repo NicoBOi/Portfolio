@@ -3,17 +3,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { projects } from "@/data/projects";
 import Hero from "@/components/home/Hero";
-import PhotoProject from "@/components/project/PhotoProject";
-import VideoProject from "@/components/project/VideoProject";
+import ProjectOverlay from "@/components/project/ProjectOverlay";
 
 interface Props {
   initialSlug: string | null;
 }
 
-// The landing *is* the project view. When a project is active we keep the same
-// page mounted, update the URL with pushState (no navigation), pin the Hero,
-// and render the project content below it. This avoids the jarring "new page"
-// feel — the landing just transforms.
+// The landing always renders Hero in browse mode. Clicking a project pops up
+// a fixed black-letterbox overlay with the project's media centered and the
+// title / role / meta arranged around it — no scroll, no sub-page. URL is
+// updated shallowly to /?project=slug so links remain shareable.
 export default function LandingExperience({ initialSlug }: Props) {
   const [activeSlug, setActiveSlug] = useState<string | null>(initialSlug);
 
@@ -21,17 +20,23 @@ export default function LandingExperience({ initialSlug }: Props) {
     ? projects.find((p) => p.slug === activeSlug) ?? null
     : null;
 
-  // Sync state with back/forward navigation so the browser buttons work too.
+  // Sync state with back/forward navigation. We accept both URL forms:
+  //   - /?project=slug  (in-app default)
+  //   - /work/slug      (legacy SSR entry point, still routed to this page)
   useEffect(() => {
-    const onPop = () => {
-      const match = window.location.pathname.match(/^\/work\/(.+?)\/?$/);
-      setActiveSlug(match ? decodeURIComponent(match[1]) : null);
+    const readSlug = () => {
+      const path = window.location.pathname;
+      const m = path.match(/^\/work\/(.+?)\/?$/);
+      if (m) return decodeURIComponent(m[1]);
+      const q = new URLSearchParams(window.location.search).get("project");
+      return q ? decodeURIComponent(q) : null;
     };
+    const onPop = () => setActiveSlug(readSlug());
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  // Client-side title for bookmarked in-page transitions.
+  // Client-side title for in-page transitions.
   useEffect(() => {
     if (active) {
       document.title = `${active.title} — Nicolas Sempere`;
@@ -40,43 +45,24 @@ export default function LandingExperience({ initialSlug }: Props) {
     }
   }, [active]);
 
-  // Block pull-to-refresh + rubber-band bounce while a project is open on
-  // mobile — otherwise swiping down from the top tears the hero image away
-  // from its frame. Class-based so it cleans up on close + route change.
+  // Block pull-to-refresh + rubber-band on mobile while the overlay is up.
   useEffect(() => {
     document.documentElement.classList.toggle("project-active", !!active);
     return () => document.documentElement.classList.remove("project-active");
   }, [active]);
 
-  // Wrap state + URL updates in document.startViewTransition when the browser
-  // supports it (Chromium + latest Safari TP). Progressive enhancement — if
-  // the API is missing (Firefox, older browsers) we fall through to a plain
-  // setState and the site keeps its Framer-driven motion.
-  const withTransition = useCallback((update: () => void) => {
-    type ViewDoc = Document & { startViewTransition?: (cb: () => void) => unknown };
-    const doc = document as ViewDoc;
-    if (typeof doc.startViewTransition === "function") {
-      doc.startViewTransition(update);
-    } else {
-      update();
-    }
+  const openProject = useCallback((slug: string) => {
+    setActiveSlug(slug);
+    window.history.pushState({}, "", `/?project=${encodeURIComponent(slug)}`);
   }, []);
 
-  const openProject = useCallback((slug: string) => {
-    withTransition(() => setActiveSlug(slug));
-    window.history.pushState({}, "", `/work/${slug}`);
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [withTransition]);
-
   const closeProject = useCallback(() => {
-    withTransition(() => setActiveSlug(null));
+    setActiveSlug(null);
     window.history.pushState({}, "", "/");
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [withTransition]);
+  }, []);
 
-  // ESC to close, plus a window-level event so the site Navigation (which sits
-  // outside this component's tree) can trigger the same smooth close without
-  // duplicating the pushState + state wiring.
+  // ESC + window-level close event (the site Navigation can dispatch this to
+  // trigger the same close path without duplicating the pushState wiring).
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
@@ -91,45 +77,16 @@ export default function LandingExperience({ initialSlug }: Props) {
     };
   }, [active, closeProject]);
 
-  const handleNavigate = useCallback(
-    (slug: string) => {
-      if (slug === "") closeProject();
-      else openProject(slug);
-    },
-    [openProject, closeProject],
-  );
-
-  const idx = active ? projects.indexOf(active) : -1;
-  const prev = active && idx > 0 ? projects[idx - 1] : null;
-  const next = active && idx < projects.length - 1 ? projects[idx + 1] : null;
-
+  // We pass activeProject through to Hero so its wheel / keyboard / touch
+  // carousel handlers stay disarmed while the overlay is up — without this,
+  // gestures land on Hero through the overlay's body-scroll-lock and silently
+  // shuffle the carousel underneath. The Hero's visible chrome is fully
+  // covered by the overlay, so the morphed-title side effect happens off
+  // screen and doesn't matter.
   return (
     <div className="relative">
-      <Hero
-        activeProject={active}
-        onOpenProject={openProject}
-      />
-      {active && (
-        <div className="relative z-10 bg-black">
-          {active.type === "video" || active.videoUrl ? (
-            <VideoProject
-              project={active}
-              prev={prev}
-              next={next}
-              mode="embedded"
-              onNavigate={handleNavigate}
-            />
-          ) : (
-            <PhotoProject
-              project={active}
-              prev={prev}
-              next={next}
-              mode="embedded"
-              onNavigate={handleNavigate}
-            />
-          )}
-        </div>
-      )}
+      <Hero activeProject={active} onOpenProject={openProject} />
+      <ProjectOverlay project={active} onClose={closeProject} />
     </div>
   );
 }
