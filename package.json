@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/build-image-manifest.mjs",
     "build": "next build",
+    "postbuild": "node scripts/auto-push.mjs",
     "start": "next start",
     "lint": "next lint",
     "images": "node scripts/build-image-manifest.mjs"
