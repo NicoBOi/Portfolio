@@ -70,7 +70,7 @@ export default function Navigation() {
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-14"
+        className="fixed top-0 left-0 right-0 z-[160] flex items-center justify-between px-6 md:px-10 h-14"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         data-cursor-suppress
       >
@@ -169,7 +169,7 @@ export default function Navigation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-black md:hidden flex flex-col"
+            className="fixed inset-0 z-[170] bg-black md:hidden flex flex-col"
           >
             {/* Top band — identity */}
             <motion.div

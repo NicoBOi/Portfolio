@@ -30,14 +30,10 @@ interface YTWindow {
   onYouTubeIframeAPIReady?: () => void;
 }
 
-interface PlayerProps {
-  fullscreenTarget?: HTMLElement | null;
-}
-
 // ─────────────────────────────────────────────────────────────
 // YouTube
 // ─────────────────────────────────────────────────────────────
-export function YouTubePlayer({ youtubeId, fullscreenTarget }: { youtubeId: string } & PlayerProps) {
+export function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -45,7 +41,6 @@ export function YouTubePlayer({ youtubeId, fullscreenTarget }: { youtubeId: stri
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [showControls, setShowControls] = useState(false);
   const iframeId = `yt-vp-${youtubeId}`;
 
   useEffect(() => {
@@ -125,21 +120,15 @@ export function YouTubePlayer({ youtubeId, fullscreenTarget }: { youtubeId: stri
   };
 
   const handleFullscreen = () => {
-    const target = fullscreenTarget ?? containerRef.current;
-    if (!target) return;
+    if (!containerRef.current) return;
     if (document.fullscreenElement) document.exitFullscreen();
-    else target.requestFullscreen?.();
+    else containerRef.current.requestFullscreen?.();
   };
 
   const src = `https://www.youtube-nocookie.com/embed/${youtubeId}?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&vq=hd1080&playsinline=1`;
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 bg-black"
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
-    >
+    <div ref={containerRef} className="absolute inset-0 bg-black">
       <iframe
         id={iframeId}
         src={src}
@@ -165,7 +154,7 @@ export function YouTubePlayer({ youtubeId, fullscreenTarget }: { youtubeId: stri
         muted={muted}
         volume={volume}
         ready={ready}
-        visible={showControls}
+        visible
         onTogglePlay={togglePlay}
         onToggleMute={toggleMute}
         onVolumeChange={handleVolume}
@@ -186,7 +175,7 @@ export function YouTubePlayer({ youtubeId, fullscreenTarget }: { youtubeId: stri
 // ─────────────────────────────────────────────────────────────
 // Vimeo
 // ─────────────────────────────────────────────────────────────
-export function VimeoPlayer({ vimeoId, fullscreenTarget }: { vimeoId: string } & PlayerProps) {
+export function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const playerRef = useRef<Player | null>(null);
@@ -195,7 +184,6 @@ export function VimeoPlayer({ vimeoId, fullscreenTarget }: { vimeoId: string } &
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
     if (!iframeRef.current) return;
@@ -253,21 +241,15 @@ export function VimeoPlayer({ vimeoId, fullscreenTarget }: { vimeoId: string } &
   };
 
   const handleFullscreen = () => {
-    const target = fullscreenTarget ?? containerRef.current;
-    if (!target) return;
+    if (!containerRef.current) return;
     if (document.fullscreenElement) document.exitFullscreen();
-    else target.requestFullscreen?.();
+    else containerRef.current.requestFullscreen?.();
   };
 
   const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1&quality=1080p&transparent=0`;
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 bg-black"
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
-    >
+    <div ref={containerRef} className="absolute inset-0 bg-black">
       <iframe
         ref={iframeRef}
         src={src}
@@ -293,7 +275,7 @@ export function VimeoPlayer({ vimeoId, fullscreenTarget }: { vimeoId: string } &
         muted={muted}
         volume={volume}
         ready={ready}
-        visible={showControls}
+        visible
         onTogglePlay={togglePlay}
         onToggleMute={toggleMute}
         onVolumeChange={handleVolume}
