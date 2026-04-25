@@ -103,28 +103,26 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
         )}
 
         <motion.footer
-          className="w-full max-w-6xl flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-10 pointer-events-none px-5 md:px-10"
+          className="w-full max-w-6xl flex flex-col items-center gap-5 md:gap-6 pointer-events-none px-5 md:px-10 text-center"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.55, delay: 0.12, ease: SOFT }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="md:max-w-md text-left">
-            {project.description && (
-              <p
-                className="text-white"
-                style={{
-                  fontSize: "clamp(0.85rem, 1.05vw, 0.95rem)",
-                  lineHeight: 1.55,
-                  opacity: 0.7,
-                }}
-              >
-                {project.description}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col gap-1.5 md:items-end md:text-right">
+          {project.description && (
+            <p
+              className="text-white max-w-xl"
+              style={{
+                fontSize: "clamp(0.85rem, 1.05vw, 0.95rem)",
+                lineHeight: 1.55,
+                opacity: 0.7,
+              }}
+            >
+              {project.description}
+            </p>
+          )}
+          <div className="flex flex-col items-center gap-1.5">
             <p className="label text-white" style={{ opacity: 0.85 }}>{project.meta.type}</p>
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
