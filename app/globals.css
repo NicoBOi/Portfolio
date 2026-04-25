@@ -138,6 +138,41 @@ body::after {
   background-size: 200px 200px;
 }
 
+/* Animated film grain over the hero background — sits above the bg media
+   and the dark scrim, below the foreground chrome. The bleed (130% size,
+   negative offset) lets the translation animation never show seams. */
+.hero-grain {
+  position: absolute;
+  top: -15%;
+  left: -15%;
+  width: 130%;
+  height: 130%;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.95'/%3E%3C/svg%3E");
+  animation: heroGrain 0.55s steps(10) infinite;
+  will-change: transform;
+}
+@keyframes heroGrain {
+  0%   { transform: translate(0,    0); }
+  10%  { transform: translate(-5%,  -5%); }
+  20%  { transform: translate(-10%, 5%); }
+  30%  { transform: translate(5%,   -8%); }
+  40%  { transform: translate(-5%,  10%); }
+  50%  { transform: translate(-10%, 5%); }
+  60%  { transform: translate(10%,  0); }
+  70%  { transform: translate(0,    8%); }
+  80%  { transform: translate(-12%, 2%); }
+  90%  { transform: translate(8%,   5%); }
+  100% { transform: translate(0,    0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-grain { animation: none; }
+}
+
 ::selection {
   background: #fff;
   color: #000;

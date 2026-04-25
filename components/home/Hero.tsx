@@ -345,6 +345,12 @@ export default function Hero({
           </AnimatePresence>
 
           <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+
+          {/* Animated film grain — sits above the bg media + scrim, below the
+              foreground chrome. Visible (opacity .22, mix-blend overlay) but
+              fine-grained (180px tile, base frequency 1.1). Skipped under
+              prefers-reduced-motion. */}
+          <div className="hero-grain" aria-hidden="true" />
         </motion.div>
 
         {/* Foreground */}
