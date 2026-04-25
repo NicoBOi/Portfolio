@@ -9,6 +9,10 @@ import { VimeoPlayer, YouTubePlayer, getVimeoId, getYoutubeId } from "./VideoPla
 import Lightbox from "./Lightbox";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+// Symmetric ease-in-out for the carousel slide. Starts slow (the photo
+// takes a beat to commit to leaving), peaks through the middle, eases
+// back out softly — reads more "considered" than a straight ease-out.
+const PREMIUM: [number, number, number, number] = [0.7, 0, 0.2, 1];
 
 interface Props {
   project: Project | null;
@@ -330,7 +334,7 @@ function PhotoCarousel({ project }: { project: Project }) {
         <motion.div
           className="flex h-full items-center"
           animate={{ x }}
-          transition={{ duration: 0.55, ease: SOFT }}
+          transition={{ duration: 0.85, ease: PREMIUM }}
           style={{ gap }}
         >
           {files.map((f, i) => {
