@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -22,8 +22,6 @@ interface Props {
 // listens to the html.project-active class set by LandingExperience).
 export default function ProjectOverlay({ project, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
-  // Hold onto the last project while exit-animating so the overlay can render
-  // the closing project's content on its way out (project is null during exit).
   const [rendered, setRendered] = useState<Project | null>(project);
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
@@ -70,12 +68,17 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
       aria-label={project.title}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
+      {/* Three-zone layout: header / media / footer.
+          Explicit gap-y between zones (rather than relying on justify-between
+          collapsing all the slack into the gaps) so the title never reads as
+          glued to the image and the pagination never reads as glued to the
+          description, regardless of viewport height. */}
       <div
-        className="relative w-full h-full flex flex-col items-center justify-between py-20 md:py-24"
+        className="relative w-full h-full flex flex-col items-center py-16 md:py-20 gap-y-10 md:gap-y-14"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.header
-          className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10"
+          className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
@@ -96,14 +99,16 @@ function Overlay({ project, onClose }: { project: Project; onClose: () => void }
           </h1>
         </motion.header>
 
-        {isVideo ? (
-          <VideoMedia project={project} />
-        ) : (
-          <PhotoCarousel project={project} />
-        )}
+        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-7 md:gap-9">
+          {isVideo ? (
+            <VideoMedia project={project} />
+          ) : (
+            <PhotoCarousel project={project} />
+          )}
+        </div>
 
         <motion.footer
-          className="w-full max-w-6xl flex flex-col items-center gap-5 md:gap-6 pointer-events-none px-5 md:px-10 text-center"
+          className="w-full max-w-6xl flex flex-col items-center gap-5 md:gap-6 pointer-events-none px-5 md:px-10 text-center shrink-0"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
@@ -146,13 +151,11 @@ function VideoMedia({ project }: { project: Project }) {
 
   return (
     <motion.div
-      // Mobile: edge-to-edge (w-screen). Desktop: capped width via the
-      // --media-w variable so the letterbox keeps breathing room around it.
       className="relative bg-black overflow-hidden w-screen md:w-[var(--media-w)]"
       style={{
         aspectRatio: aspectStr,
-        ["--media-w" as string]: `min(76vw, calc(62vh * ${ratio}))`,
-        maxHeight: "62vh",
+        ["--media-w" as string]: `min(76vw, calc(58vh * ${ratio}))`,
+        maxHeight: "58vh",
       }}
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -187,28 +190,39 @@ function VideoMedia({ project }: { project: Project }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Photo carousel — fixed height, prev/next + arrow keys + swipe.
-// Click an image to open the zoomable Lightbox.
+// Photo carousel — sliding track, neighbours peek on each side.
+// No wrap-around: arrows disabled at the ends, plain prev / next.
 // ─────────────────────────────────────────────────────────────
 function PhotoCarousel({ project }: { project: Project }) {
   const files = project.imageFiles ?? [];
   const [idx, setIdx] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [direction, setDirection] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerW, setContainerW] = useState(0);
 
-  const goTo = (next: number) => {
-    if (next === idx || files.length === 0) return;
-    setDirection(next > idx ? 1 : -1);
-    setIdx((next + files.length) % files.length);
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerW(el.clientWidth);
+    const ro = new ResizeObserver(([entry]) => setContainerW(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const goTo = (n: number) => {
+    if (n < 0 || n >= files.length || n === idx) return;
+    setIdx(n);
   };
-  const prev = () => goTo((idx - 1 + files.length) % files.length);
-  const next = () => goTo((idx + 1) % files.length);
+  const prev = () => goTo(idx - 1);
+  const next = () => goTo(idx + 1);
+  const canPrev = idx > 0;
+  const canNext = idx < files.length - 1;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (lightbox !== null) return; // lightbox handles its own keys
-      if (e.key === "ArrowRight") { e.preventDefault(); next(); }
-      else if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+      if (lightbox !== null) return;
+      if (e.key === "ArrowRight" && canNext) { e.preventDefault(); next(); }
+      else if (e.key === "ArrowLeft" && canPrev) { e.preventDefault(); prev(); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -220,93 +234,110 @@ function PhotoCarousel({ project }: { project: Project }) {
   const onTouchEnd = (e: React.TouchEvent) => {
     if (startX.current === null) return;
     const dx = e.changedTouches[0].clientX - startX.current;
-    if (Math.abs(dx) >= 40) (dx < 0 ? next : prev)();
+    if (Math.abs(dx) >= 40) {
+      if (dx < 0 && canNext) next();
+      else if (dx > 0 && canPrev) prev();
+    }
     startX.current = null;
   };
 
   if (files.length === 0) {
     return (
       <div
-        className="bg-black"
-        style={{ width: "min(70vw, 90vw)", height: "62vh", backgroundColor: project.coverPlaceholder }}
+        style={{
+          width: "min(70vw, 90vw)",
+          height: "58vh",
+          backgroundColor: project.coverPlaceholder,
+        }}
       />
     );
   }
 
-  const current = files[idx];
+  // Slide takes ~85% of the container width on mobile (15% peek), ~78% on
+  // desktop (22% peek = 11% on each side). The remaining 4% of the gap is
+  // empty space between adjacent slides so the peeks don't merge into one
+  // continuous strip.
+  const isDesktop = containerW >= 768;
+  const slideRatio = isDesktop ? 0.78 : 0.86;
+  const gapRatio = 0.03;
+  const slideW = containerW * slideRatio;
+  const gap = containerW * gapRatio;
+  const offset = (containerW - slideW) / 2;
+  const x = offset - idx * (slideW + gap);
 
   return (
     <>
-      <div className="flex flex-col items-center gap-5 md:gap-6">
+      <motion.div
+        ref={containerRef}
+        className="relative w-screen md:w-[min(85vw,1280px)] flex-1 min-h-0 max-h-[58vh] overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.45, delay: 0.05, ease: SOFT }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <motion.div
-          // Mobile: edge-to-edge (w-screen). Desktop: capped at 1100px.
-          className="relative flex items-center justify-center w-screen md:w-[min(80vw,1100px)]"
-          style={{ height: "62vh" }}
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.55, delay: 0.05, ease: SOFT }}
-          onClick={(e) => e.stopPropagation()}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
+          className="flex h-full items-center"
+          animate={{ x }}
+          transition={{ duration: 0.55, ease: SOFT }}
+          style={{ gap }}
         >
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.button
-              key={current}
-              type="button"
-              onClick={() => setLightbox(idx)}
-              className="absolute inset-0 flex items-center justify-center"
-              data-cursor="Agrandir"
-              aria-label={`Agrandir la photo ${idx + 1}`}
-              initial={{ opacity: 0, x: direction * 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -24 }}
-              transition={{ duration: 0.4, ease: SOFT }}
-            >
-              <div className="relative w-full h-full">
+          {files.map((f, i) => {
+            const isCurrent = i === idx;
+            return (
+              <button
+                key={f}
+                type="button"
+                onClick={() => (isCurrent ? setLightbox(i) : goTo(i))}
+                className="shrink-0 h-full relative block"
+                style={{ width: slideW || 1 }}
+                data-cursor={isCurrent ? "Agrandir" : i < idx ? "Précédent" : "Suivant"}
+                aria-label={isCurrent ? `Agrandir la photo ${i + 1}` : `Photo ${i + 1}`}
+                aria-current={isCurrent ? "true" : undefined}
+                tabIndex={isCurrent ? 0 : -1}
+              >
                 <Image
-                  src={`/projects/${project.slug}/${current}`}
+                  src={`/projects/${project.slug}/${f}`}
                   alt=""
                   fill
-                  priority
-                  sizes="(min-width: 768px) 80vw, 100vw"
-                  className="object-contain"
+                  priority={i === 0}
+                  sizes="(min-width: 768px) 78vw, 86vw"
+                  className="object-contain transition-opacity duration-500"
+                  style={{ opacity: isCurrent ? 1 : 0.35 }}
                 />
-              </div>
-            </motion.button>
-          </AnimatePresence>
-
-          {files.length > 1 && (
-            <>
-              <CarouselArrow side="prev" onClick={prev} />
-              <CarouselArrow side="next" onClick={next} />
-            </>
-          )}
+              </button>
+            );
+          })}
         </motion.div>
 
-        {files.length > 1 && (
-          <div
-            className="flex items-center pointer-events-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {files.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onMouseEnter={() => goTo(i)}
-                onFocus={() => goTo(i)}
-                onClick={() => goTo(i)}
-                className="label text-white tabular-nums transition-opacity duration-300 px-3 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
-                style={{ opacity: i === idx ? 0.95 : 0.45 }}
-                aria-label={`Photo ${i + 1}`}
-                aria-current={i === idx ? "true" : undefined}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        {canPrev && <CarouselArrow side="prev" onClick={prev} />}
+        {canNext && <CarouselArrow side="next" onClick={next} />}
+      </motion.div>
+
+      {files.length > 1 && (
+        <div
+          className="flex items-center pointer-events-auto shrink-0"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {files.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onMouseEnter={() => goTo(i)}
+              onFocus={() => goTo(i)}
+              onClick={() => goTo(i)}
+              className="label text-white tabular-nums transition-opacity duration-300 px-3 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
+              style={{ opacity: i === idx ? 0.95 : 0.45 }}
+              aria-label={`Photo ${i + 1}`}
+              aria-current={i === idx ? "true" : undefined}
+            >
+              {String(i + 1).padStart(2, "0")}
+            </button>
+          ))}
+        </div>
+      )}
 
       <Lightbox
         slug={project.slug}
@@ -330,7 +361,7 @@ function CarouselArrow({ side, onClick }: { side: "prev" | "next"; onClick: () =
       aria-label={isPrev ? "Précédent" : "Suivant"}
       data-cursor={isPrev ? "Précédent" : "Suivant"}
       className={`absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center px-4 py-6 text-white transition-opacity duration-300 hover:opacity-100 ${
-        isPrev ? "left-3 md:-left-12" : "right-3 md:-right-12"
+        isPrev ? "left-3 md:left-6" : "right-3 md:right-6"
       }`}
       style={{ opacity: 0.65 }}
     >
