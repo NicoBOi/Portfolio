@@ -20,9 +20,11 @@ export default function LandingExperience({ initialSlug }: Props) {
     ? projects.find((p) => p.slug === activeSlug) ?? null
     : null;
 
-  // Sync state with back/forward navigation. We accept both URL forms:
-  //   - /?project=slug  (in-app default)
-  //   - /work/slug      (legacy SSR entry point, still routed to this page)
+  // Hydrate from the URL on mount (so a hard refresh on /?project=slug
+  // re-opens the overlay) and stay in sync with back/forward navigation.
+  // We accept both URL forms:
+  //   - /?project=slug  (in-app default + shareable refresh-safe link)
+  //   - /work/slug      (SSR entry point, still routed to this page)
   useEffect(() => {
     const readSlug = () => {
       const path = window.location.pathname;
@@ -31,9 +33,12 @@ export default function LandingExperience({ initialSlug }: Props) {
       const q = new URLSearchParams(window.location.search).get("project");
       return q ? decodeURIComponent(q) : null;
     };
+    const fromUrl = readSlug();
+    if (fromUrl !== activeSlug) setActiveSlug(fromUrl);
     const onPop = () => setActiveSlug(readSlug());
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Client-side title for in-page transitions.
