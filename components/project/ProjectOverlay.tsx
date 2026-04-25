@@ -109,50 +109,54 @@ function Overlay({
       aria-label={project.title}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* Three-zone layout: header / media / footer.
-          Explicit gap-y between zones (rather than relying on justify-between
-          collapsing all the slack into the gaps) so the title never reads as
-          glued to the image and the pagination never reads as glued to the
-          description, regardless of viewport height. */}
+      {/* Mobile: three groups distributed by justify-between — (header +
+          media + pagination tight at the top), (description + meta floating
+          in the middle), (nav buttons row pinned at the bottom). Desktop
+          keeps the header / media / footer rhythm with explicit gap-y. */}
       <div
-        className="relative w-full h-full flex flex-col items-center py-16 md:py-20 gap-y-10 md:gap-y-14"
+        className="relative w-full h-full flex flex-col items-center py-12 md:py-20 justify-between md:justify-start md:gap-y-14"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
-        <motion.header
-          className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.55, delay: 0.08, ease: SOFT }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <p
-            className="label text-white mb-3 md:mb-4"
-            style={{ opacity: 0.55, letterSpacing: "0.32em" }}
+        {/* TOP GROUP — wraps header + media tight together on mobile. On
+            desktop we use display:contents so the wrapper unwraps and the
+            outer container's gap-y-14 still spaces header / media properly. */}
+        <div className="w-full flex flex-col items-center gap-3 md:contents">
+          <motion.header
+            className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.55, delay: 0.08, ease: SOFT }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {project.year} — {project.role}
-          </p>
-          <h1
-            className="text-white title leading-none"
-            style={{ fontSize: "clamp(1.8rem, 5.2vw, 4.5rem)" }}
-          >
-            {project.title}
-          </h1>
-        </motion.header>
+            <p
+              className="label text-white mb-3 md:mb-4"
+              style={{ opacity: 0.55, letterSpacing: "0.32em" }}
+            >
+              {project.year} — {project.role}
+            </p>
+            <h1
+              className="text-white title leading-none"
+              style={{ fontSize: "clamp(1.8rem, 5.2vw, 4.5rem)" }}
+            >
+              {project.title}
+            </h1>
+          </motion.header>
 
-        {/* Key on the media wrapper resets the carousel idx + measurements
-            (and forces video iframes to reload) when switching projects.
-            The outer overlay shell stays mounted so the backdrop never
-            blinks off. */}
-        <div
-          key={project.slug}
-          className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-7 md:gap-9"
-        >
-          {isVideo ? (
-            <VideoMedia project={project} />
-          ) : (
-            <PhotoCarousel project={project} />
-          )}
+          {/* Key on the media wrapper resets the carousel idx + measurements
+              (and forces video iframes to reload) when switching projects.
+              The outer overlay shell stays mounted so the backdrop never
+              blinks off. */}
+          <div
+            key={project.slug}
+            className="w-full flex flex-col items-center md:flex-1 md:min-h-0 gap-3 md:gap-9"
+          >
+            {isVideo ? (
+              <VideoMedia project={project} />
+            ) : (
+              <PhotoCarousel project={project} />
+            )}
+          </div>
         </div>
 
         <motion.footer
@@ -180,31 +184,30 @@ function Overlay({
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
             <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
           </div>
-          {/* Mobile: prev / next sit side-by-side at the very bottom of
-              the footer flow, after the meta. Desktop hides this row and
-              renders the two buttons absolutely-positioned in the corners
-              (see below). */}
-          {(prevProject || nextProject) && (
-            <div className="md:hidden mt-2 flex items-center gap-6 pointer-events-auto">
-              {prevProject && (
-                <NavProjectButton
-                  side="prev"
-                  target={prevProject}
-                  onClick={onOpenPrev}
-                  compact
-                />
-              )}
-              {nextProject && (
-                <NavProjectButton
-                  side="next"
-                  target={nextProject}
-                  onClick={onOpenNext}
-                  compact
-                />
-              )}
-            </div>
-          )}
         </motion.footer>
+
+        {/* Mobile-only nav row — pinned to the bottom by the outer
+            justify-between. Description / meta float in the middle slot. */}
+        {(prevProject || nextProject) && (
+          <div className="md:hidden flex items-center gap-6 pointer-events-auto shrink-0">
+            {prevProject && (
+              <NavProjectButton
+                side="prev"
+                target={prevProject}
+                onClick={onOpenPrev}
+                compact
+              />
+            )}
+            {nextProject && (
+              <NavProjectButton
+                side="next"
+                target={nextProject}
+                onClick={onOpenNext}
+                compact
+              />
+            )}
+          </div>
+        )}
 
         {/* Desktop: prev bottom-left, next bottom-right — mirrors of the
             Retour pill at top-left. */}
@@ -321,11 +324,10 @@ function VideoMedia({ project }: { project: Project }) {
 
   return (
     <motion.div
-      className="relative bg-black overflow-hidden md:rounded-[20px] w-screen md:w-[var(--media-w)] isolate"
+      className="relative bg-black overflow-hidden md:rounded-[20px] w-screen md:w-[var(--media-w)] isolate max-h-[50vh] md:max-h-[58vh]"
       style={{
         aspectRatio: aspectStr,
         ["--media-w" as string]: `min(76vw, calc(58vh * ${ratio}))`,
-        maxHeight: "58vh",
       }}
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -514,7 +516,10 @@ function PhotoCarousel({ project }: { project: Project }) {
         // Carousel spans the full viewport so neighbours can run all the way
         // off the screen edge. The mask-image fades the leftmost/rightmost
         // 6% so they melt into the page background instead of cutting hard.
-        className="relative w-screen flex-1 min-h-0 max-h-[58vh] overflow-hidden"
+        // Mobile uses an explicit 50vh so the new justify-between layout
+        // has predictable space to distribute; desktop keeps flex-1 + a
+        // 58vh cap so the media absorbs whatever room the page gives it.
+        className="relative w-screen h-[50vh] md:h-auto md:flex-1 md:min-h-0 md:max-h-[58vh] overflow-hidden"
         style={{
           maskImage:
             "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
