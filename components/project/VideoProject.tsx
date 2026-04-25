@@ -14,6 +14,7 @@ const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 interface YTPlayer {
   playVideo(): void;
   pauseVideo(): void;
+  seekTo(seconds: number, allowSeekAhead?: boolean): void;
   mute(): void;
   unMute(): void;
   setVolume(v: number): void;
@@ -161,10 +162,16 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   const [ready, setReady] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  // Brief black flash on loop boundaries — YT's `loop=1` quirk lets a frame
+  // of the end-screen / title overlay slip through before the video restarts.
+  // We detect state 0 (ended), seek-to-0 + playVideo immediately, and cover
+  // the swap with a 320ms mask so nothing of YT's chrome ever shows.
+  const [loopMask, setLoopMask] = useState(false);
   const iframeId = `yt-vp-${youtubeId}`;
 
   useEffect(() => {
     let player: YTPlayer | null = null;
+    let loopTimer: number | null = null;
 
     const createPlayer = () => {
       const yt = (window as unknown as YTWindow).YT!;
@@ -185,6 +192,17 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
               try {
                 player?.setPlaybackQuality("hd1080");
               } catch {}
+            }
+            // Manual loop — YT's built-in loop=1 still flashes its end UI for
+            // a frame; cover with a mask + force restart.
+            if (e.data === 0) {
+              setLoopMask(true);
+              try {
+                player?.seekTo(0, true);
+                player?.playVideo();
+              } catch {}
+              if (loopTimer) window.clearTimeout(loopTimer);
+              loopTimer = window.setTimeout(() => setLoopMask(false), 320);
             }
           },
           onPlaybackQualityChange: () => {
@@ -217,11 +235,13 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
     }
 
     return () => {
+      if (loopTimer) window.clearTimeout(loopTimer);
       player?.destroy();
       playerRef.current = null;
       setReady(false);
       setPlaying(false);
       setHasPlayed(false);
+      setLoopMask(false);
     };
   }, [iframeId]);
 
@@ -304,7 +324,8 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
         onVolumeChange={handleVolume}
         onFullscreen={handleFullscreen}
       />
-      {/* Opaque loading mask — hides YT's title/branding/spinner chrome until the video actually starts. */}
+      {/* Opaque loading mask — hides YT's title/branding/spinner chrome until
+          the video actually starts. */}
       {!hasPlayed && (
         <div className="absolute inset-0 z-20 bg-black flex items-center justify-center pointer-events-none">
           <div
@@ -312,6 +333,14 @@ function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
             style={{ borderTopColor: "rgba(255,255,255,0.55)" }}
           />
         </div>
+      )}
+      {/* Loop boundary mask — covers the brief YT end-screen flash between
+          the last frame and the seek-to-0 restart. */}
+      {hasPlayed && loopMask && (
+        <div
+          className="absolute inset-0 z-20 bg-black pointer-events-none"
+          aria-hidden="true"
+        />
       )}
     </div>
   );
