@@ -704,56 +704,26 @@ export default function Hero({
   );
 }
 
-// Self-hosted hero loop. Plain <video>, no SDK overhead. The poster (project's
-// first imageFile) shows instantly so the swap to a video slide never blinks
-// black; once the video has actually decoded a frame the poster fades out.
+// Self-hosted hero loop. Plain <video>, no SDK overhead.
+//
+// Native poster= shows the project's first image instantly (the file is
+// already AVIF, no need to route it through next/image which would fetch
+// a *different* optimised URL and waste a request). The WebM streams in
+// behind it; browsers swap to the first decoded frame automatically with
+// no black gap on screen.
 function HeroLocalVideo({ src, poster }: { src: string; poster?: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    const onPlaying = () => setReady(true);
-    v.addEventListener("playing", onPlaying);
-    // Some browsers fire `loadeddata` before they actually composite the
-    // first frame — playing is the safest signal.
-    return () => v.removeEventListener("playing", onPlaying);
-  }, []);
-
   return (
-    <>
-      {poster && (
-        <Image
-          src={poster}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-          aria-hidden="true"
-        />
-      )}
-      <video
-        ref={ref}
-        className="absolute inset-0 w-full h-full object-cover"
-        src={src}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        aria-hidden="true"
-      />
-      {/* Holds the poster visible until the real video commits a frame. */}
-      <motion.div
-        className="absolute inset-0 bg-black pointer-events-none z-[1]"
-        initial={{ opacity: 1 }}
-        animate={{ opacity: ready ? 0 : 1 }}
-        transition={{ duration: 0.35, ease: SOFT }}
-        style={{ display: poster ? "none" : "block" }}
-      />
-    </>
+    <video
+      className="absolute inset-0 w-full h-full object-cover"
+      src={src}
+      poster={poster}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+    />
   );
 }
 

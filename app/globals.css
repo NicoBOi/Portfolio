@@ -88,15 +88,17 @@ video:-webkit-full-screen {
    cursor div lives outside the fullscreen subtree (the browser only
    paints the fullscreen element + its descendants) so without this rule
    the user is left with no pointer at all over Vimeo / YouTube
-   fullscreen. */
-:fullscreen,
-:fullscreen *,
-:fullscreen *::before,
-:fullscreen *::after,
-:-webkit-full-screen,
-:-webkit-full-screen *,
-:-webkit-full-screen *::before,
-:-webkit-full-screen *::after {
+   fullscreen. Specificity is bumped via `html.cursor-ready` so the rule
+   beats `html.cursor-ready *` (which sets cursor: none) at equal
+   importance. */
+html.cursor-ready :fullscreen,
+html.cursor-ready :fullscreen *,
+html.cursor-ready :fullscreen *::before,
+html.cursor-ready :fullscreen *::after,
+html.cursor-ready :-webkit-full-screen,
+html.cursor-ready :-webkit-full-screen *,
+html.cursor-ready :-webkit-full-screen *::before,
+html.cursor-ready :-webkit-full-screen *::after {
   cursor: auto !important;
 }
 
