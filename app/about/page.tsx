@@ -99,37 +99,56 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="md:col-span-8 flex flex-col gap-5 max-w-xl">
+          <div className="md:col-span-8 flex flex-col gap-8 max-w-2xl">
+            {/* Lead — Cormorant, large, full weight. Manifeste. */}
             <p
-              className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.9, lineHeight: 1.9 }}
+              className="title text-white"
+              style={{
+                fontSize: "clamp(1.4rem, 2.4vw, 2rem)",
+                lineHeight: 1.35,
+                opacity: 0.95,
+              }}
             >
-              Photographe et réalisateur à Bordeaux, 28 ans. Je crée
-              des images pour les marques et les projets qui refusent
-              de ressembler aux autres — campagnes, éditoriaux, films,
+              Photographe et réalisateur à Bordeaux, 28 ans. Je crée des
+              images pour les marques et les projets qui refusent de
+              ressembler aux autres — campagnes, éditoriaux, films,
               quand l&apos;image doit dire quelque chose de précis.
             </p>
+
+            {/* Body — Fragment Mono regular, smaller. Faits secs. */}
             <p
-              className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.75, lineHeight: 1.9 }}
+              className="text-white font-light"
+              style={{
+                fontFamily: "var(--font-fragment), monospace",
+                fontSize: "0.85rem",
+                lineHeight: 1.8,
+                opacity: 0.7,
+                letterSpacing: "0.01em",
+              }}
             >
               Photographe depuis mes 15 ans, réalisateur depuis 23.
-              Autodidacte pendant longtemps, puis diplômé de MJM
-              Graphic Design en webdesign et motion.
+              Autodidacte pendant longtemps, puis diplômé de MJM Graphic
+              Design en webdesign et motion.
             </p>
+
+            {/* Voice — Cormorant italic. Personnel. */}
             <p
-              className="text-white font-light leading-relaxed"
-              style={{ fontSize: "0.95rem", opacity: 0.65, lineHeight: 1.9 }}
+              className="title italic text-white"
+              style={{
+                fontSize: "clamp(1.05rem, 1.5vw, 1.2rem)",
+                lineHeight: 1.6,
+                opacity: 0.78,
+              }}
             >
-              Seul ou avec une équipe, selon le projet. Trois
-              références reviennent toujours : Lars von Trier pour
-              la tension, Ash Thorp pour la rigueur du motion,
-              Beksiński pour l&apos;élégance sombre.
+              Seul ou avec une équipe, selon le projet. Trois références
+              reviennent toujours : Lars von Trier pour la tension, Ash
+              Thorp pour la rigueur du motion, Beksiński pour l&apos;élégance
+              sombre.
             </p>
 
             <Link
               href="/contact"
-              className="label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-4 mt-4"
+              className="label text-white hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-4 mt-2"
               style={{ opacity: 0.85, letterSpacing: "0.34em" }}
             >
               Écrivez-moi
