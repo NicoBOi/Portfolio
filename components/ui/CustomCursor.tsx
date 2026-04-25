@@ -40,66 +40,53 @@ export default function CustomCursor() {
     let visible = false;
     let moved = false;
 
-    // Smooth-trailing cursor. We track the "target" mouse position on every
-    // mousemove and lerp the rendered cursor towards it on each rAF tick.
-    // The interpolation is delta-time aware so the settle time feels the
-    // same on a 60Hz monitor as on a 120Hz ProMotion display — the cursor
-    // is just rendered more often on the latter.
-    //
-    //   x_new = x + (target - x) * (1 - e^(-dt / TAU_MS))
-    //
-    // TAU controls the perceived weight: lower = snappier, higher = more
-    // trailing. 28ms feels premium without ever feeling laggy.
-    const TAU_MS = 28;
+    // Cursor strategy: snap to the exact mouse position, but paint via rAF
+    // so we render at the monitor's native refresh rate (60 / 120 / 240 Hz)
+    // instead of mouse-poll rate (which can fire 1000x/s on gaming mice
+    // and waste transforms the GPU never composites). One rAF per frame =
+    // one transform per frame, always at the latest mouse coordinate.
+    // Result: zero perceived lag, no chunky steps — the cursor *is* the
+    // mouse, redrawn every frame the display can show.
     let targetX = 0;
     let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let last = 0;
+    let pending = false;
+    let lastSeen = 0;
     let rafId: number | null = null;
 
     const paint = () => {
-      el.style.transform = `translate3d(${currentX - 5}px, ${currentY - 5}px, 0)`;
+      el.style.transform = `translate3d(${targetX - 5}px, ${targetY - 5}px, 0)`;
     };
 
     const tick = (now: number) => {
-      const dt = last === 0 ? 16 : Math.min(64, now - last);
-      last = now;
-      const factor = 1 - Math.exp(-dt / TAU_MS);
-      currentX += (targetX - currentX) * factor;
-      currentY += (targetY - currentY) * factor;
+      pending = false;
       paint();
-      if (
-        Math.abs(targetX - currentX) > 0.4 ||
-        Math.abs(targetY - currentY) > 0.4
-      ) {
+      // Keep the rAF loop alive for ~120ms after the last mouse signal so
+      // we don't restart on every micro-move. After the idle window passes
+      // we let it die — zero CPU when the cursor is truly still.
+      if (now - lastSeen < 120) {
         rafId = requestAnimationFrame(tick);
+        pending = true;
       } else {
-        // Snap to exact target so the next gesture starts from the truth.
-        currentX = targetX;
-        currentY = targetY;
-        paint();
         rafId = null;
-        last = 0;
       }
+    };
+
+    const schedule = () => {
+      lastSeen = performance.now();
+      if (pending) return;
+      pending = true;
+      rafId = requestAnimationFrame(tick);
     };
 
     const show = (x: number, y: number) => {
       targetX = x;
       targetY = y;
-      // First show: snap into place so the cursor doesn't sweep in from
-      // 0,0 the very first time the mouse enters the page.
       if (!visible) {
-        currentX = x;
-        currentY = y;
         paint();
         el.style.opacity = "1";
         visible = true;
       }
-      if (rafId === null) {
-        last = 0;
-        rafId = requestAnimationFrame(tick);
-      }
+      schedule();
     };
 
     const hide = () => {
