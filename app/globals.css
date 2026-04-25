@@ -84,6 +84,24 @@ video:-webkit-full-screen {
   background: #000;
 }
 
+/* Editorial horizontal marquee — the children get duplicated in markup so a
+   -50% translate loops seamlessly. Slow + paused on hover so the viewer can
+   actually read the names. Honours prefers-reduced-motion. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 36s linear infinite;
+  will-change: transform;
+}
+.marquee-host:hover .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
 /* Restore the native cursor inside any fullscreen element. The custom
    cursor div lives outside the fullscreen subtree (the browser only
    paints the fullscreen element + its descendants) so without this rule
