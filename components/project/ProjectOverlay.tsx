@@ -229,14 +229,15 @@ function PhotoCarousel({ project }: { project: Project }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, files.length, lightbox]);
 
-  // Wheel / trackpad scroll → navigate. Same gesture-end + min-swap-gap
-  // pacing the hero uses for its featured carousel: one swap per intentional
-  // scroll, then a 250ms quiet period before the next swap, so a fling
-  // doesn't fire ten transitions in a row.
+  // Wheel / trackpad scroll → one photo per gesture. A trackpad fling fires
+  // events for a second+ with brief inertia pauses; we treat a 220ms quiet
+  // window as the gesture's end, and enforce a hard 600ms cooldown after
+  // each swap so a single fling can never traverse multiple photos even
+  // when its inertia momentarily dips below the 220ms threshold.
   useEffect(() => {
     if (lightbox !== null) return;
-    const GESTURE_END_MS = 100;
-    const MIN_SWAP_GAP_MS = 250;
+    const GESTURE_END_MS = 220;
+    const SWAP_COOLDOWN_MS = 600;
     let lastWheel = 0;
     let lastSwap = 0;
     let inGesture = false;
@@ -248,7 +249,7 @@ function PhotoCarousel({ project }: { project: Project }) {
       const now = performance.now();
       if (now - lastWheel > GESTURE_END_MS) inGesture = false;
       lastWheel = now;
-      if (!inGesture && now - lastSwap >= MIN_SWAP_GAP_MS) {
+      if (!inGesture && now - lastSwap >= SWAP_COOLDOWN_MS) {
         inGesture = true;
         lastSwap = now;
         if (delta > 0 && canNext) next();
