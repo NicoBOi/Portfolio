@@ -26,15 +26,15 @@ export const metadata: Metadata = {
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="label text-white mb-6"
-      style={{ opacity: 0.5, letterSpacing: "0.36em", fontSize: "11px" }}
+      className="label text-white text-center mb-10"
+      style={{ opacity: 0.45, letterSpacing: "0.4em", fontSize: "11px" }}
     >
       {children}
     </p>
   );
 }
 
-function InfoRow({
+function InfoLine({
   label,
   value,
   href,
@@ -47,34 +47,32 @@ function InfoRow({
 }) {
   const content = (
     <span
-      className="text-white font-light"
-      style={{ fontSize: "1rem", opacity: 0.9 }}
+      className="text-white font-light block"
+      style={{ fontSize: "1.1rem", opacity: 1 }}
     >
       {value}
     </span>
   );
   return (
-    <div className="grid grid-cols-12 items-baseline py-4 gap-4">
+    <div className="flex flex-col items-center gap-1">
       <span
-        className="col-span-5 sm:col-span-4 label text-white"
-        style={{ opacity: 0.5, letterSpacing: "0.32em", fontSize: "11px" }}
+        className="label text-white"
+        style={{ opacity: 0.45, letterSpacing: "0.36em", fontSize: "11px" }}
       >
         {label}
       </span>
-      <span className="col-span-7 sm:col-span-8">
-        {href ? (
-          <a
-            href={href}
-            target={external ? "_blank" : undefined}
-            rel={external ? "noopener noreferrer" : undefined}
-            className="hover:opacity-100 transition-opacity duration-300"
-          >
-            {content}
-          </a>
-        ) : (
-          content
-        )}
-      </span>
+      {href ? (
+        <a
+          href={href}
+          target={external ? "_blank" : undefined}
+          rel={external ? "noopener noreferrer" : undefined}
+          className="hover:opacity-100 transition-opacity duration-300"
+        >
+          {content}
+        </a>
+      ) : (
+        content
+      )}
     </div>
   );
 }
@@ -82,56 +80,57 @@ function InfoRow({
 export default function ContactPage() {
   return (
     <article className="bg-black min-h-screen">
-      {/* Header */}
-      <header className="px-6 md:px-10 pt-32 md:pt-28 pb-12 border-b border-white/10">
-        <div className="mb-6">
+      {/* Header — centered axis. */}
+      <header className="px-6 md:px-10 pt-32 md:pt-32 pb-16 md:pb-20 text-center border-b border-white/10">
+        <div className="mb-8 flex justify-center">
           <LiveStatus />
         </div>
         <h1
           className="text-white title"
-          style={{ fontSize: "clamp(3rem, 7vw, 7rem)", lineHeight: 1 }}
+          style={{ fontSize: "clamp(3rem, 8vw, 8rem)", lineHeight: 1 }}
         >
           Contact
         </h1>
       </header>
 
-      {/* Intro */}
-      <section className="px-6 md:px-10 py-16 md:py-20 border-b border-white/10">
+      {/* Intro — centered. */}
+      <section className="px-6 md:px-10 py-20 md:py-24 border-b border-white/10">
         <p
-          className="text-white font-light max-w-2xl"
-          style={{ fontSize: "1.05rem", lineHeight: 1.85, opacity: 0.9 }}
+          className="text-white font-light max-w-2xl mx-auto text-center"
+          style={{ fontSize: "1.05rem", lineHeight: 1.85, opacity: 1 }}
         >
           Parlez-moi du projet — campagne, éditorial, clip, ou 3D. Insta,
           mail ou le formulaire ci-dessous. Je réponds dans les 24 heures.
         </p>
       </section>
 
-      {/* Two columns: coordonnées | brief */}
-      <div className="grid grid-cols-1 md:grid-cols-12 px-6 md:px-10 py-16 md:py-20 gap-12 md:gap-16">
-        <aside className="md:col-span-5">
-          <SectionTitle>Coordonnées</SectionTitle>
-          <div className="flex flex-col divide-y divide-white/10 max-w-md">
-            <InfoRow
-              label="Email"
-              value="nicosmp.pro@gmail.com"
-              href="mailto:nicosmp.pro@gmail.com"
-            />
-            <InfoRow
-              label="Instagram"
-              value="@nicolas_Sempere"
-              href="https://instagram.com/nicolas_Sempere"
-              external
-            />
-            <InfoRow label="Basé à" value="Bordeaux — Paris" />
-            <InfoRow label="Délai de réponse" value="Sous 24 heures" />
-          </div>
-        </aside>
+      {/* Coordonnées — centered stack. */}
+      <section className="px-6 md:px-10 py-20 md:py-24 border-b border-white/10">
+        <SectionTitle>Coordonnées</SectionTitle>
+        <div className="flex flex-col items-center gap-10 max-w-md mx-auto">
+          <InfoLine
+            label="Email"
+            value="nicosmp.pro@gmail.com"
+            href="mailto:nicosmp.pro@gmail.com"
+          />
+          <InfoLine
+            label="Instagram"
+            value="@nicolas_Sempere"
+            href="https://instagram.com/nicolas_Sempere"
+            external
+          />
+          <InfoLine label="Basé à" value="Bordeaux — Paris" />
+          <InfoLine label="Délai de réponse" value="Sous 24 heures" />
+        </div>
+      </section>
 
-        <div className="md:col-span-7">
-          <SectionTitle>Brief — formulaire</SectionTitle>
+      {/* Brief — centered form. */}
+      <section className="px-6 md:px-10 py-20 md:py-24">
+        <SectionTitle>Brief — formulaire</SectionTitle>
+        <div className="max-w-xl mx-auto">
           <ContactForm />
         </div>
-      </div>
+      </section>
     </article>
   );
 }

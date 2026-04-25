@@ -28,14 +28,22 @@ export default function LiveStatus() {
       className="inline-flex items-center gap-3"
       aria-label="Disponible — Bordeaux"
     >
-      <span
-        className="block w-1.5 h-1.5 rounded-full bg-white"
-        style={{ opacity: 0.85 }}
-        aria-hidden="true"
-      />
+      <span className="relative inline-flex w-2 h-2" aria-hidden="true">
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{
+            backgroundColor: "#22c55e",
+            animation: "live-ping 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+          }}
+        />
+        <span
+          className="relative block w-full h-full rounded-full"
+          style={{ backgroundColor: "#22c55e", boxShadow: "0 0 8px rgba(34, 197, 94, 0.6)" }}
+        />
+      </span>
       <span
         className="label text-white"
-        style={{ opacity: 0.6, letterSpacing: "0.32em", fontSize: "11px" }}
+        style={{ opacity: 0.85, letterSpacing: "0.32em", fontSize: "11px" }}
       >
         Disponible · Bordeaux
         {time && <> · <span className="tabular-nums">{time}</span></>}
