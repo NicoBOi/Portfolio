@@ -304,22 +304,18 @@ export default function Hero({
         animate={{ scale: isProject ? 1.05 : 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-          {/* Rack-focus crossfade. Both layers mounted at once (mode="sync").
-              Outgoing defocuses to a soft bokeh + dims while fading; incoming
-              rises from the same bokeh state back to sharp and bright. Reads
-              like a photographer racking focus between two frames — no
-              motion, pure optics. */}
+          {/* Plain opacity crossfade. The blur version was killing the GPU
+              on full-viewport hero (filter: blur(22px) is a multi-pass
+              shader operation that gets heavy on 1440p+). Opacity is a
+              single composite step. */}
           <AnimatePresence mode="sync">
             <motion.div
               key={index}
               className="absolute inset-0 overflow-hidden bg-black"
-              initial={{ filter: "blur(22px) brightness(0.6)", opacity: 0 }}
-              animate={{ filter: "blur(0px) brightness(1)", opacity: 1 }}
-              exit={{ filter: "blur(22px) brightness(0.6)", opacity: 0 }}
-              transition={{
-                filter: { duration: 0.85, ease: SOFT },
-                opacity: { duration: 0.7, ease: SOFT },
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.1, ease: SOFT }}
             >
               {(() => {
                 // Self-hosted hero loop wins — direct <video>, no SDK.

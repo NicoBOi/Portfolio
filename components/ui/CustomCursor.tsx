@@ -40,53 +40,17 @@ export default function CustomCursor() {
     let visible = false;
     let moved = false;
 
-    // Cursor strategy: snap to the exact mouse position, but paint via rAF
-    // so we render at the monitor's native refresh rate (60 / 120 / 240 Hz)
-    // instead of mouse-poll rate (which can fire 1000x/s on gaming mice
-    // and waste transforms the GPU never composites). One rAF per frame =
-    // one transform per frame, always at the latest mouse coordinate.
-    // Result: zero perceived lag, no chunky steps — the cursor *is* the
-    // mouse, redrawn every frame the display can show.
-    let targetX = 0;
-    let targetY = 0;
-    let pending = false;
-    let lastSeen = 0;
-    let rafId: number | null = null;
-
-    const paint = () => {
-      el.style.transform = `translate3d(${targetX - 5}px, ${targetY - 5}px, 0)`;
-    };
-
-    const tick = (now: number) => {
-      pending = false;
-      paint();
-      // Keep the rAF loop alive for ~120ms after the last mouse signal so
-      // we don't restart on every micro-move. After the idle window passes
-      // we let it die — zero CPU when the cursor is truly still.
-      if (now - lastSeen < 120) {
-        rafId = requestAnimationFrame(tick);
-        pending = true;
-      } else {
-        rafId = null;
-      }
-    };
-
-    const schedule = () => {
-      lastSeen = performance.now();
-      if (pending) return;
-      pending = true;
-      rafId = requestAnimationFrame(tick);
-    };
-
+    // The cursor follows the mouse with a direct transform on every
+    // mousemove. The browser composites the GPU layer at the monitor's
+    // native refresh (60 / 120 / 240 Hz), so even if mousemove fires
+    // 1000x/s on a gaming mouse only the latest position per frame is
+    // ever painted. Simplest possible code, zero rAF loop overhead.
     const show = (x: number, y: number) => {
-      targetX = x;
-      targetY = y;
+      el.style.transform = `translate3d(${x - 5}px, ${y - 5}px, 0)`;
       if (!visible) {
-        paint();
         el.style.opacity = "1";
         visible = true;
       }
-      schedule();
     };
 
     const hide = () => {
@@ -135,7 +99,6 @@ export default function CustomCursor() {
 
     return () => {
       window.clearTimeout(fallbackTimer);
-      if (rafId !== null) cancelAnimationFrame(rafId);
       document.removeEventListener("mousemove", onMove, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseout", onWindowOut);
