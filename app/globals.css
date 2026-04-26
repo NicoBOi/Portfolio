@@ -6,6 +6,13 @@
 
 :root {
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Mobile hero filter bar height — kept in CSS so anything that needs
+     to clear it (the Ouvrir pill, project nav rows, etc.) can derive
+     its bottom offset from one source instead of re-doing the maths in
+     every component. The 5rem covers: py-3 wrapper (24px) + button
+     py-4 (32px) + 11px label + 1px border-top + a small safety margin
+     (~12px) so font-rendering variance can't tip it into the pill. */
+  --hero-filter-bar-h: calc(5rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* Respect the OS "reduce motion" preference. Kills CSS @keyframes and
