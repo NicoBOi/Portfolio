@@ -191,21 +191,30 @@ body {
 }
 
 /* ── Grain overlay ───────────────────────────────────────── */
+/* Two layers at different tile sizes (220 / 360) so the visual period
+   becomes LCM(220, 360) ≈ 1980 px — the eye can't lock onto the same
+   shape repeating across the viewport the way a single-tile grain does. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 9998;
   pointer-events: none;
-  opacity: 0.042;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 200px 200px;
+  opacity: 0.05;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='3' stitchTiles='stitch' seed='7'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='3'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat, repeat;
+  background-size: 220px 220px, 360px 360px;
+  background-position: 0 0, 80px 40px;
 }
 
 /* Animated film grain over the hero background — sits above the bg media
    and the dark scrim, below the foreground chrome. The bleed (130% size,
-   negative offset) lets the translation animation never show seams. */
+   negative offset) lets the translation animation never show seams. Two
+   stacked SVGs at 240 / 360 break up the periodicity, then the matrix on
+   each one drops bright noise to alpha=0 so the layer only adds shadow,
+   never lifts the blacks of the source. */
 .hero-grain {
   position: absolute;
   top: -15%;
@@ -213,31 +222,29 @@ body::after {
   width: 130%;
   height: 130%;
   pointer-events: none;
-  /* The SVG below outputs ONLY dark specks on transparent (a feColorMatrix
-     maps the noise's bright pixels to alpha 0). The layer can only add
-     shadow — it can never lift the blacks the way grey-noise overlays do.
-     The frame stays as dark as the source, the grain reads as fine dust. */
-  opacity: 0.75;
-  background-repeat: repeat;
-  background-size: 170px 170px;
-  /* Matrix tuned for accentuated coverage: alpha = -1.3 * R + 1.05, so
-     ~80% of noise pixels survive (vs ~50% before). Frame still can't
-     brighten — only the density of dark specks rises. */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.3 0 0 0 1.05'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23g)'/%3E%3C/svg%3E");
-  animation: heroGrain 0.45s steps(10) infinite;
+  opacity: 0.55;
+  background-repeat: repeat, repeat;
+  background-size: 240px 240px, 360px 360px;
+  background-position: 0 0, 90px 50px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.45' numOctaves='3' stitchTiles='stitch' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.2 0 0 0 1.0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.05 0 0 0 0.95'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation: heroGrain 0.5s steps(12) infinite;
   will-change: transform;
 }
 @keyframes heroGrain {
   0%   { transform: translate(0,    0); }
-  10%  { transform: translate(-5%,  -5%); }
-  20%  { transform: translate(-10%, 5%); }
-  30%  { transform: translate(5%,   -8%); }
-  40%  { transform: translate(-5%,  10%); }
-  50%  { transform: translate(-10%, 5%); }
-  60%  { transform: translate(10%,  0); }
-  70%  { transform: translate(0,    8%); }
-  80%  { transform: translate(-12%, 2%); }
-  90%  { transform: translate(8%,   5%); }
+  8%   { transform: translate(-6%,  -4%); }
+  16%  { transform: translate(-11%, 6%); }
+  25%  { transform: translate(4%,   -9%); }
+  33%  { transform: translate(-8%,  11%); }
+  42%  { transform: translate(9%,   -2%); }
+  50%  { transform: translate(-12%, 4%); }
+  58%  { transform: translate(11%,  -7%); }
+  66%  { transform: translate(-3%,  9%); }
+  75%  { transform: translate(7%,   -11%); }
+  83%  { transform: translate(-9%,  3%); }
+  91%  { transform: translate(5%,   8%); }
   100% { transform: translate(0,    0); }
 }
 @media (prefers-reduced-motion: reduce) {
