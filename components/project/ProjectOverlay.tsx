@@ -542,20 +542,20 @@ function PhotoCarousel({ project }: { project: Project }) {
       <motion.div
         ref={containerRef}
         // Carousel spans the full viewport so neighbours can run all the way
-        // off the screen edge. The mask-image fades the leftmost/rightmost
-        // 6% so they melt into the page background instead of cutting hard.
-        // Mobile sizes the carousel to the *active* slide's height (set
-        // inline below) so the title sits flush on top of the photo with
-        // no empty band — pagination then slots in right under the photo.
-        // Desktop keeps flex-1 + 58vh cap so the media absorbs whatever
-        // room the page gives it.
+        // off the screen edge. On desktop, the mask-image fades the
+        // leftmost / rightmost 6% so peeking neighbours melt into the page
+        // background instead of cutting hard. Mobile drops the mask: slides
+        // are full-width with no neighbour peek, so the fade would only be
+        // a soft fade-out at the photo's edges — visible and unwanted.
         className="relative w-screen md:h-auto md:flex-1 md:min-h-0 md:max-h-[58vh] overflow-hidden"
         style={{
           height: isDesktop ? undefined : (currentSlideH || "50vh"),
-          maskImage:
-            "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
+          maskImage: isDesktop
+            ? "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)"
+            : undefined,
+          WebkitMaskImage: isDesktop
+            ? "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)"
+            : undefined,
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -578,11 +578,27 @@ function PhotoCarousel({ project }: { project: Project }) {
               <button
                 key={f}
                 type="button"
-                onClick={() => (isCurrent ? setLightbox(i) : goTo(i))}
+                // Tap on the active slide opens the lightbox on desktop only
+                // — the mobile carousel already shows the photo full-width,
+                // a fullscreen mode would just be the same image with chrome
+                // on top. Tap on a non-active slide jumps to it on both
+                // platforms.
+                onClick={() => {
+                  if (isCurrent && isDesktop) setLightbox(i);
+                  else if (!isCurrent) goTo(i);
+                }}
                 className="shrink-0 relative block overflow-hidden md:rounded-[20px] isolate"
                 style={{ width: dim.w || 1, height: dim.h || 1 }}
-                data-cursor={isCurrent ? "Agrandir" : i < idx ? "Précédent" : "Suivant"}
-                aria-label={isCurrent ? `Agrandir la photo ${i + 1}` : `Photo ${i + 1}`}
+                data-cursor={
+                  isCurrent
+                    ? isDesktop ? "Agrandir" : undefined
+                    : i < idx ? "Précédent" : "Suivant"
+                }
+                aria-label={
+                  isCurrent && isDesktop
+                    ? `Agrandir la photo ${i + 1}`
+                    : `Photo ${i + 1}`
+                }
                 aria-current={isCurrent ? "true" : undefined}
                 tabIndex={isCurrent ? 0 : -1}
               >
@@ -646,13 +662,18 @@ function PhotoCarousel({ project }: { project: Project }) {
         </div>
       )}
 
-      <Lightbox
-        slug={project.slug}
-        files={files}
-        index={lightbox}
-        onClose={() => setLightbox(null)}
-        onChange={setLightbox}
-      />
+      {/* Mobile carousel never opens the lightbox (the photo is already
+          full-bleed in the overlay), so the chunk + react-zoom-pan-pinch
+          dependency only loads on desktop. */}
+      {isDesktop && (
+        <Lightbox
+          slug={project.slug}
+          files={files}
+          index={lightbox}
+          onClose={() => setLightbox(null)}
+          onChange={setLightbox}
+        />
+      )}
     </>
   );
 }
