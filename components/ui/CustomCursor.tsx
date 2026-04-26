@@ -39,30 +39,49 @@ export default function CustomCursor() {
 
     let visible = false;
     let moved = false;
-    // rAF-throttled position commit. pointermove can fire at the mouse's
-    // sample rate (often 1000 Hz on gaming mice, sometimes more frequent
-    // than the display refresh) — we collect the latest sample in a local
-    // and flush exactly once per frame, so the cursor commits in lockstep
-    // with the display's vsync at 60 / 120 / 144 / 240 Hz, no faster, no
-    // slower. Result is one transform write per painted frame: zero
-    // wasted JS, zero subframe drift, perfectly fluid on every monitor.
-    let pendingX = 0;
-    let pendingY = 0;
+    let initialised = false;
+    // The mouse fires at its own sample rate (60 Hz on a basic optical
+    // mouse, 1000+ Hz on a gaming one). Writing the transform straight
+    // out of pointermove means the cursor only moves when the mouse
+    // sends a sample — on a 60 Hz mouse against a 144 / 240 Hz display
+    // the cursor visibly steps. Instead, decouple the two: pointermove
+    // only updates a target, and a rAF loop interpolates the cursor
+    // toward that target every paint frame. The browser ticks rAF at
+    // the display's refresh rate (60 / 120 / 144 / 240 Hz) so the
+    // cursor moves as fluidly as the screen can paint, regardless of
+    // how often the mouse reports. The loop pauses itself once the
+    // cursor settles on the target so it doesn't spin idle.
+    let targetX = 0;
+    let targetY = 0;
+    let renderX = 0;
+    let renderY = 0;
     let rafId = 0;
+    // Smoothing factor — closer to 1 = snappier / less lag, closer to 0
+    // = silkier / more lag. 0.35 lands at ~2 frames of latency on a 60 Hz
+    // monitor, ~1 frame on 144 Hz, which reads as instant 1:1 tracking
+    // while still smoothing the inter-sample gaps.
+    const SMOOTHING = 0.35;
 
-    const flush = () => {
-      rafId = 0;
-      el.style.transform = `translate3d(${pendingX - 5}px, ${pendingY - 5}px, 0)`;
-      if (!visible) {
-        el.style.opacity = "1";
-        visible = true;
-      }
+    const commit = () => {
+      el.style.transform = `translate3d(${renderX - 5}px, ${renderY - 5}px, 0)`;
     };
 
-    const schedule = (x: number, y: number) => {
-      pendingX = x;
-      pendingY = y;
-      if (rafId === 0) rafId = requestAnimationFrame(flush);
+    const tick = () => {
+      const dx = targetX - renderX;
+      const dy = targetY - renderY;
+      // ~0.05 px is well below a CSS pixel — once we're inside that
+      // tolerance, snap to target and stop the loop.
+      if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) {
+        renderX = targetX;
+        renderY = targetY;
+        commit();
+        rafId = 0;
+        return;
+      }
+      renderX += dx * SMOOTHING;
+      renderY += dy * SMOOTHING;
+      commit();
+      rafId = requestAnimationFrame(tick);
     };
 
     const hide = () => {
@@ -76,7 +95,21 @@ export default function CustomCursor() {
 
     const onMove = (e: PointerEvent | MouseEvent) => {
       if (!moved) moved = true;
-      schedule(e.clientX, e.clientY);
+      targetX = e.clientX;
+      targetY = e.clientY;
+      // First move: place the cursor under the pointer with no
+      // ease-in animation so it doesn't fly across the screen on entry.
+      if (!initialised) {
+        renderX = targetX;
+        renderY = targetY;
+        initialised = true;
+        commit();
+      }
+      if (!visible) {
+        el.style.opacity = "1";
+        visible = true;
+      }
+      if (rafId === 0) rafId = requestAnimationFrame(tick);
     };
 
     const onOver = (e: MouseEvent) => {
