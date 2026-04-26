@@ -23,7 +23,14 @@ export const metadata: Metadata = {
   },
 };
 
-const INFLUENCES = ["Lars von Trier", "Ash Thorp", "Beksiński"];
+const CLIENTS = [
+  "Sephora",
+  "Philips",
+  "A Better Feeling",
+  "Showroomprivé",
+  "Sink Deeper",
+  "MadeInParis",
+];
 
 export default function AboutPage() {
   return (
@@ -77,19 +84,27 @@ export default function AboutPage() {
           style={{ width: 44, opacity: 0.35 }}
         />
 
-        <p
-          className="label text-white inline-flex items-center gap-3 flex-wrap justify-center"
-          style={{ opacity: 0.6, letterSpacing: "0.32em", fontSize: "11px" }}
-        >
-          {INFLUENCES.map((n, i) => (
-            <span key={n} className="inline-flex items-center gap-3">
-              {i > 0 && (
-                <span aria-hidden="true" style={{ opacity: 0.4 }}>·</span>
-              )}
-              {n}
-            </span>
-          ))}
-        </p>
+        <div className="flex flex-col items-center gap-3">
+          <span
+            className="label text-white"
+            style={{ opacity: 0.4, letterSpacing: "0.4em", fontSize: "10px" }}
+          >
+            Clients
+          </span>
+          <p
+            className="label text-white inline-flex items-center gap-3 flex-wrap justify-center"
+            style={{ opacity: 0.6, letterSpacing: "0.32em", fontSize: "11px" }}
+          >
+            {CLIENTS.map((n, i) => (
+              <span key={n} className="inline-flex items-center gap-3">
+                {i > 0 && (
+                  <span aria-hidden="true" style={{ opacity: 0.4 }}>·</span>
+                )}
+                {n}
+              </span>
+            ))}
+          </p>
+        </div>
       </div>
 
       {/* Bottom row — name kicker (left), disciplines list (center), pill CTA (right). */}
