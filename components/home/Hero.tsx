@@ -48,6 +48,23 @@ export default function Hero({
   });
   const [loaded, setLoaded] = useState(false);
   const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  // Track viewport width + mobile flag. The mobile-only Instagram-style
+  // drag carousel needs the actual pixel width to drive its `animate.x`
+  // and dragConstraints. SSR ships isMobile=false; after mount we read
+  // the real value and the desktop AnimatePresence vs mobile drag track
+  // resolves to the right path.
+  const [vw, setVw] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      setVw(w);
+      setIsMobile(w < 768);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   // "Tout" keeps the curated featured highlight reel; a discipline filter
   // opens up to the full catalogue of that type so nothing gets hidden when
@@ -194,40 +211,10 @@ export default function Hero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featuredLen, isProject, index, filter]);
 
-  // Touch swipe — horizontal on mobile. Swipe left = next, swipe right
-  // = previous. Discrete threshold to trigger the dolly-in cut.
+  // Touch swipe is handled by the mobile drag track now (framer-motion
+  // drag at the slide-track level). The window-level listener stays
+  // disarmed so it doesn't fight with the carousel's own gesture.
   const swipingRef = useRef(false);
-  useEffect(() => {
-    if (isProject || featuredLen <= 1) return;
-    let sx = 0;
-    let sy = 0;
-    const ts = (e: TouchEvent) => {
-      sx = e.touches[0].clientX;
-      sy = e.touches[0].clientY;
-      swipingRef.current = false;
-    };
-    const tm = (e: TouchEvent) => {
-      const dx = Math.abs(e.touches[0].clientX - sx);
-      const dy = Math.abs(e.touches[0].clientY - sy);
-      if (dx > 10 && dx > dy) swipingRef.current = true;
-    };
-    const te = (e: TouchEvent) => {
-      const dx = sx - e.changedTouches[0].clientX;
-      const dy = sy - e.changedTouches[0].clientY;
-      if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
-        setIndex((i) => (dx > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
-      }
-      window.setTimeout(() => { swipingRef.current = false; }, 160);
-    };
-    window.addEventListener("touchstart", ts, { passive: true });
-    window.addEventListener("touchmove", tm, { passive: true });
-    window.addEventListener("touchend", te, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", ts);
-      window.removeEventListener("touchmove", tm);
-      window.removeEventListener("touchend", te);
-    };
-  }, [featuredLen, isProject]);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
   const rafRef = useRef<number | null>(null);
@@ -295,6 +282,10 @@ export default function Hero({
         className="absolute inset-0 z-0"
         onClick={() => {
           if (isProject) return;
+          // On mobile the inner drag track owns taps via its own onTap —
+          // letting this fire too would call openProject twice. Desktop
+          // keeps it as the click target for the centred backdrop.
+          if (isMobile) return;
           if (swipingRef.current) return;
           openProject(current.slug);
         }}
@@ -303,58 +294,85 @@ export default function Hero({
         animate={{ scale: isProject ? 1.05 : 1 }}
         transition={{ duration: 0.9, ease: SOFT }}
       >
-          {/* Plain opacity crossfade. The blur version was killing the GPU
-              on full-viewport hero (filter: blur(22px) is a multi-pass
-              shader operation that gets heavy on 1440p+). Opacity is a
-              single composite step. */}
-          <AnimatePresence mode="sync">
+          {isMobile && !isProject ? (
+            /* Mobile carousel — Instagram-style. The track holds every
+               FEATURED slide side by side, follows the finger via
+               framer-motion drag, and snaps to the nearest slide on
+               release (or to a neighbour past the velocity threshold).
+               Only the active slide ± 1 carry the full media so we never
+               keep more than three videos / iframes alive at once. */
             <motion.div
-              key={index}
-              className="absolute inset-0 overflow-hidden bg-black"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.1, ease: SOFT }}
+              className="absolute inset-0 flex"
+              style={{ width: `${featuredLen * 100}vw`, touchAction: "pan-y" }}
+              drag="x"
+              dragConstraints={{ left: -(featuredLen - 1) * vw, right: 0 }}
+              dragElastic={0.12}
+              dragMomentum={false}
+              animate={{ x: -index * vw }}
+              transition={{ type: "spring", stiffness: 280, damping: 32, mass: 0.6 }}
+              onDragEnd={(_, info) => {
+                const { offset, velocity } = info;
+                const SNAP = vw * 0.18;
+                const VEL = 360;
+                if ((offset.x < -SNAP || velocity.x < -VEL) && index < featuredLen - 1) {
+                  setIndex((i) => i + 1);
+                } else if ((offset.x > SNAP || velocity.x > VEL) && index > 0) {
+                  setIndex((i) => i - 1);
+                }
+              }}
+              onTap={() => {
+                if (!isProject) openProject(current.slug);
+              }}
             >
-              {(() => {
-                // Self-hosted hero loop wins — direct <video>, no SDK.
-                if (current.videoFile) {
-                  const poster = current.imageFiles?.[0]
-                    ? `/projects/${current.slug}/${current.imageFiles[0]}`
-                    : undefined;
-                  return (
-                    <HeroLocalVideo
-                      key={current.slug}
-                      src={`/projects/${current.slug}/${current.videoFile}`}
-                      poster={poster}
-                    />
-                  );
-                }
-                const vId = getVimeoId(current.videoUrl);
-                if (vId) {
-                  const aspectStr = current.videoAspect ?? "16/9";
-                  const [aw, ah] = aspectStr.split("/").map(Number);
-                  return <HeroVimeo vimeoId={vId} ratio={aw / ah} />;
-                }
-                if (current.youtubeId) {
-                  return <HeroYouTube youtubeId={current.youtubeId} />;
-                }
-                if (current.imageFiles && current.imageFiles.length > 0) {
-                  return (
-                    <Image
-                      src={`/projects/${current.slug}/${current.imageFiles[0]}`}
-                      alt={current.title}
-                      fill
-                      priority
-                      sizes="100vw"
-                      className="object-cover"
-                    />
-                  );
-                }
-                return <div className="placeholder-img text-white h-full">Image</div>;
-              })()}
+              {FEATURED.map((p, i) => {
+                const dist = Math.abs(i - index);
+                const live = dist <= 1;
+                const cover = p.imageFiles?.[0]
+                  ? `/projects/${p.slug}/${p.imageFiles[0]}`
+                  : null;
+                return (
+                  <div
+                    key={p.slug}
+                    className="relative shrink-0 w-screen h-full overflow-hidden bg-black"
+                  >
+                    {live ? (
+                      <HeroMediaSlot project={p} priority={i === index} />
+                    ) : cover ? (
+                      <Image
+                        src={cover}
+                        alt={p.title}
+                        fill
+                        sizes="100vw"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="absolute inset-0"
+                        style={{ backgroundColor: p.coverPlaceholder }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </motion.div>
-          </AnimatePresence>
+          ) : (
+            /* Plain opacity crossfade. The blur version was killing the GPU
+               on full-viewport hero (filter: blur(22px) is a multi-pass
+               shader operation that gets heavy on 1440p+). Opacity is a
+               single composite step. */
+            <AnimatePresence mode="sync">
+              <motion.div
+                key={index}
+                className="absolute inset-0 overflow-hidden bg-black"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.1, ease: SOFT }}
+              >
+                <HeroMediaSlot project={current} priority />
+              </motion.div>
+            </AnimatePresence>
+          )}
 
           <div className="absolute inset-0 bg-black/50 pointer-events-none" />
 
@@ -718,6 +736,47 @@ export default function Hero({
         </AnimatePresence>
     </section>
   );
+}
+
+// Renders the right media element for a project — self-hosted webm wins,
+// then Vimeo, then YouTube, then the cover image as a static fallback.
+// Used by both the desktop AnimatePresence path and each slide of the
+// mobile drag carousel.
+function HeroMediaSlot({ project, priority = false }: { project: Project; priority?: boolean }) {
+  if (project.videoFile) {
+    const poster = project.imageFiles?.[0]
+      ? `/projects/${project.slug}/${project.imageFiles[0]}`
+      : undefined;
+    return (
+      <HeroLocalVideo
+        key={project.slug}
+        src={`/projects/${project.slug}/${project.videoFile}`}
+        poster={poster}
+      />
+    );
+  }
+  const vId = getVimeoId(project.videoUrl);
+  if (vId) {
+    const aspectStr = project.videoAspect ?? "16/9";
+    const [aw, ah] = aspectStr.split("/").map(Number);
+    return <HeroVimeo vimeoId={vId} ratio={aw / ah} />;
+  }
+  if (project.youtubeId) {
+    return <HeroYouTube youtubeId={project.youtubeId} />;
+  }
+  if (project.imageFiles && project.imageFiles.length > 0) {
+    return (
+      <Image
+        src={`/projects/${project.slug}/${project.imageFiles[0]}`}
+        alt={project.title}
+        fill
+        priority={priority}
+        sizes="100vw"
+        className="object-cover"
+      />
+    );
+  }
+  return <div className="placeholder-img text-white h-full">Image</div>;
 }
 
 // Self-hosted hero loop. Plain <video>, no SDK overhead.
