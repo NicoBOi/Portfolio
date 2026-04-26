@@ -67,12 +67,12 @@ export default function CustomCursor() {
       const target = e.target as HTMLElement;
       const interactive = closestInteractive(target);
       const { label: explicit, suppress, silent } = readCursorInfo(target);
-      let label = explicit;
-      if (!label && !suppress && interactive) {
-        // Default label: the element's own text, trimmed and compact
-        const text = (interactive.innerText || "").trim().split("\n")[0];
-        label = text && text.length <= 24 ? text : "→";
-      }
+      // Echoing the element's own text was redundant ("Écrivez-moi"
+      // button → cursor whispered "Écrivez-moi" right next to it). For
+      // any interactive element without an explicit data-cursor, fall
+      // back to a neutral "→" — it nudges toward the click without
+      // duplicating the affordance.
+      const label = explicit ?? (!suppress && interactive ? "→" : null);
       // `silent` shows the label but never flips the red/blink state
       const hovered = silent ? false : !!interactive || !!label;
       setState((prev) =>
