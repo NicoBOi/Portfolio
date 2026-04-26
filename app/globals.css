@@ -310,7 +310,48 @@ body::after {
 }
 
 
-/* ── Cursor REC pulse ────────────────────────────────────── */
+/* ── Custom cursor ───────────────────────────────────────── */
+/* Conteneur transformé sur sa propre couche GPU — translateZ(0) + will-change
+   garantissent la promotion compositor, contain isole ses recompositions
+   du reste de la page. Aucun mix-blend-mode ici : le blend reste sur les
+   enfants seuls pour ne pas obliger le compositeur à rasteriser le parent
+   à chaque déplacement. */
+.custom-cursor {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.custom-cursor-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: white;
+  mix-blend-mode: difference;
+}
+.custom-cursor.is-hovered .custom-cursor-dot {
+  background: #aa0000;
+  mix-blend-mode: normal;
+  animation: rec-blink 0.28s ease-in-out infinite alternate;
+}
+
+.custom-cursor-label {
+  position: absolute;
+  top: -1px;
+  left: 16px;
+  white-space: nowrap;
+  opacity: 0.65;
+  mix-blend-mode: difference;
+  line-height: 12px;
+  pointer-events: none;
+  color: white;
+  font-family: var(--font-fragment), 'Fragment Mono', "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 @keyframes rec-blink {
   from { opacity: 1; }
   to   { opacity: 0.05; }
