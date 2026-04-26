@@ -215,6 +215,9 @@ export default function Hero({
   // drag at the slide-track level). The window-level listener stays
   // disarmed so it doesn't fight with the carousel's own gesture.
   const swipingRef = useRef(false);
+  // Manual tap detector for the mobile drag track — see onPointerDown /
+  // onPointerUp on that motion.div.
+  const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
   // Magnetic letter repulsion — direct DOM manipulation, no re-render, throttled to rAF
   const rafRef = useRef<number | null>(null);
@@ -320,8 +323,32 @@ export default function Hero({
                   setIndex((i) => i - 1);
                 }
               }}
-              onTap={() => {
-                if (!isProject) openProject(current.slug);
+              // Manual tap detection — framer-motion's onTap was firing
+              // for any swipe that didn't quite cross its internal drag
+              // threshold, which on mobile meant "I tried to swipe but
+              // ended up opening the project". Track the pointer
+              // ourselves and only treat it as a tap if it moved less
+              // than 6 px and lifted within 400 ms.
+              onPointerDown={(e) => {
+                pressRef.current = {
+                  x: e.clientX,
+                  y: e.clientY,
+                  t: performance.now(),
+                };
+              }}
+              onPointerUp={(e) => {
+                const start = pressRef.current;
+                pressRef.current = null;
+                if (!start) return;
+                const dx = Math.abs(e.clientX - start.x);
+                const dy = Math.abs(e.clientY - start.y);
+                const dt = performance.now() - start.t;
+                if (dx < 6 && dy < 6 && dt < 400 && !isProject) {
+                  openProject(current.slug);
+                }
+              }}
+              onPointerCancel={() => {
+                pressRef.current = null;
               }}
             >
               {FEATURED.map((p, i) => {
