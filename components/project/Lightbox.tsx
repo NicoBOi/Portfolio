@@ -95,11 +95,17 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
                   wrapperStyle={{ width: "100%", height: "100%" }}
                   contentStyle={{ width: "100%", height: "100%" }}
                 >
+                  {/* Mobile: image fills the full viewport (object-contain
+                      preserves aspect, so any natural letterbox stays
+                      black-on-black instead of a small image floating in
+                      the middle of the screen). Desktop keeps a 94vw /
+                      92vh inset so the chrome at the corners isn't sitting
+                      directly on the photo. */}
                   <div className="w-full h-full flex items-center justify-center">
                     <img
                       src={`/projects/${slug}/${current}`}
                       alt=""
-                      className="max-w-[94vw] max-h-[92vh] object-contain select-none"
+                      className="w-screen h-[100dvh] md:w-auto md:h-auto md:max-w-[94vw] md:max-h-[92vh] object-contain select-none"
                       draggable={false}
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -111,18 +117,32 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
 
           {/* Chrome — lifted above the zoom wrapper via z-[20] and wired to
               onPointerUp so the gesture library (which claims pointer/click
-              events during pan/pinch) can't swallow the tap. */}
+              events during pan/pinch) can't swallow the tap. mix-blend-mode:
+              difference keeps every label legible against any image, which
+              is what lets the photo go full-bleed on mobile underneath. */}
           <button
             type="button"
             onPointerUp={(e) => { e.stopPropagation(); onClose(); }}
             onClick={(e) => e.stopPropagation()}
             className="hit absolute top-5 right-6 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-2 -mx-3"
-            style={{ opacity: 0.75, pointerEvents: "auto" }}
+            style={{
+              opacity: 0.85,
+              mixBlendMode: "difference",
+              paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+              pointerEvents: "auto",
+            }}
           >
             Fermer
           </button>
 
-          <span className="absolute top-5 left-6 z-[20] label text-white pointer-events-none" style={{ opacity: 0.55 }}>
+          <span
+            className="absolute top-5 left-6 z-[20] label text-white pointer-events-none"
+            style={{
+              opacity: 0.7,
+              mixBlendMode: "difference",
+              paddingTop: "max(0rem, env(safe-area-inset-top))",
+            }}
+          >
             {rendered !== null ? String(rendered + 1).padStart(2, "0") : "00"} / {String(files.length).padStart(2, "0")}
           </span>
 
@@ -132,7 +152,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
               onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! - 1); }}
               onClick={(e) => e.stopPropagation()}
               className="hit absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
-              style={{ opacity: 0.65, pointerEvents: "auto" }}
+              style={{ opacity: 0.75, mixBlendMode: "difference", pointerEvents: "auto" }}
               data-cursor="Précédent"
               aria-label="Précédent"
             >
@@ -146,7 +166,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
               onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! + 1); }}
               onClick={(e) => e.stopPropagation()}
               className="hit absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
-              style={{ opacity: 0.65, pointerEvents: "auto" }}
+              style={{ opacity: 0.75, mixBlendMode: "difference", pointerEvents: "auto" }}
               data-cursor="Suivant"
               aria-label="Suivant"
             >

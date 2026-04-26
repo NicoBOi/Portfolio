@@ -118,15 +118,25 @@ export default function AboutPage() {
           ))}
         </span>
 
+        {/* Same signature as the landing's Ouvrir pill — white rounded
+            pill, italic title, scale-on-hover, underline drawing under
+            the label on hover, scale-down on tap. CSS-only so the page
+            can stay a server component. */}
         <Link
           href="/contact"
-          className="inline-flex items-center rounded-full bg-white text-black px-5 md:px-8 py-2 md:py-3 transition-colors duration-300 hover:bg-white/90 md:justify-self-end"
+          className="group pointer-events-auto inline-flex items-center rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3 transition-transform duration-[280ms] ease-out-expo hover:scale-[1.03] active:scale-[0.96] md:justify-self-end"
         >
-          <span
-            className="title italic block leading-none whitespace-nowrap"
-            style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)" }}
-          >
-            Écrivez-moi
+          <span className="relative inline-block leading-none">
+            <span
+              className="title italic block whitespace-nowrap"
+              style={{ fontSize: "clamp(1.05rem, 1.4vw, 1.2rem)" }}
+            >
+              Écrivez-moi
+            </span>
+            <span
+              aria-hidden="true"
+              className="absolute left-0 right-0 -bottom-1 h-px bg-black origin-left scale-x-0 opacity-0 transition-all duration-[450ms] ease-out-expo group-hover:scale-x-100 group-hover:opacity-70"
+            />
           </span>
         </Link>
       </div>
