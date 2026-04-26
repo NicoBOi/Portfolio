@@ -1,11 +1,5 @@
 export type ProjectType = "photo" | "video" | "3d";
 
-export interface ProjectMeta {
-  type: string;      // e.g. "Mode / projet personnel"
-  location: string;  // e.g. "Bordeaux, France"
-  credits: string;   // e.g. "Photo & post-prod"
-}
-
 export interface Project {
   slug: string;
   title: string;
@@ -14,9 +8,7 @@ export interface Project {
   type: ProjectType;
   category: string;
   coverPlaceholder: string;
-  meta: ProjectMeta;
   description?: string;
-  images?: number;
   imageFiles?: string[];
   videoUrl?: string;
   /** Self-hosted hero loop, filename in /public/projects/<slug>/. Used as
@@ -39,11 +31,8 @@ export const projects: Project[] = [
     type: "3d",
     category: "3D",
     coverPlaceholder: "#0A0A0C",
-    meta: {
-      type: "Showreel / motion design 3D",
-      location: "Bordeaux, France",
-      credits: "Réalisation & post-prod",
-    },
+    description:
+      "Mes projets 3D — commerciaux comme personnels — montés sur un seul rythme.",
     videoUrl: "https://vimeo.com/722586890",
     videoFile: "hero.webm",
     videoAspect: "2.39/1",
@@ -58,11 +47,8 @@ export const projects: Project[] = [
     type: "video",
     category: "Clip",
     coverPlaceholder: "#0B0A0D",
-    meta: {
-      type: "Clip musical pour Sink Deeper",
-      location: "Clermont-Ferrand, France",
-      credits: "Réalisation & montage",
-    },
+    description:
+      "Premier clip de Sink Deeper, réalisé et monté de bout en bout.",
     youtubeId: "ypJkTv3gFX8",
     videoFile: "hero.webm",
     aspectRatio: "landscape",
@@ -76,11 +62,8 @@ export const projects: Project[] = [
     type: "3d",
     category: "3D",
     coverPlaceholder: "#14100E",
-    meta: {
-      type: "Pub 3D parfum pour Affinessence",
-      location: "Paris, France",
-      credits: "Réalisation 3D & post-prod",
-    },
+    description:
+      "Pub 3D pour Affinessence. Installer le luxe sans en surjouer les codes.",
     videoUrl: "https://vimeo.com/1033824012",
     videoFile: "hero.webm",
     videoAspect: "4/5",
@@ -95,11 +78,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Portrait",
     coverPlaceholder: "#1E1A18",
-    meta: {
-      type: "Portrait / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Une série de portraits où l'orchidée prend la place du regard. Le visage s'efface, la fleur tient le cadre.",
     imageFiles: [
       "DSCF7145-Modifier_AVIF.avif",
       "DSCF7125_AVIF.avif",
@@ -120,11 +100,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#0F1115",
-    meta: {
-      type: "Nocturne / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Bordeaux la nuit, lumières flottantes et silhouettes en suspens. Une promenade qui finit par ressembler à un rêve.",
     imageFiles: [
       "DSCF0244_AVIF.avif",
       "DSCF0356-2_AVIF.avif",
@@ -143,11 +120,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1A2430",
-    meta: {
-      type: "Intérieur / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Une salle de bain bleue, captée dans l'isolement du soir. Tout y est immobile.",
     imageFiles: [
       "P1000698_AVIF.avif",
       "P1000705_AVIF.avif",
@@ -169,11 +143,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1D2118",
-    meta: {
-      type: "Paysage / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Trois parcs traversés sur le même tempo. Les paysages qu'on regarde sans les voir, restitués un à un.",
     imageFiles: [
       "DSCF1302_AVIF.avif",
       "DSCF0221_AVIF.avif",
@@ -193,11 +164,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1A1414",
-    meta: {
-      type: "Documentaire / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Documenter une séance de shibari. Le lien comme écriture sur le corps, photographié sans détourner les yeux.",
     imageFiles: [
       "14_AVIF.avif",
       "3_AVIF.avif",
@@ -218,11 +186,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Mode",
     coverPlaceholder: "#241820",
-    meta: {
-      type: "Mode / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Mode pop, latex, palettes saturées. La couleur poussée jusqu'au sucre, à la limite du soutenable.",
     imageFiles: [
       "DSCF0493_AVIF.avif",
       "DSCF0129_AVIF.avif",
@@ -240,11 +205,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Éditorial",
     coverPlaceholder: "#201A16",
-    meta: {
-      type: "Éditorial / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Une chambre, des draps, une pose tenue juste avant le geste. L'éditorial dans son moment d'attente.",
     imageFiles: [
       "P1001664-2_AVIF.avif",
       "P1001688-2_AVIF.avif",
@@ -263,11 +225,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#17181A",
-    meta: {
-      type: "Fiction / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Une nymphe en couloir, entre deux portes, dans une lumière qui hésite. Fiction courte montée comme un rêve.",
     imageFiles: [
       "DSCF6154_AVIF.avif",
       "DSCF6082_AVIF.avif",
@@ -283,11 +242,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#141414",
-    meta: {
-      type: "Série noir & blanc / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "Noir profond, blanc cassé. La photographie revenue à ses textures, sans concession à la couleur.",
     imageFiles: [
       "P1002222_AVIF.avif",
       "P1001913-3_AVIF.avif",
@@ -304,11 +260,8 @@ export const projects: Project[] = [
     type: "photo",
     category: "Personnel",
     coverPlaceholder: "#1C1E17",
-    meta: {
-      type: "Paysage / projet personnel",
-      location: "Bordeaux, France",
-      credits: "Photo & post-prod",
-    },
+    description:
+      "L'herbe haute d'un été qui s'étire. Paysage minimal pour un souvenir qu'on n'attendait pas à garder.",
     imageFiles: [
       "P1002259-2_AVIF.avif",
       "P1002225_AVIF.avif",

@@ -120,10 +120,13 @@ export default function Hero({
   }, []);
 
   // Warm the browser cache for every featured image right after first paint
-  // so wheel/swipe transitions + filter changes don't stall on a network fetch.
-  // Use requestIdleCallback so this runs during browser downtime without
-  // competing with the LCP paint — with a short setTimeout fallback for Safari.
+  // so wheel / swipe transitions + filter changes don't stall on a network
+  // fetch. We also fire prefetch link tags for the videoFiles of the next
+  // two featured projects so the mobile carousel's first swipe lands on
+  // already-buffered media. Runs on requestIdleCallback so it never
+  // competes with the LCP paint (Safari falls back to a short setTimeout).
   useEffect(() => {
+    const links: HTMLLinkElement[] = [];
     const warm = () => {
       ALL_FEATURED.forEach((p) => {
         const first = p.imageFiles?.[0];
@@ -133,15 +136,35 @@ export default function Hero({
           img.src = `/projects/${p.slug}/${first}`;
         }
       });
+      // Slot 0 is already preloaded by the SSR <link> in the layout.
+      // Prefetch the next two video files so the swipe / wheel into them
+      // is instant on a cold visit.
+      ALL_FEATURED.slice(1, 3).forEach((p) => {
+        if (!p.videoFile) return;
+        const link = document.createElement("link");
+        link.rel = "prefetch";
+        link.as = "video";
+        link.href = `/projects/${p.slug}/${p.videoFile}`;
+        document.head.appendChild(link);
+        links.push(link);
+      });
     };
     type IC = (cb: () => void, opts?: { timeout?: number }) => number;
     const ric = (window as unknown as { requestIdleCallback?: IC }).requestIdleCallback;
+    let id: number | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (ric) {
-      const id = ric(warm, { timeout: 800 });
-      return () => (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(id);
+      id = ric(warm, { timeout: 800 });
+    } else {
+      timer = setTimeout(warm, 120);
     }
-    const t = setTimeout(warm, 120);
-    return () => clearTimeout(t);
+    return () => {
+      if (id !== undefined) {
+        (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(id);
+      }
+      if (timer) clearTimeout(timer);
+      links.forEach((l) => l.remove());
+    };
   }, []);
 
   // Wheel — one swap per intentional gesture. A gesture is closed as soon

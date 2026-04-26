@@ -5,10 +5,65 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+interface FieldProps {
+  name: string;
+  label: string;
+  type?: "text" | "email";
+  placeholder?: string;
+  required?: boolean;
+  delay?: number;
+}
+
+// Single text input — the bottom border draws under the label on focus
+// (left → right) instead of just changing colour, matching the Ouvrir /
+// Écrivez-moi pill underline vocabulary.
+function Field({ name, label, type = "text", placeholder, required, delay = 0 }: FieldProps) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay, ease: SOFT }}
+      className="flex flex-col gap-2.5"
+    >
+      <label className="label text-white" style={{ opacity: focused ? 0.85 : 0.55, transition: "opacity 0.3s" }}>
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          type={type}
+          name={name}
+          required={required}
+          placeholder={placeholder}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          className="w-full pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18"
+          style={{ letterSpacing: "0.02em" }}
+        />
+        {/* Static rule */}
+        <span
+          aria-hidden="true"
+          className="absolute left-0 right-0 bottom-0 h-px bg-white/12"
+        />
+        {/* Animated focus rule — draws from the left */}
+        <motion.span
+          aria-hidden="true"
+          className="absolute left-0 right-0 bottom-0 h-px bg-white origin-left"
+          initial={false}
+          animate={{ scaleX: focused ? 1 : 0, opacity: focused ? 0.7 : 0 }}
+          transition={{ duration: 0.4, ease: SOFT }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
 export default function ContactForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [typeFocused, setTypeFocused] = useState(false);
+  const [messageFocused, setMessageFocused] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,18 +102,50 @@ export default function ContactForm() {
       {sent ? (
         <motion.div
           key="sent"
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: SOFT }}
-          className="flex flex-col gap-3"
+          transition={{ duration: 0.55, ease: SOFT }}
+          className="flex flex-col gap-4"
         >
-          <p
+          <motion.svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.path
+              d="M5 17 L13 24 L27 9"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              variants={{
+                hidden: { pathLength: 0, opacity: 0 },
+                visible: { pathLength: 1, opacity: 1 },
+              }}
+              transition={{ duration: 0.55, delay: 0.15, ease: SOFT }}
+            />
+          </motion.svg>
+          <motion.p
             className="text-white title"
             style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.45, ease: SOFT }}
           >
             Reçu.
-          </p>
-          <p className="label text-white" style={{ opacity: 0.55 }}>Je vous réponds sous 24h.</p>
+          </motion.p>
+          <motion.p
+            className="label text-white"
+            style={{ opacity: 0.55 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.55 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            Je vous réponds sous 24h.
+          </motion.p>
         </motion.div>
       ) : (
         <motion.form
@@ -78,63 +165,133 @@ export default function ContactForm() {
             </label>
           </div>
 
-          {[
-            { name: "name", label: "Nom", type: "text", placeholder: "Votre nom" },
-            { name: "email", label: "Email", type: "email", placeholder: "vous@email.com" },
-          ].map(({ name, label, type, placeholder }) => (
-            <div key={name} className="flex flex-col gap-2.5">
-              <label className="label text-white" style={{ opacity: 0.55 }}>{label}</label>
-              <input
-                type={type}
-                name={name}
+          <Field name="name" label="Nom" type="text" placeholder="Votre nom" required delay={0.05} />
+          <Field name="email" label="Email" type="email" placeholder="vous@email.com" required delay={0.1} />
+
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15, ease: SOFT }}
+            className="flex flex-col gap-2.5"
+          >
+            <label className="label text-white" style={{ opacity: typeFocused ? 0.85 : 0.55, transition: "opacity 0.3s" }}>
+              Type de projet
+            </label>
+            <div className="relative">
+              <select
+                name="type"
+                onFocus={() => setTypeFocused(true)}
+                onBlur={() => setTypeFocused(false)}
+                className="w-full pb-3 bg-transparent outline-none text-sm text-white/55 font-light appearance-none"
+              >
+                <option value="" className="bg-black">Sélectionner…</option>
+                {["Éditorial", "Commercial", "Film / Vidéo", "Personnel", "Autre"].map((v) => (
+                  <option key={v} value={v} className="bg-black">{v}</option>
+                ))}
+              </select>
+              <span aria-hidden="true" className="absolute left-0 right-0 bottom-0 h-px bg-white/12" />
+              <motion.span
+                aria-hidden="true"
+                className="absolute left-0 right-0 bottom-0 h-px bg-white origin-left"
+                initial={false}
+                animate={{ scaleX: typeFocused ? 1 : 0, opacity: typeFocused ? 0.7 : 0 }}
+                transition={{ duration: 0.4, ease: SOFT }}
+              />
+              {/* Custom chevron — appears since we strip the native appearance */}
+              <span
+                aria-hidden="true"
+                className="absolute right-1 bottom-3.5 text-white/45"
+                style={{ fontSize: 10, letterSpacing: "0.18em" }}
+              >
+                ▾
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: SOFT }}
+            className="flex flex-col gap-2.5"
+          >
+            <label className="label text-white" style={{ opacity: messageFocused ? 0.85 : 0.55, transition: "opacity 0.3s" }}>
+              Message
+            </label>
+            <div className="relative">
+              <textarea
+                name="message"
                 required
-                placeholder={placeholder}
-                className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18 focus:border-white/40 transition-colors duration-300"
+                rows={4}
+                placeholder="Budget. Date. Référence. Le reste, on verra."
+                onFocus={() => setMessageFocused(true)}
+                onBlur={() => setMessageFocused(false)}
+                className="w-full pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18 resize-none"
                 style={{ letterSpacing: "0.02em" }}
               />
+              <span aria-hidden="true" className="absolute left-0 right-0 bottom-0 h-px bg-white/12" />
+              <motion.span
+                aria-hidden="true"
+                className="absolute left-0 right-0 bottom-0 h-px bg-white origin-left"
+                initial={false}
+                animate={{ scaleX: messageFocused ? 1 : 0, opacity: messageFocused ? 0.7 : 0 }}
+                transition={{ duration: 0.4, ease: SOFT }}
+              />
             </div>
-          ))}
+          </motion.div>
 
-          <div className="flex flex-col gap-2.5">
-            <label className="label text-white" style={{ opacity: 0.55 }}>Type de projet</label>
-            <select
-              name="type"
-              className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white/50 font-light focus:border-white/40 transition-colors duration-300 appearance-none"
-            >
-              <option value="" className="bg-black">Sélectionner…</option>
-              {["Éditorial", "Commercial", "Film / Vidéo", "Personnel", "Autre"].map((v) => (
-                <option key={v} value={v} className="bg-black">{v}</option>
-              ))}
-            </select>
-          </div>
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                key="err"
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 0.85, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.3, ease: SOFT }}
+                className="label"
+                style={{ color: "#ff8080" }}
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
 
-          <div className="flex flex-col gap-2.5">
-            <label className="label text-white" style={{ opacity: 0.55 }}>Message</label>
-            <textarea
-              name="message"
-              required
-              rows={4}
-              placeholder="Budget. Date. Référence. Le reste, on verra."
-              className="w-full border-b border-white/12 pb-3 bg-transparent outline-none text-sm text-white font-light placeholder:text-white/18 focus:border-white/40 transition-colors duration-300 resize-none"
-              style={{ letterSpacing: "0.02em" }}
-            />
-          </div>
-
-          {error && (
-            <p className="label text-white" style={{ opacity: 0.7, color: "#ff8080" }}>
-              {error}
-            </p>
-          )}
-
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
-            className="self-start label text-white hover:opacity-100 transition-opacity duration-300 flex items-center gap-5 disabled:opacity-25 mt-2"
-            style={{ opacity: 0.8 }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: SOFT }}
+            whileHover={loading ? undefined : "hover"}
+            whileTap={loading ? undefined : "tap"}
+            variants={{
+              hover: { x: 0 },
+              tap: { scale: 0.98 },
+            }}
+            className="group self-start label text-white flex items-center gap-5 disabled:opacity-25 mt-2"
+            style={{ opacity: 0.85 }}
           >
-            {loading ? "Envoi…" : "Envoyer"}
-            <span className="block w-8 h-px bg-white" />
-          </button>
+            <span className="relative inline-block">
+              {loading ? "Envoi…" : "Envoyer"}
+              <motion.span
+                aria-hidden="true"
+                className="absolute left-0 right-0 -bottom-1 h-px bg-white origin-left"
+                variants={{
+                  hover: { scaleX: 1, opacity: 0.7 },
+                }}
+                initial={{ scaleX: 0, opacity: 0 }}
+                transition={{ duration: 0.4, ease: SOFT }}
+              />
+            </span>
+            <motion.span
+              aria-hidden="true"
+              className="block w-8 h-px bg-white"
+              variants={{
+                hover: { width: 56 },
+              }}
+              initial={{ width: 32 }}
+              transition={{ duration: 0.4, ease: SOFT }}
+            />
+          </motion.button>
         </motion.form>
       )}
     </AnimatePresence>

@@ -5,6 +5,13 @@ import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import CustomCursor from "@/components/ui/CustomCursor";
 import MotionProvider from "@/components/providers/MotionProvider";
+import { projects } from "@/data/projects";
+
+// First featured project drives the LCP on the landing — its videoFile
+// (or, failing that, its first cover image) is the very first paint.
+// Resolved at build time so the preload tag can be emitted in the SSR
+// payload before any JS runs.
+const FIRST_FEATURED = projects.find((p) => p.featured);
 
 // Self-host Google Fonts instead of CSS @import — avoids a render-blocking
 // request to fonts.googleapis.com on every page load.
@@ -143,8 +150,27 @@ export default function RootLayout({
   preconnect("https://img.youtube.com");
   prefetchDNS("https://vumbnail.com");
 
+  // LCP preload — point the browser at the first featured project's hero
+  // media before any client JS runs. videoFile takes precedence; if the
+  // project is photo-only, we preload its first cover image instead.
+  const lcpVideo = FIRST_FEATURED?.videoFile
+    ? `/projects/${FIRST_FEATURED.slug}/${FIRST_FEATURED.videoFile}`
+    : null;
+  const lcpImage =
+    !lcpVideo && FIRST_FEATURED?.imageFiles?.[0]
+      ? `/projects/${FIRST_FEATURED.slug}/${FIRST_FEATURED.imageFiles[0]}`
+      : null;
+
   return (
     <html lang="fr" className={`${cormorant.variable} ${fragmentMono.variable}`}>
+      <head>
+        {lcpVideo && (
+          <link rel="preload" as="video" href={lcpVideo} type="video/webm" />
+        )}
+        {lcpImage && (
+          <link rel="preload" as="image" href={lcpImage} fetchPriority="high" />
+        )}
+      </head>
       <body>
         <MotionProvider>
           <CustomCursor />

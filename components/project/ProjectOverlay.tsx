@@ -189,11 +189,6 @@ function Overlay({
                 {project.description}
               </p>
             )}
-            <div className="flex flex-col items-center gap-1.5">
-              <p className="label text-white" style={{ opacity: 0.85 }}>{project.meta.type}</p>
-              <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
-              <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
-            </div>
           </motion.footer>
         </div>
 

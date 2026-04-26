@@ -21,7 +21,7 @@ export async function generateMetadata({
     project.type === "photo" ? "Photographie" : project.type === "3d" ? "Motion 3D" : "Film";
   const description =
     project.description ??
-    `${project.title} — ${project.meta.type}. ${discipline} par Nicolas Sempere, ${project.year}.`;
+    `${project.title} — ${project.category}. ${discipline} par Nicolas Sempere, ${project.year}.`;
   const url = `/work/${project.slug}`;
 
   return {

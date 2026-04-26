@@ -302,6 +302,21 @@ body::after {
 }
 
 
+/* ── Fade-up reveal ──────────────────────────────────────── */
+/* Single keyframe used by static (server-rendered) sections that want a
+   stagger reveal without pulling in framer-motion. Children get an
+   animationDelay style override to space them out. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-up { animation: none; opacity: 1; transform: none; }
+}
+
 /* ── Hit-area extender ───────────────────────────────────── */
 /* Invisible halo around a small button / link via a transparent ::before
    so the visual stays untouched but the click target grows past the
