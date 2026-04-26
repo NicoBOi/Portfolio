@@ -114,47 +114,47 @@ function Overlay({
       aria-label={project.title}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* Mobile: three groups distributed by justify-between — (header +
-          media + pagination tight at the top), (description + meta floating
-          in the middle), (nav buttons row pinned at the bottom). Desktop
-          keeps the header / media / footer rhythm with explicit gap-y. */}
+      {/* Mobile: header pinned at top, media + description+meta centered in
+          the middle (flex-1 wrapper with justify-center), nav row pinned at
+          the bottom. Desktop unwraps the middle wrapper via display:contents
+          so the outer gap-y-14 still spaces header / media / footer. */}
       <div
-        className="relative w-full h-full flex flex-col items-center py-12 md:py-20 justify-between md:justify-start md:gap-y-14"
+        className="relative w-full h-full flex flex-col items-center py-12 md:py-20 md:justify-start md:gap-y-14"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
-        {/* TOP GROUP — wraps header + media tight together on mobile. On
-            desktop we use display:contents so the wrapper unwraps and the
-            outer container's gap-y-14 still spaces header / media properly. */}
-        <div className="w-full flex flex-col items-center gap-3 md:contents">
-          <motion.header
-            className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.55, delay: 0.08, ease: SOFT }}
-            onClick={(e) => e.stopPropagation()}
+        <motion.header
+          className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.55, delay: 0.08, ease: SOFT }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p
+            className="label text-white mb-3 md:mb-4"
+            style={{ opacity: 0.55, letterSpacing: "0.32em" }}
           >
-            <p
-              className="label text-white mb-3 md:mb-4"
-              style={{ opacity: 0.55, letterSpacing: "0.32em" }}
-            >
-              {project.year} — {project.role}
-            </p>
-            <h1
-              className="text-white title leading-none"
-              style={{ fontSize: "clamp(1.8rem, 5.2vw, 4.5rem)" }}
-            >
-              {project.title}
-            </h1>
-          </motion.header>
+            {project.year} — {project.role}
+          </p>
+          <h1
+            className="text-white title leading-none"
+            style={{ fontSize: "clamp(1.8rem, 5.2vw, 4.5rem)" }}
+          >
+            {project.title}
+          </h1>
+        </motion.header>
 
+        {/* MIDDLE GROUP — flex-1 on mobile so the media + description+meta
+            sit centered in the remaining viewport space. md:contents unwraps
+            on desktop so the outer flex still drives the layout there. */}
+        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-6 md:contents">
           {/* Key on the media wrapper resets the carousel idx + measurements
               (and forces video iframes to reload) when switching projects.
               The outer overlay shell stays mounted so the backdrop never
               blinks off. */}
           <div
             key={project.slug}
-            className="w-full flex flex-col items-center md:flex-1 md:min-h-0 gap-3 md:gap-9"
+            className="w-full flex flex-col items-center md:flex-1 md:min-h-0 gap-3 md:gap-9 shrink-0"
           >
             {isVideo ? (
               <VideoMedia project={project} />
@@ -162,40 +162,39 @@ function Overlay({
               <PhotoCarousel project={project} />
             )}
           </div>
+
+          <motion.footer
+            className="w-full max-w-6xl flex flex-col items-center gap-5 md:gap-6 pointer-events-none px-5 md:px-10 text-center shrink-0"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.55, delay: 0.12, ease: SOFT }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {project.description && (
+              <p
+                className="text-white max-w-xl"
+                style={{
+                  fontSize: "clamp(0.85rem, 1.05vw, 0.95rem)",
+                  lineHeight: 1.55,
+                  opacity: 0.7,
+                }}
+              >
+                {project.description}
+              </p>
+            )}
+            <div className="flex flex-col items-center gap-1.5">
+              <p className="label text-white" style={{ opacity: 0.85 }}>{project.meta.type}</p>
+              <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
+              <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
+            </div>
+          </motion.footer>
         </div>
 
-        <motion.footer
-          className="w-full max-w-6xl flex flex-col items-center gap-5 md:gap-6 pointer-events-none px-5 md:px-10 text-center shrink-0"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ duration: 0.55, delay: 0.12, ease: SOFT }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {project.description && (
-            <p
-              className="text-white max-w-xl"
-              style={{
-                fontSize: "clamp(0.85rem, 1.05vw, 0.95rem)",
-                lineHeight: 1.55,
-                opacity: 0.7,
-              }}
-            >
-              {project.description}
-            </p>
-          )}
-          <div className="flex flex-col items-center gap-1.5">
-            <p className="label text-white" style={{ opacity: 0.85 }}>{project.meta.type}</p>
-            <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.location}</p>
-            <p className="label text-white" style={{ opacity: 0.65 }}>{project.meta.credits}</p>
-          </div>
-        </motion.footer>
-
-        {/* Mobile-only nav row — pinned to the bottom by the outer
-            justify-between. Buttons hug the screen edges (justify-between
-            with px-6) so they feel like proper page-margin affordances
-            rather than a centred chip. Description / meta float in the
-            middle slot. */}
+        {/* Mobile-only nav row — sits at the bottom because the flex-1 middle
+            wrapper above absorbs the remaining vertical space. Buttons hug
+            the screen edges (justify-between + px-6) so they feel like page
+            margins rather than a centred chip. */}
         {(prevProject || nextProject) && (
           <div className="md:hidden w-full flex items-center justify-between px-6 pointer-events-auto shrink-0">
             {prevProject ? (
