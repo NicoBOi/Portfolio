@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function readCursorInfo(el: HTMLElement | null): {
   label: string | null;
@@ -23,90 +23,83 @@ function closestInteractive(el: HTMLElement | null): HTMLElement | null {
   return el ? (el.closest("a, button") as HTMLElement | null) : null;
 }
 
-// Imperative cursor — zero React state, zero rAF, zero interpolation. The
-// previous react-state version re-rendered on every mouseover (which fires
-// every time the pointer crosses an element boundary), and the lerp version
-// added 1–3 frames of latency that read as input-lag. The fastest cursor
-// is the one that does nothing extra: write style.transform straight out
-// of pointermove (the browser already coalesces those to the display's
-// vsync) and toggle a class for the hover state.
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const labelRef = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<{ hovered: boolean; label: string | null }>({
+    hovered: false,
+    label: null,
+  });
 
   useEffect(() => {
-    const cursor = cursorRef.current;
-    const labelEl = labelRef.current;
-    if (!cursor || !labelEl) return;
+    const el = cursorRef.current;
+    if (!el) return;
 
+    // Gate `cursor: none` on mount so there's no "no cursor" flash before this runs
     document.documentElement.classList.add("cursor-ready");
 
     let visible = false;
     let moved = false;
-    let currentHover = false;
-    let currentLabel: string | null = null;
 
-    const onMove = (e: PointerEvent) => {
-      if (!moved) moved = true;
-      // Direct write — browsers coalesce pointermove to one event per
-      // painted frame, so this commits exactly once per vsync.
-      cursor.style.transform = `translate3d(${e.clientX - 5}px, ${e.clientY - 5}px, 0)`;
+    // The cursor follows the mouse with a direct transform on every
+    // mousemove. The browser composites the GPU layer at the monitor's
+    // native refresh (60 / 120 / 240 Hz), so even if mousemove fires
+    // 1000x/s on a gaming mouse only the latest position per frame is
+    // ever painted. Simplest possible code, zero rAF loop overhead.
+    const show = (x: number, y: number) => {
+      el.style.transform = `translate3d(${x - 5}px, ${y - 5}px, 0)`;
       if (!visible) {
-        cursor.style.opacity = "1";
+        el.style.opacity = "1";
         visible = true;
       }
     };
 
     const hide = () => {
-      cursor.style.opacity = "0";
+      el.style.opacity = "0";
       visible = false;
+    };
+
+    const onMove = (e: MouseEvent) => {
+      if (!moved) moved = true;
+      show(e.clientX, e.clientY);
     };
 
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const interactive = closestInteractive(target);
-      const info = readCursorInfo(target);
-      let next = info.label;
-      if (!next && !info.suppress && interactive) {
+      const { label: explicit, suppress, silent } = readCursorInfo(target);
+      let label = explicit;
+      if (!label && !suppress && interactive) {
+        // Default label: the element's own text, trimmed and compact
         const text = (interactive.innerText || "").trim().split("\n")[0];
-        next = text && text.length <= 24 ? text : "→";
+        label = text && text.length <= 24 ? text : "→";
       }
-      const hovered = info.silent ? false : !!interactive || !!next;
-
-      // Imperative class + textContent — no React re-render means the
-      // cursor's motion thread never gets preempted by reconciliation.
-      if (hovered !== currentHover) {
-        currentHover = hovered;
-        cursor.classList.toggle("is-hovered", hovered);
-      }
-      if (next !== currentLabel) {
-        currentLabel = next;
-        if (next) {
-          labelEl.textContent = next;
-          labelEl.style.display = "block";
-        } else {
-          labelEl.style.display = "none";
-        }
-      }
+      // `silent` shows the label but never flips the red/blink state
+      const hovered = silent ? false : !!interactive || !!label;
+      setState((prev) =>
+        prev.hovered === hovered && prev.label === label ? prev : { hovered, label }
+      );
     };
 
+    // Hide when pointer leaves the viewport so the custom cursor doesn't linger
+    // next to the native one if macOS surfaces it near screen edges (Dock, etc.)
     const onWindowOut = (e: MouseEvent) => {
       if (e.relatedTarget === null) hide();
     };
     const onDocLeave = () => hide();
 
+    // Fallback: if no move received in 2s, bail out of the custom cursor entirely
     const fallbackTimer = window.setTimeout(() => {
       if (!moved) document.documentElement.classList.add("cursor-fallback");
     }, 2000);
 
-    document.addEventListener("pointermove", onMove, { passive: true, capture: true });
+    document.addEventListener("mousemove", onMove, { passive: true, capture: true });
     document.addEventListener("mouseover", onOver, { passive: true, capture: true });
     document.addEventListener("mouseout", onWindowOut, { passive: true });
     document.documentElement.addEventListener("mouseleave", onDocLeave, { passive: true });
 
     return () => {
       window.clearTimeout(fallbackTimer);
-      document.removeEventListener("pointermove", onMove, { capture: true } as EventListenerOptions);
+      document.removeEventListener("mousemove", onMove, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseout", onWindowOut);
       document.documentElement.removeEventListener("mouseleave", onDocLeave);
@@ -114,14 +107,42 @@ export default function CustomCursor() {
     };
   }, []);
 
+  const { hovered, label } = state;
+
   return (
     <div
       ref={cursorRef}
       className="fixed top-0 left-0 pointer-events-none z-[9999] custom-cursor"
-      style={{ opacity: 0 }}
+      style={{ opacity: 0, willChange: "transform" }}
     >
-      <div className="custom-cursor-dot" />
-      <div ref={labelRef} className="custom-cursor-label" style={{ display: "none" }} />
+      {/* Dot */}
+      <div
+        className="rounded-full"
+        style={{
+          width: 10,
+          height: 10,
+          backgroundColor: hovered ? "#aa0000" : "white",
+          mixBlendMode: hovered ? "normal" : "difference",
+          animation: hovered ? "rec-blink 0.28s ease-in-out infinite alternate" : "none",
+        }}
+      />
+      {/* Label */}
+      {label && (
+        <div
+          className="absolute label text-white"
+          style={{
+            top: -1,
+            left: 16,
+            whiteSpace: "nowrap",
+            opacity: 0.65,
+            mixBlendMode: "difference",
+            lineHeight: "12px",
+            pointerEvents: "none",
+          }}
+        >
+          {label}
+        </div>
+      )}
     </div>
   );
 }

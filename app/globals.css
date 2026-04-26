@@ -191,9 +191,12 @@ body {
 }
 
 /* ── Grain overlay ───────────────────────────────────────── */
-/* Two layers at different tile sizes (220 / 360) so the visual period
-   becomes LCM(220, 360) ≈ 1980 px — the eye can't lock onto the same
-   shape repeating across the viewport the way a single-tile grain does. */
+/* Single-layer grain. Two stacked SVGs (the previous take) doubled the
+   compositor work on the animated hero layer, which dragged framerate
+   on anything that mix-blends through it (the cursor, in particular).
+   Patterns are hidden via a large 480 px tile + 5 octaves so the noise
+   has enough internal variation that no recurring shape is identifiable
+   across a single viewport. */
 body::after {
   content: "";
   position: fixed;
@@ -201,19 +204,15 @@ body::after {
   z-index: 9998;
   pointer-events: none;
   opacity: 0.05;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='3' stitchTiles='stitch' seed='7'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='3'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat, repeat;
-  background-size: 220px 220px, 360px 360px;
-  background-position: 0 0, 80px 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch' seed='3'/%3E%3C/filter%3E%3Crect width='480' height='480' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 480px 480px;
 }
 
 /* Animated film grain over the hero background — sits above the bg media
    and the dark scrim, below the foreground chrome. The bleed (130% size,
-   negative offset) lets the translation animation never show seams. Two
-   stacked SVGs at 240 / 360 break up the periodicity, then the matrix on
-   each one drops bright noise to alpha=0 so the layer only adds shadow,
+   negative offset) lets the translation animation never show seams. The
+   matrix drops bright noise to alpha=0 so the layer only adds shadow,
    never lifts the blacks of the source. */
 .hero-grain {
   position: absolute;
@@ -222,29 +221,24 @@ body::after {
   width: 130%;
   height: 130%;
   pointer-events: none;
-  opacity: 0.55;
-  background-repeat: repeat, repeat;
-  background-size: 240px 240px, 360px 360px;
-  background-position: 0 0, 90px 50px;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.45' numOctaves='3' stitchTiles='stitch' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.2 0 0 0 1.0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.05 0 0 0 0.95'/%3E%3C/filter%3E%3Crect width='360' height='360' filter='url(%23g)'/%3E%3C/svg%3E");
-  animation: heroGrain 0.5s steps(12) infinite;
+  opacity: 0.6;
+  background-repeat: repeat;
+  background-size: 480px 480px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.05' numOctaves='5' stitchTiles='stitch' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.15 0 0 0 1.0'/%3E%3C/filter%3E%3Crect width='480' height='480' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation: heroGrain 0.45s steps(10) infinite;
   will-change: transform;
 }
 @keyframes heroGrain {
   0%   { transform: translate(0,    0); }
-  8%   { transform: translate(-6%,  -4%); }
-  16%  { transform: translate(-11%, 6%); }
-  25%  { transform: translate(4%,   -9%); }
-  33%  { transform: translate(-8%,  11%); }
-  42%  { transform: translate(9%,   -2%); }
-  50%  { transform: translate(-12%, 4%); }
-  58%  { transform: translate(11%,  -7%); }
-  66%  { transform: translate(-3%,  9%); }
-  75%  { transform: translate(7%,   -11%); }
-  83%  { transform: translate(-9%,  3%); }
-  91%  { transform: translate(5%,   8%); }
+  10%  { transform: translate(-5%,  -5%); }
+  20%  { transform: translate(-10%, 5%); }
+  30%  { transform: translate(5%,   -8%); }
+  40%  { transform: translate(-5%,  10%); }
+  50%  { transform: translate(-10%, 5%); }
+  60%  { transform: translate(10%,  0); }
+  70%  { transform: translate(0,    8%); }
+  80%  { transform: translate(-12%, 2%); }
+  90%  { transform: translate(8%,   5%); }
   100% { transform: translate(0,    0); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -310,48 +304,7 @@ body::after {
 }
 
 
-/* ── Custom cursor ───────────────────────────────────────── */
-/* Conteneur transformé sur sa propre couche GPU — translateZ(0) + will-change
-   garantissent la promotion compositor, contain isole ses recompositions
-   du reste de la page. Aucun mix-blend-mode ici : le blend reste sur les
-   enfants seuls pour ne pas obliger le compositeur à rasteriser le parent
-   à chaque déplacement. */
-.custom-cursor {
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-  contain: layout style paint;
-}
-
-.custom-cursor-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background: white;
-  mix-blend-mode: difference;
-}
-.custom-cursor.is-hovered .custom-cursor-dot {
-  background: #aa0000;
-  mix-blend-mode: normal;
-  animation: rec-blink 0.28s ease-in-out infinite alternate;
-}
-
-.custom-cursor-label {
-  position: absolute;
-  top: -1px;
-  left: 16px;
-  white-space: nowrap;
-  opacity: 0.65;
-  mix-blend-mode: difference;
-  line-height: 12px;
-  pointer-events: none;
-  color: white;
-  font-family: var(--font-fragment), 'Fragment Mono', "Courier New", monospace;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
+/* ── Cursor REC pulse ────────────────────────────────────── */
 @keyframes rec-blink {
   from { opacity: 1; }
   to   { opacity: 0.05; }
