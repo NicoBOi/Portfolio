@@ -52,13 +52,6 @@ export default function AboutPage() {
 
       {/* Foreground — centered axis. */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 md:px-10 text-center gap-8">
-        <p
-          className="label text-white"
-          style={{ opacity: 0.55, letterSpacing: "0.4em", fontSize: "11px" }}
-        >
-          Bordeaux — Photographe · Réalisateur
-        </p>
-
         <h1
           className="text-white title whitespace-nowrap"
           style={{ fontSize: "clamp(3rem, 9vw, 9rem)", lineHeight: 0.95 }}
@@ -99,20 +92,20 @@ export default function AboutPage() {
         </p>
       </div>
 
-      {/* Bottom row — name kicker (left), disciplines list (center), pill CTA (right). */}
+      {/* Bottom row — location kicker (left), disciplines list (center), pill CTA (right). */}
       <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 grid grid-cols-3 items-center gap-4">
         <span
           className="label text-white"
           style={{ opacity: 0.45, letterSpacing: "0.32em", fontSize: "11px" }}
         >
-          Nicolas Sempere · 2024
+          Bordeaux
         </span>
 
         <span
           className="label text-white inline-flex items-center justify-center gap-3 flex-wrap"
           style={{ opacity: 0.6, letterSpacing: "0.36em", fontSize: "11px" }}
         >
-          {["Photo", "Film", "3D"].map((d, i) => (
+          {["Photographe", "Réalisateur"].map((d, i) => (
             <span key={d} className="inline-flex items-center gap-3">
               {i > 0 && (
                 <span aria-hidden="true" style={{ opacity: 0.4 }}>·</span>
