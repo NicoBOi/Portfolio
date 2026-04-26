@@ -613,11 +613,15 @@ export default function Hero({
 
           {/* Bottom row — browse mode only. Desktop pairs the current project
               title on the left with the Ouvrir CTA on the right; mobile just
-              shows Ouvrir centered. Prev/next are reachable via the 01-08
-              column, wheel (desktop) or vertical swipe (mobile). */}
+              shows Ouvrir centred. On mobile we position absolutely just
+              above the fixed filter bar so the bottom row no longer eats
+              into the title area's flex-1 — that lets the title block sit
+              perfectly viewport-centred instead of shifted upwards by the
+              bottom row's height. Desktop keeps the relative-in-flow
+              behaviour with pb-8. */}
           {!isProject && (
           <motion.div
-            className="px-6 md:px-10 pb-32 md:pb-8 flex items-center justify-center md:justify-between md:items-baseline gap-6"
+            className="px-6 md:px-10 absolute md:relative left-0 md:left-auto right-0 md:right-auto bottom-[calc(env(safe-area-inset-bottom,0px)+6rem)] md:bottom-auto md:pb-8 flex items-center justify-center md:justify-between md:items-baseline gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
