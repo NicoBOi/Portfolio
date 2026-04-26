@@ -187,25 +187,28 @@ function Overlay({
         </motion.footer>
 
         {/* Mobile-only nav row — pinned to the bottom by the outer
-            justify-between. Description / meta float in the middle slot. */}
+            justify-between. Buttons hug the screen edges (justify-between
+            with px-6) so they feel like proper page-margin affordances
+            rather than a centred chip. Description / meta float in the
+            middle slot. */}
         {(prevProject || nextProject) && (
-          <div className="md:hidden flex items-center gap-6 pointer-events-auto shrink-0">
-            {prevProject && (
+          <div className="md:hidden w-full flex items-center justify-between px-6 pointer-events-auto shrink-0">
+            {prevProject ? (
               <NavProjectButton
                 side="prev"
                 target={prevProject}
                 onClick={onOpenPrev}
                 compact
               />
-            )}
-            {nextProject && (
+            ) : <span />}
+            {nextProject ? (
               <NavProjectButton
                 side="next"
                 target={nextProject}
                 onClick={onOpenNext}
                 compact
               />
-            )}
+            ) : <span />}
           </div>
         )}
 
@@ -371,6 +374,7 @@ function PhotoCarousel({ project }: { project: Project }) {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [container, setContainer] = useState({ w: 0, h: 0 });
+  const [viewportH, setViewportH] = useState(0);
 
   useLayoutEffect(() => {
     const el = containerRef.current;
@@ -383,6 +387,13 @@ function PhotoCarousel({ project }: { project: Project }) {
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
+  }, []);
+
+  useLayoutEffect(() => {
+    const updateVh = () => setViewportH(window.innerHeight);
+    updateVh();
+    window.addEventListener("resize", updateVh);
+    return () => window.removeEventListener("resize", updateVh);
   }, []);
 
   const goTo = (n: number) => {
@@ -482,20 +493,27 @@ function PhotoCarousel({ project }: { project: Project }) {
   }
 
   const isDesktop = container.w >= 768;
-  const slideH = container.h;
-  // Mobile: photos are full-width edge-to-edge (cap = full container width).
-  // Landscape shots fill the screen; portraits naturally constrain to fit
-  // the carousel's height. Desktop keeps a generous cap so neighbours peek.
-  const maxSlideW = container.w * (isDesktop ? 0.62 : 1);
+  // Desktop: slide height tracks the carousel's flex-1 height; width is
+  // derived from the photo's aspect, capped at 62% so neighbours peek.
+  // Mobile: slide width is the full viewport, height derived from aspect.
+  // Capped at 60vh for very tall portraits — for those the slide ends up
+  // slightly inset on the sides instead of overflowing the screen height.
   const slideDims = aspects.map((a) => {
-    let w = slideH * a;
-    let h = slideH;
-    if (w > maxSlideW) {
-      w = maxSlideW;
-      h = w / a;
+    if (isDesktop) {
+      const slideH = container.h;
+      const maxW = container.w * 0.62;
+      let w = slideH * a;
+      let h = slideH;
+      if (w > maxW) { w = maxW; h = w / a; }
+      return { w, h };
     }
+    const maxH = viewportH * 0.6;
+    let w = container.w;
+    let h = w / a;
+    if (h > maxH && maxH > 0) { h = maxH; w = h * a; }
     return { w, h };
   });
+  const currentSlideH = slideDims[idx]?.h ?? 0;
   // No gap on mobile (slides are full-width so neighbours stay off-screen);
   // editorial gap on desktop where neighbours peek in.
   const gap = isDesktop ? container.w * 0.05 : 0;
@@ -516,11 +534,14 @@ function PhotoCarousel({ project }: { project: Project }) {
         // Carousel spans the full viewport so neighbours can run all the way
         // off the screen edge. The mask-image fades the leftmost/rightmost
         // 6% so they melt into the page background instead of cutting hard.
-        // Mobile uses an explicit 50vh so the new justify-between layout
-        // has predictable space to distribute; desktop keeps flex-1 + a
-        // 58vh cap so the media absorbs whatever room the page gives it.
-        className="relative w-screen h-[50vh] md:h-auto md:flex-1 md:min-h-0 md:max-h-[58vh] overflow-hidden"
+        // Mobile sizes the carousel to the *active* slide's height (set
+        // inline below) so the title sits flush on top of the photo with
+        // no empty band — pagination then slots in right under the photo.
+        // Desktop keeps flex-1 + 58vh cap so the media absorbs whatever
+        // room the page gives it.
+        className="relative w-screen md:h-auto md:flex-1 md:min-h-0 md:max-h-[58vh] overflow-hidden"
         style={{
+          height: isDesktop ? undefined : (currentSlideH || "50vh"),
           maskImage:
             "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
           WebkitMaskImage:
