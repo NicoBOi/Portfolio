@@ -437,7 +437,7 @@ export default function Hero({
                       setIndex(i);
                     }
                   }}
-                  className="label text-white tabular-nums transition-opacity duration-300 px-5 py-3 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
+                  className="hit-h label text-white tabular-nums transition-opacity duration-300 px-4 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
                   style={{ opacity: i === index ? 0.95 : 0.45 }}
                   data-cursor={p.type === "photo" ? "Voir" : "Lire"}
                   aria-label={p.title}
@@ -467,7 +467,7 @@ export default function Hero({
                   <button
                     type="button"
                     onClick={() => setFilter(f.value)}
-                    className="label text-white transition-opacity duration-300 relative px-4 py-3 rounded"
+                    className="hit-v label text-white transition-opacity duration-300 px-2 py-2 rounded"
                     style={{
                       opacity: filter === f.value ? 1 : 0.6,
                       letterSpacing: "0.32em",
@@ -654,7 +654,7 @@ export default function Hero({
                   key={f.value}
                   type="button"
                   onClick={() => setFilter(f.value)}
-                  className="label text-white relative px-5 py-4 transition-opacity duration-300"
+                  className="hit-v label text-white px-3 py-3 transition-opacity duration-300"
                   style={{
                     opacity: active ? 0.95 : 0.5,
                     fontSize: "10px",

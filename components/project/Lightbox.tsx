@@ -131,7 +131,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
               type="button"
               onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! - 1); }}
               onClick={(e) => e.stopPropagation()}
-              className="hit absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-4 py-5"
+              className="hit absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
               style={{ opacity: 0.65, pointerEvents: "auto" }}
               data-cursor="Précédent"
               aria-label="Précédent"
@@ -145,7 +145,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
               type="button"
               onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! + 1); }}
               onClick={(e) => e.stopPropagation()}
-              className="hit absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-4 py-5"
+              className="hit absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
               style={{ opacity: 0.65, pointerEvents: "auto" }}
               data-cursor="Suivant"
               aria-label="Suivant"

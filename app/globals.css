@@ -303,21 +303,33 @@ body::after {
 
 
 /* ── Hit-area extender ───────────────────────────────────── */
-/* Invisible 10 px halo around a button / link via a transparent ::before
+/* Invisible halo around a small button / link via a transparent ::before
    so the visual stays untouched but the click target grows past the
-   "needs to aim at the label" threshold. Children stay clickable because
-   the ::before sits behind their stacking context (z:-1) and never
-   intercepts pointer events that would otherwise hit the label / icon. */
-.hit {
+   "needs to aim at the label" threshold. The halo sits behind the
+   parent's stacking context (z:-1 + isolation:isolate) so it never
+   visually shadows neighbours.
+   Variants:
+     .hit    — 10 px halo on every side (use on isolated buttons)
+     .hit-h  — wide horizontally, tight vertically (use inside vertical
+               stacks so adjacent halos don't fight in the gap)
+     .hit-v  — wide vertically, tight horizontally (use inside horizontal
+               rows so adjacent halos don't fight either) */
+.hit,
+.hit-h,
+.hit-v {
   position: relative;
   isolation: isolate;
 }
-.hit::before {
+.hit::before,
+.hit-h::before,
+.hit-v::before {
   content: "";
   position: absolute;
-  inset: -10px;
   z-index: -1;
 }
+.hit::before   { inset: -10px; }
+.hit-h::before { inset: -4px -12px; }
+.hit-v::before { inset: -12px -4px; }
 
 /* ── Cursor REC pulse ────────────────────────────────────── */
 @keyframes rec-blink {
