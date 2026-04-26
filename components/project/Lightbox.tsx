@@ -116,7 +116,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
             type="button"
             onPointerUp={(e) => { e.stopPropagation(); onClose(); }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute top-5 right-6 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-2 -mx-3"
+            className="hit absolute top-5 right-6 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-2 -mx-3"
             style={{ opacity: 0.75, pointerEvents: "auto" }}
           >
             Fermer
@@ -131,7 +131,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
               type="button"
               onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! - 1); }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
+              className="hit absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-4 py-5"
               style={{ opacity: 0.65, pointerEvents: "auto" }}
               data-cursor="Précédent"
               aria-label="Précédent"
@@ -145,7 +145,7 @@ export default function Lightbox({ slug, files, index, onClose, onChange }: Prop
               type="button"
               onPointerUp={(e) => { e.stopPropagation(); onChange(rendered! + 1); }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-3 py-3"
+              className="hit absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-[20] label text-white hover:opacity-100 transition-opacity duration-300 px-4 py-5"
               style={{ opacity: 0.65, pointerEvents: "auto" }}
               data-cursor="Suivant"
               aria-label="Suivant"

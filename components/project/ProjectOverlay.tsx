@@ -635,7 +635,7 @@ function PhotoCarousel({ project }: { project: Project }) {
               onMouseEnter={() => goTo(i)}
               onFocus={() => goTo(i)}
               onClick={() => goTo(i)}
-              className="label text-white tabular-nums transition-opacity duration-300 px-3 py-2 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
+              className="label text-white tabular-nums transition-opacity duration-300 px-5 py-3 !text-[10px] md:!text-[13px] !tracking-[0.22em] md:!tracking-[0.18em]"
               style={{ opacity: i === idx ? 0.95 : 0.45 }}
               aria-label={`Photo ${i + 1}`}
               aria-current={i === idx ? "true" : undefined}

@@ -39,7 +39,7 @@ export default function VideoControls({
       >
         <button
           onClick={onToggleMute}
-          className="flex items-center justify-center hover:opacity-100 transition-opacity duration-200"
+          className="hit flex items-center justify-center hover:opacity-100 transition-opacity duration-200"
           style={{ opacity: 0.65 }}
           aria-label={muted ? "Unmute" : "Mute"}
         >
@@ -76,7 +76,7 @@ export default function VideoControls({
         style={{
           background: "rgba(0,0,0,0.65)",
           backdropFilter: "blur(8px)",
-          padding: "8px 10px",
+          padding: "12px 14px",
           opacity: ready ? 0.75 : 0.3,
         }}
         aria-label={playing ? "Pause" : "Play"}
@@ -101,7 +101,7 @@ export default function VideoControls({
           style={{
             background: "rgba(0,0,0,0.65)",
             backdropFilter: "blur(8px)",
-            padding: "8px 10px",
+            padding: "12px 14px",
             opacity: 0.75,
           }}
           aria-label="Plein écran"
