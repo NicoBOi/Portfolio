@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     url: "/about",
     title: "À propos — Nicolas Sempere",
     description:
-      "Photographe, réalisateur et motion designer 3D basé entre Bordeaux et Paris.",
+      "Photographe et réalisateur basé entre Bordeaux et Paris.",
     siteName: "Nicolas Sempere",
     locale: "fr_FR",
   },

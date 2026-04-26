@@ -107,9 +107,9 @@ const personJsonLd = {
   name: "Nicolas Sempere",
   url: SITE_URL,
   image: `${SITE_URL}/about/portrait.avif`,
-  jobTitle: "Photographe, réalisateur & motion designer 3D",
+  jobTitle: "Photographe & réalisateur",
   description:
-    "Photographe, réalisateur et motion designer 3D basé entre Bordeaux et Paris. Art, mode, éditorial, clip, pub.",
+    "Photographe et réalisateur basé entre Bordeaux et Paris. Art, mode, éditorial, clip, pub. Photo, film, 3D.",
   knowsAbout: [
     "Photographie",
     "Réalisation",
