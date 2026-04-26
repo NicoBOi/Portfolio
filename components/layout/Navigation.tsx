@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navigation() {
+  const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
@@ -120,14 +121,9 @@ export default function Navigation() {
             </Link>
           )
         ) : (
-          <button
-            type="button"
-            onClick={() => {
-              // Force a full reload so the landing always starts from a
-              // clean slate — carousel index, filter, scroll position all
-              // reset.
-              window.location.href = "/";
-            }}
+          <Link
+            href="/"
+            onClick={() => router.refresh()}
             className="title text-white transition-opacity duration-300 hover:opacity-100 inline-flex items-center px-3 py-3 -mx-3 -my-3"
             style={{
               opacity: isHome ? 0.75 : 0.9,
@@ -136,7 +132,7 @@ export default function Navigation() {
             aria-label="Accueil"
           >
             NS
-          </button>
+          </Link>
         )}
 
         <div className="hidden md:flex items-center gap-8">

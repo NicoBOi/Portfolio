@@ -4,13 +4,7 @@ import Player from "@vimeo/player";
 import { useEffect, useRef, useState } from "react";
 import VideoControls from "./VideoControls";
 
-export function getVimeoId(url?: string): string | null {
-  return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
-}
-
-export function getYoutubeId(url?: string): string | null {
-  return url ? url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)?.[1] ?? null : null;
-}
+export { getVimeoId, getYoutubeId } from "@/lib/video";
 
 interface YTPlayer {
   playVideo(): void;

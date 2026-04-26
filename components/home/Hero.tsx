@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "@vimeo/player";
 import { projects, type Project } from "@/data/projects";
+import { getVimeoId } from "@/lib/video";
 
 const ALL_FEATURED = projects.filter((p) => p.featured);
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -21,10 +22,6 @@ const FILTERS: { value: HeroFilter; label: string }[] = [
   { value: "video", label: "Film" },
   { value: "3d", label: "3D" },
 ];
-
-function getVimeoId(url?: string): string | null {
-  return url ? url.match(/vimeo\.com\/(\d+)/)?.[1] ?? null : null;
-}
 
 interface HeroProps {
   // When set, the hero enters "project mode": filters/index/prev-next fade
@@ -55,8 +52,10 @@ export default function Hero({
   // "Tout" keeps the curated featured highlight reel; a discipline filter
   // opens up to the full catalogue of that type so nothing gets hidden when
   // the viewer explicitly asks "show me photos / films / 3D".
-  const FEATURED =
-    filter === "all" ? ALL_FEATURED : projects.filter((p) => p.type === filter);
+  const FEATURED = useMemo(
+    () => (filter === "all" ? ALL_FEATURED : projects.filter((p) => p.type === filter)),
+    [filter],
+  );
   // In browse mode the background tracks the carousel index. In project mode
   // it always reflects the active project (even if it's not in FEATURED).
   const current = activeProject ?? FEATURED[index] ?? ALL_FEATURED[0];

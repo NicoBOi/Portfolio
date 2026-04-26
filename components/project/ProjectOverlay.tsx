@@ -5,9 +5,14 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import type { Project } from "@/data/projects";
-import { VimeoPlayer, YouTubePlayer, getVimeoId, getYoutubeId } from "./VideoPlayers";
-import Lightbox from "./Lightbox";
+import dynamic from "next/dynamic";
+import { VimeoPlayer, YouTubePlayer } from "./VideoPlayers";
+import { getVimeoId, getYoutubeId } from "@/lib/video";
 import { getImageDims } from "@/lib/image-dims";
+
+// Lightbox pulls in react-zoom-pan-pinch (~30 KB gzipped). Defer it until the
+// viewer actually clicks a photo so it never blocks the initial overlay paint.
+const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 // Snappy ease-in-out for the carousel slide. Quick wind-up so the swap

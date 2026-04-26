@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { projects } from "@/data/projects";
 import Hero from "@/components/home/Hero";
 import ProjectOverlay from "@/components/project/ProjectOverlay";
 
 interface Props {
   initialSlug: string | null;
+}
+
+function readSlugFromUrl(): string | null {
+  const path = window.location.pathname;
+  const m = path.match(/^\/work\/(.+?)\/?$/);
+  if (m) return decodeURIComponent(m[1]);
+  const q = new URLSearchParams(window.location.search).get("project");
+  return q ? decodeURIComponent(q) : null;
 }
 
 // The landing always renders Hero in browse mode. Clicking a project pops up
@@ -26,16 +34,9 @@ export default function LandingExperience({ initialSlug }: Props) {
   //   - /?project=slug  (in-app default + shareable refresh-safe link)
   //   - /work/slug      (SSR entry point, still routed to this page)
   useEffect(() => {
-    const readSlug = () => {
-      const path = window.location.pathname;
-      const m = path.match(/^\/work\/(.+?)\/?$/);
-      if (m) return decodeURIComponent(m[1]);
-      const q = new URLSearchParams(window.location.search).get("project");
-      return q ? decodeURIComponent(q) : null;
-    };
-    const fromUrl = readSlug();
+    const fromUrl = readSlugFromUrl();
     if (fromUrl !== activeSlug) setActiveSlug(fromUrl);
-    const onPop = () => setActiveSlug(readSlug());
+    const onPop = () => setActiveSlug(readSlugFromUrl());
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,19 +86,27 @@ export default function LandingExperience({ initialSlug }: Props) {
   // We pass activeProject through to Hero so its wheel / keyboard / touch
   // carousel handlers stay disarmed while the overlay is up — without this,
   // gestures land on Hero through the overlay's body-scroll-lock and silently
-  // shuffle the carousel underneath. The Hero's visible chrome is fully
-  // covered by the overlay, so the morphed-title side effect happens off
-  // screen and doesn't matter.
-  // Cycle through projects in array order. Prev wraps to the last project
-  // at index 0, next wraps back to the first at the end — the visitor
-  // always has somewhere to go in either direction.
-  const idx = active ? projects.indexOf(active) : -1;
-  const prevProject = active
-    ? projects[(idx - 1 + projects.length) % projects.length] ?? null
-    : null;
-  const nextProject = active
-    ? projects[(idx + 1) % projects.length] ?? null
-    : null;
+  // shuffle the carousel underneath.
+  // Cycle through projects in array order; prev/next always wrap so the
+  // visitor never hits a dead end.
+  const { prevProject, nextProject } = useMemo(() => {
+    if (!active) return { prevProject: null, nextProject: null };
+    const idx = projects.indexOf(active);
+    const len = projects.length;
+    return {
+      prevProject: projects[(idx - 1 + len) % len] ?? null,
+      nextProject: projects[(idx + 1) % len] ?? null,
+    };
+  }, [active]);
+
+  const onOpenPrev = useCallback(
+    () => prevProject && openProject(prevProject.slug),
+    [prevProject, openProject],
+  );
+  const onOpenNext = useCallback(
+    () => nextProject && openProject(nextProject.slug),
+    [nextProject, openProject],
+  );
 
   return (
     <div className="relative">
@@ -107,8 +116,8 @@ export default function LandingExperience({ initialSlug }: Props) {
         prevProject={prevProject}
         nextProject={nextProject}
         onClose={closeProject}
-        onOpenPrev={() => prevProject && openProject(prevProject.slug)}
-        onOpenNext={() => nextProject && openProject(nextProject.slug)}
+        onOpenPrev={onOpenPrev}
+        onOpenNext={onOpenNext}
       />
     </div>
   );
