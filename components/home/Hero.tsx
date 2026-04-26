@@ -194,8 +194,8 @@ export default function Hero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featuredLen, isProject, index, filter]);
 
-  // Touch swipe — vertical on mobile. Swipe up = next, swipe down = previous.
-  // Discrete threshold to trigger the dolly-in cut.
+  // Touch swipe — horizontal on mobile. Swipe left = next, swipe right
+  // = previous. Discrete threshold to trigger the dolly-in cut.
   const swipingRef = useRef(false);
   useEffect(() => {
     if (isProject || featuredLen <= 1) return;
@@ -209,13 +209,13 @@ export default function Hero({
     const tm = (e: TouchEvent) => {
       const dx = Math.abs(e.touches[0].clientX - sx);
       const dy = Math.abs(e.touches[0].clientY - sy);
-      if (dy > 10 && dy > dx) swipingRef.current = true;
+      if (dx > 10 && dx > dy) swipingRef.current = true;
     };
     const te = (e: TouchEvent) => {
       const dx = sx - e.changedTouches[0].clientX;
       const dy = sy - e.changedTouches[0].clientY;
-      if (Math.abs(dy) >= 50 && Math.abs(dy) > Math.abs(dx)) {
-        setIndex((i) => (dy > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
+      if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) {
+        setIndex((i) => (dx > 0 ? (i + 1) % featuredLen : (i - 1 + featuredLen) % featuredLen));
       }
       window.setTimeout(() => { swipingRef.current = false; }, 160);
     };
@@ -409,17 +409,6 @@ export default function Hero({
               </div>
             </div>
 
-            <div className="md:hidden flex absolute left-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center pointer-events-none">
-              <div className="relative h-14 w-px bg-white/20 overflow-hidden">
-                <motion.div
-                  className="absolute left-0 w-full bg-white"
-                  style={{ opacity: 0.75, height: 6 }}
-                  animate={{ y: [56, -8] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
-                />
-              </div>
-            </div>
-
             {/* Right-edge vertical index. Desktop: hover to preview, click
                 to open. Mobile: tap to jump (setIndex only), "Ouvrir" opens.
                 The scroll-hint rule below the numbers is mobile-only — it
@@ -557,6 +546,20 @@ export default function Hero({
                 >
               Bordeaux — Paris
                 </p>
+                {/* Mobile horizontal swipe affordance — sits right under
+                    the title block, animates a dot left → right to hint
+                    the carousel responds to a horizontal swipe. Desktop
+                    keeps the vertical "Scroll" rule on the left edge. */}
+                <div className="md:hidden flex justify-center pt-1 pointer-events-none" aria-hidden="true">
+                  <div className="relative w-14 h-px bg-white/20 overflow-hidden">
+                    <motion.div
+                      className="absolute top-0 h-full bg-white"
+                      style={{ opacity: 0.75, width: 6 }}
+                      animate={{ x: [56, -8] }}
+                      transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
+                    />
+                  </div>
+                </div>
               </motion.div>
             )}
             </AnimatePresence>
@@ -643,10 +646,11 @@ export default function Hero({
             backdropFilter: "blur(14px)",
             WebkitBackdropFilter: "blur(14px)",
             paddingBottom: "env(safe-area-inset-bottom, 0px)",
+            borderTop: "1px solid rgba(255,255,255,0.18)",
           }}
           aria-label="Filtrer par discipline"
         >
-          <div className="flex items-center justify-around px-2 py-1">
+          <div className="flex items-center justify-around px-2 py-3">
             {FILTERS.map((f) => {
               const active = filter === f.value;
               return (
@@ -654,10 +658,10 @@ export default function Hero({
                   key={f.value}
                   type="button"
                   onClick={() => setFilter(f.value)}
-                  className="hit-v label text-white px-3 py-3 transition-opacity duration-300"
+                  className="hit-v label text-white px-4 py-4 transition-opacity duration-300"
                   style={{
                     opacity: active ? 0.95 : 0.5,
-                    fontSize: "10px",
+                    fontSize: "11px",
                     letterSpacing: "0.32em",
                     WebkitTapHighlightColor: "transparent",
                   }}
@@ -667,7 +671,7 @@ export default function Hero({
                   {active && (
                     <motion.span
                       layoutId="hero-filter-bottom-underline"
-                      className="absolute left-3 right-3 bottom-1 h-px bg-white"
+                      className="absolute left-4 right-4 bottom-2 h-px bg-white"
                       style={{ opacity: 0.75 }}
                       transition={{ duration: 0.3, ease: SOFT }}
                     />
