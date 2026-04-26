@@ -636,15 +636,15 @@ export default function Hero({
 
           {/* Bottom row — browse mode only. Desktop pairs the current project
               title on the left with the Ouvrir CTA on the right; mobile just
-              shows Ouvrir centred. On mobile we position absolutely just
-              above the fixed filter bar (its height lives in the
-              --hero-filter-bar-h custom property + a 1.25rem clearance) so
-              the title area's flex-1 can centre the heading on the full
-              viewport. Desktop keeps the relative-in-flow behaviour with
-              pb-8. */}
+              shows Ouvrir centred. On mobile we position with `fixed` (not
+              `absolute`) so the pill anchors against the *visible* viewport
+              instead of the parent section — which on Android Chrome is
+              taller than visible while the URL bar is shown, otherwise the
+              pill ends up below the fold and the filter bar paints over it.
+              Desktop reverts to relative-in-flow with pb-8. */}
           {!isProject && (
           <motion.div
-            className="px-6 md:px-10 absolute md:relative left-0 md:left-auto right-0 md:right-auto bottom-[calc(var(--hero-filter-bar-h)_+_1.25rem)] md:bottom-auto md:pb-8 flex items-center justify-center md:justify-between md:items-baseline gap-6"
+            className="px-6 md:px-10 fixed md:relative left-0 md:left-auto right-0 md:right-auto bottom-[calc(var(--hero-filter-bar-h)_+_1.25rem)] md:bottom-auto md:pb-8 z-20 md:z-auto flex items-center justify-center md:justify-between md:items-baseline gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
