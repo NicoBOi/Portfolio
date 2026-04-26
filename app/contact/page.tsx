@@ -90,7 +90,7 @@ export default function ContactPage() {
           className="label text-white justify-self-end"
           style={{ opacity: 0.4, letterSpacing: "0.32em", fontSize: "11px" }}
         >
-          Bordeaux · 2024
+          Bordeaux — Paris
         </span>
       </div>
     </section>

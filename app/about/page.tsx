@@ -5,21 +5,21 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "À propos",
   description:
-    "Nicolas Sempere — photographie, film, motion 3D. 28 ans, basé à Bordeaux.",
+    "Nicolas Sempere — photographie, film, motion 3D. 28 ans, basé entre Bordeaux et Paris.",
   alternates: { canonical: "/about" },
   openGraph: {
     type: "profile",
     url: "/about",
     title: "À propos — Nicolas Sempere",
     description:
-      "Photographe, réalisateur et motion designer 3D basé à Bordeaux.",
+      "Photographe, réalisateur et motion designer 3D basé entre Bordeaux et Paris.",
     siteName: "Nicolas Sempere",
     locale: "fr_FR",
   },
   twitter: {
     card: "summary_large_image",
     title: "À propos — Nicolas Sempere",
-    description: "Photo, film, motion 3D. Basé à Bordeaux.",
+    description: "Photo, film, motion 3D. Basé entre Bordeaux et Paris.",
   },
 };
 
@@ -67,8 +67,9 @@ export default function AboutPage() {
             opacity: 0.95,
           }}
         >
-          Photographe et réalisateur à Bordeaux, 28 ans. Je crée des images
-          pour les marques et les projets qui refusent de ressembler aux autres.
+          Photographe et réalisateur entre Bordeaux et Paris, 28 ans. Je crée
+          des images pour les marques et les projets qui refusent de ressembler
+          aux autres.
         </p>
 
         <span
@@ -98,7 +99,7 @@ export default function AboutPage() {
           className="label text-white"
           style={{ opacity: 0.45, letterSpacing: "0.32em", fontSize: "11px" }}
         >
-          Bordeaux
+          Bordeaux — Paris
         </span>
 
         <span
