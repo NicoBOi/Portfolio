@@ -644,7 +644,7 @@ export default function Hero({
               pb-8. */}
           {!isProject && (
           <motion.div
-            className="px-6 md:px-10 absolute md:relative left-0 md:left-auto right-0 md:right-auto bottom-[calc(var(--hero-filter-bar-h)+1.25rem)] md:bottom-auto md:pb-8 flex items-center justify-center md:justify-between md:items-baseline gap-6"
+            className="px-6 md:px-10 absolute md:relative left-0 md:left-auto right-0 md:right-auto bottom-[calc(var(--hero-filter-bar-h)_+_1.25rem)] md:bottom-auto md:pb-8 flex items-center justify-center md:justify-between md:items-baseline gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
