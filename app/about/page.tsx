@@ -93,17 +93,19 @@ export default function AboutPage() {
         </p>
       </div>
 
-      {/* Bottom row — location kicker (left), disciplines list (center), pill CTA (right). */}
-      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 grid grid-cols-3 items-center gap-4">
+      {/* Bottom row — mobile pares it down to location (left) + pill (right);
+          desktop unfolds the full 3-column editorial footer with the
+          disciplines lockup centred between them. */}
+      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 flex items-center justify-between gap-4 md:grid md:grid-cols-3">
         <span
-          className="label text-white"
-          style={{ opacity: 0.45, letterSpacing: "0.32em", fontSize: "11px" }}
+          className="label text-white whitespace-nowrap"
+          style={{ opacity: 0.45, letterSpacing: "0.28em", fontSize: "10px" }}
         >
           Bordeaux — Paris
         </span>
 
         <span
-          className="label text-white inline-flex items-center justify-center gap-3 flex-wrap"
+          className="hidden md:inline-flex label text-white items-center justify-center gap-3 flex-wrap"
           style={{ opacity: 0.6, letterSpacing: "0.36em", fontSize: "11px" }}
         >
           {["Photographe", "Réalisateur"].map((d, i) => (
@@ -118,11 +120,11 @@ export default function AboutPage() {
 
         <Link
           href="/contact"
-          className="inline-flex items-center rounded-full bg-white text-black px-7 md:px-8 py-2.5 md:py-3 transition-colors duration-300 hover:bg-white/90 justify-self-end"
+          className="inline-flex items-center rounded-full bg-white text-black px-5 md:px-8 py-2 md:py-3 transition-colors duration-300 hover:bg-white/90 md:justify-self-end"
         >
           <span
-            className="title italic block leading-none"
-            style={{ fontSize: "clamp(1.05rem, 1.4vw, 1.2rem)" }}
+            className="title italic block leading-none whitespace-nowrap"
+            style={{ fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)" }}
           >
             Écrivez-moi
           </span>

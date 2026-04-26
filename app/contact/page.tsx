@@ -56,18 +56,20 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Bottom row — name kicker (left), channels (center), location (right). */}
-      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 grid grid-cols-3 items-center gap-4">
+      {/* Bottom row — mobile keeps channels (left, the actually-clickable
+          row) + location (right); the decorative name kicker only shows
+          from md+ where the 3-column editorial footer has room to breathe. */}
+      <div className="relative z-10 px-6 md:px-10 pb-8 md:pb-10 flex items-center justify-between gap-4 md:grid md:grid-cols-3">
         <span
-          className="label text-white"
+          className="hidden md:inline-flex label text-white"
           style={{ opacity: 0.45, letterSpacing: "0.32em", fontSize: "11px" }}
         >
           Nicolas Sempere · 2024
         </span>
 
         <span
-          className="label text-white inline-flex items-center justify-center gap-3 flex-wrap pointer-events-auto"
-          style={{ opacity: 0.6, letterSpacing: "0.36em", fontSize: "11px" }}
+          className="label text-white inline-flex items-center gap-3 flex-wrap pointer-events-auto md:justify-center"
+          style={{ opacity: 0.6, letterSpacing: "0.32em", fontSize: "10px" }}
         >
           <a
             href="mailto:nicosmp.pro@gmail.com"
@@ -87,8 +89,8 @@ export default function ContactPage() {
         </span>
 
         <span
-          className="label text-white justify-self-end"
-          style={{ opacity: 0.4, letterSpacing: "0.32em", fontSize: "11px" }}
+          className="label text-white whitespace-nowrap md:justify-self-end"
+          style={{ opacity: 0.4, letterSpacing: "0.28em", fontSize: "10px" }}
         >
           Bordeaux — Paris
         </span>
