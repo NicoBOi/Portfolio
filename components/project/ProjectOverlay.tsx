@@ -114,53 +114,59 @@ function Overlay({
       aria-label={project.title}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* Mobile: header pinned at top, media + description+meta centered in
-          the middle (flex-1 wrapper with justify-center), nav row pinned at
-          the bottom. Desktop unwraps the middle wrapper via display:contents
-          so the outer gap-y-14 still spaces header / media / footer. */}
+      {/* Mobile: the whole header + media + description+meta block sits in
+          a flex-1 wrapper with justify-center so the media reads as the
+          vertical centerpiece, the title sits glued just above it, and the
+          nav row falls naturally to the bottom. Desktop unwraps both
+          wrappers via display:contents so the outer gap-y-14 still drives
+          the header / media / footer rhythm there. */}
       <div
         className="relative w-full h-full flex flex-col items-center py-12 md:py-20 md:justify-start md:gap-y-14"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
-        <motion.header
-          className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.55, delay: 0.08, ease: SOFT }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <p
-            className="label text-white mb-3 md:mb-4"
-            style={{ opacity: 0.55, letterSpacing: "0.32em" }}
-          >
-            {project.year} — {project.role}
-          </p>
-          <h1
-            className="text-white title leading-none"
-            style={{ fontSize: "clamp(1.8rem, 5.2vw, 4.5rem)" }}
-          >
-            {project.title}
-          </h1>
-        </motion.header>
-
-        {/* MIDDLE GROUP — flex-1 on mobile so the media + description+meta
-            sit centered in the remaining viewport space. md:contents unwraps
-            on desktop so the outer flex still drives the layout there. */}
+        {/* MIDDLE GROUP — flex-1 on mobile so header + media + description+
+            meta sit centered in the remaining viewport space. md:contents
+            unwraps on desktop so the outer flex still drives the layout. */}
         <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-6 md:contents">
-          {/* Key on the media wrapper resets the carousel idx + measurements
-              (and forces video iframes to reload) when switching projects.
-              The outer overlay shell stays mounted so the backdrop never
-              blinks off. */}
-          <div
-            key={project.slug}
-            className="w-full flex flex-col items-center md:flex-1 md:min-h-0 gap-3 md:gap-9 shrink-0"
-          >
-            {isVideo ? (
-              <VideoMedia project={project} />
-            ) : (
-              <PhotoCarousel project={project} />
-            )}
+          {/* Title + media glued together on mobile (gap-3). md:contents so
+              desktop falls back to the outer gap-y-14 between the two. */}
+          <div className="w-full flex flex-col items-center gap-3 md:contents">
+            <motion.header
+              className="w-full max-w-6xl text-center pointer-events-none px-5 md:px-10 shrink-0"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.55, delay: 0.08, ease: SOFT }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p
+                className="label text-white mb-3 md:mb-4"
+                style={{ opacity: 0.55, letterSpacing: "0.32em" }}
+              >
+                {project.year} — {project.role}
+              </p>
+              <h1
+                className="text-white title leading-none"
+                style={{ fontSize: "clamp(1.8rem, 5.2vw, 4.5rem)" }}
+              >
+                {project.title}
+              </h1>
+            </motion.header>
+
+            {/* Key on the media wrapper resets the carousel idx + measurements
+                (and forces video iframes to reload) when switching projects.
+                The outer overlay shell stays mounted so the backdrop never
+                blinks off. */}
+            <div
+              key={project.slug}
+              className="w-full flex flex-col items-center md:flex-1 md:min-h-0 gap-3 md:gap-9 shrink-0"
+            >
+              {isVideo ? (
+                <VideoMedia project={project} />
+              ) : (
+                <PhotoCarousel project={project} />
+              )}
+            </div>
           </div>
 
           <motion.footer
