@@ -39,28 +39,44 @@ export default function CustomCursor() {
 
     let visible = false;
     let moved = false;
+    // rAF-throttled position commit. pointermove can fire at the mouse's
+    // sample rate (often 1000 Hz on gaming mice, sometimes more frequent
+    // than the display refresh) — we collect the latest sample in a local
+    // and flush exactly once per frame, so the cursor commits in lockstep
+    // with the display's vsync at 60 / 120 / 144 / 240 Hz, no faster, no
+    // slower. Result is one transform write per painted frame: zero
+    // wasted JS, zero subframe drift, perfectly fluid on every monitor.
+    let pendingX = 0;
+    let pendingY = 0;
+    let rafId = 0;
 
-    // The cursor follows the mouse with a direct transform on every
-    // mousemove. The browser composites the GPU layer at the monitor's
-    // native refresh (60 / 120 / 240 Hz), so even if mousemove fires
-    // 1000x/s on a gaming mouse only the latest position per frame is
-    // ever painted. Simplest possible code, zero rAF loop overhead.
-    const show = (x: number, y: number) => {
-      el.style.transform = `translate3d(${x - 5}px, ${y - 5}px, 0)`;
+    const flush = () => {
+      rafId = 0;
+      el.style.transform = `translate3d(${pendingX - 5}px, ${pendingY - 5}px, 0)`;
       if (!visible) {
         el.style.opacity = "1";
         visible = true;
       }
     };
 
+    const schedule = (x: number, y: number) => {
+      pendingX = x;
+      pendingY = y;
+      if (rafId === 0) rafId = requestAnimationFrame(flush);
+    };
+
     const hide = () => {
+      if (rafId !== 0) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
       el.style.opacity = "0";
       visible = false;
     };
 
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: PointerEvent | MouseEvent) => {
       if (!moved) moved = true;
-      show(e.clientX, e.clientY);
+      schedule(e.clientX, e.clientY);
     };
 
     const onOver = (e: MouseEvent) => {
@@ -92,14 +108,18 @@ export default function CustomCursor() {
       if (!moved) document.documentElement.classList.add("cursor-fallback");
     }, 2000);
 
-    document.addEventListener("mousemove", onMove, { passive: true, capture: true });
+    // pointermove rather than mousemove — pointer events expose the native
+    // sample rate of the input device, which lets the rAF throttle above
+    // do its job cleanly on high-Hz mice.
+    document.addEventListener("pointermove", onMove, { passive: true, capture: true });
     document.addEventListener("mouseover", onOver, { passive: true, capture: true });
     document.addEventListener("mouseout", onWindowOut, { passive: true });
     document.documentElement.addEventListener("mouseleave", onDocLeave, { passive: true });
 
     return () => {
       window.clearTimeout(fallbackTimer);
-      document.removeEventListener("mousemove", onMove, { capture: true } as EventListenerOptions);
+      if (rafId !== 0) cancelAnimationFrame(rafId);
+      document.removeEventListener("pointermove", onMove, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseover", onOver, { capture: true } as EventListenerOptions);
       document.removeEventListener("mouseout", onWindowOut);
       document.documentElement.removeEventListener("mouseleave", onDocLeave);
