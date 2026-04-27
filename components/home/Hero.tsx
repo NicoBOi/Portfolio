@@ -477,11 +477,10 @@ export default function Hero({
               </div>
             </div>
 
-            {/* Right-edge vertical index. Desktop: hover to preview, click
-                to open. Mobile: tap to jump (setIndex only), "Ouvrir" opens.
-                The scroll-hint rule below the numbers is mobile-only — it
-                doubles as the vertical-swipe affordance. */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end pointer-events-auto">
+            {/* Right-edge vertical index — desktop only. Mobile shows the
+                same numbers in a horizontal row under the swipe indicator
+                inside the title block (see below). */}
+            <div className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 flex-col items-end pointer-events-auto">
               {FEATURED.map((p, i) => (
                 <button
                   key={p.slug}
@@ -627,6 +626,25 @@ export default function Hero({
                       transition={{ duration: 1.8, repeat: Infinity, ease: [0.45, 0, 0.55, 1] }}
                     />
                   </div>
+                </div>
+                {/* Mobile horizontal index — same 01-08 numbers as the
+                    desktop right-edge column, laid out in a row beneath
+                    the swipe rule. Tap to jump, the active number reads
+                    full-opacity. */}
+                <div className="md:hidden flex items-center justify-center gap-1 pt-3 pointer-events-auto">
+                  {FEATURED.map((p, i) => (
+                    <button
+                      key={p.slug}
+                      type="button"
+                      onClick={() => setIndex(i)}
+                      className="hit-v label text-white tabular-nums transition-opacity duration-300 px-2 py-2 !text-[10px] !tracking-[0.22em]"
+                      style={{ opacity: i === index ? 0.95 : 0.4 }}
+                      aria-label={p.title}
+                      aria-current={i === index ? "true" : undefined}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             )}
