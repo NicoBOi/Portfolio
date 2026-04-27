@@ -424,7 +424,11 @@ export default function Hero({
             </AnimatePresence>
           )}
 
-          <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+          {/* Soft dim — was 50% before, lowered to 35% so the colour and
+              the highlights of the media come through. The hero title
+              still reads cleanly thanks to the foreground motion fade
+              and the editorial typography sitting above the grain. */}
+          <div className="absolute inset-0 bg-black/35 pointer-events-none" />
 
           {/* Animated film grain — sits above the bg media + scrim, below the
               foreground chrome. Visible (opacity .22, mix-blend overlay) but

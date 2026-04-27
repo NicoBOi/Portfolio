@@ -35,6 +35,15 @@ export function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
+  // Show the controls only when the cursor is over the player or the
+  // video is paused. Touch devices have no hover so we keep them visible
+  // there (matchMedia is read once on mount).
+  const [hovered, setHovered] = useState(false);
+  const [hoverCapable, setHoverCapable] = useState(true);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setHoverCapable(window.matchMedia("(hover: hover)").matches);
+  }, []);
   const iframeId = `yt-vp-${youtubeId}`;
 
   useEffect(() => {
@@ -122,7 +131,12 @@ export function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
   const src = `https://www.youtube-nocookie.com/embed/${youtubeId}?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&vq=hd1080&playsinline=1`;
 
   return (
-    <div ref={containerRef} className="absolute inset-0 bg-black">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 bg-black"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <iframe
         id={iframeId}
         src={src}
@@ -148,7 +162,7 @@ export function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
         muted={muted}
         volume={volume}
         ready={ready}
-        visible
+        visible={!hoverCapable || hovered || !playing}
         onTogglePlay={togglePlay}
         onToggleMute={toggleMute}
         onVolumeChange={handleVolume}
@@ -178,6 +192,12 @@ export function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [hoverCapable, setHoverCapable] = useState(true);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setHoverCapable(window.matchMedia("(hover: hover)").matches);
+  }, []);
 
   useEffect(() => {
     if (!iframeRef.current) return;
@@ -243,7 +263,12 @@ export function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
   const src = `https://player.vimeo.com/video/${vimeoId}?background=1&dnt=1&quality=1080p&transparent=0`;
 
   return (
-    <div ref={containerRef} className="absolute inset-0 bg-black">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 bg-black"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <iframe
         ref={iframeRef}
         src={src}
@@ -269,7 +294,7 @@ export function VimeoPlayer({ vimeoId }: { vimeoId: string }) {
         muted={muted}
         volume={volume}
         ready={ready}
-        visible
+        visible={!hoverCapable || hovered || !playing}
         onTogglePlay={togglePlay}
         onToggleMute={toggleMute}
         onVolumeChange={handleVolume}
