@@ -326,20 +326,26 @@ export default function Hero({
                framer-motion drag, and snaps to the nearest slide on
                release (or to a neighbour past the velocity threshold).
                Only the active slide ± 1 carry the full media so we never
-               keep more than three videos / iframes alive at once. */
+               keep more than three videos / iframes alive at once.
+               Snap is a tween (not a spring) so the transition lands in
+               ~280 ms with no overshoot — keeps the active number
+               perfectly in sync with the slide that's actually centred. */
             <motion.div
               className="absolute inset-0 flex"
               style={{ width: `${featuredLen * 100}vw`, touchAction: "pan-y" }}
               drag="x"
               dragConstraints={{ left: -(featuredLen - 1) * vw, right: 0 }}
-              dragElastic={0.12}
+              dragElastic={0.08}
               dragMomentum={false}
               animate={{ x: -index * vw }}
-              transition={{ type: "spring", stiffness: 280, damping: 32, mass: 0.6 }}
+              transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
               onDragEnd={(_, info) => {
                 const { offset, velocity } = info;
-                const SNAP = vw * 0.18;
-                const VEL = 360;
+                // 12% of viewport width OR 250 px/s flick — whichever
+                // comes first triggers the snap. Was 18% / 360, which
+                // felt unresponsive on quick swipes.
+                const SNAP = vw * 0.12;
+                const VEL = 250;
                 if ((offset.x < -SNAP || velocity.x < -VEL) && index < featuredLen - 1) {
                   setIndex((i) => i + 1);
                 } else if ((offset.x > SNAP || velocity.x > VEL) && index > 0) {
