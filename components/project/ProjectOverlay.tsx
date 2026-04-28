@@ -15,10 +15,6 @@ import { getImageDims } from "@/lib/image-dims";
 const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
 
 const SOFT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-// Snappy ease-in-out for the carousel slide. Quick wind-up so the swap
-// feels reactive on scroll/swipe, with a soft landing so the photo
-// doesn't slap into place. Reads premium without dragging.
-const PREMIUM: [number, number, number, number] = [0.4, 0, 0.15, 1];
 
 interface Props {
   project: Project | null;
@@ -461,17 +457,9 @@ function PhotoCarousel({ project }: { project: Project }) {
     return () => window.removeEventListener("wheel", onWheel);
   }, []);
 
-  const startX = useRef<number | null>(null);
-  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (startX.current === null) return;
-    const dx = e.changedTouches[0].clientX - startX.current;
-    if (Math.abs(dx) >= 40) {
-      if (dx < 0 && canNext) next();
-      else if (dx > 0 && canPrev) prev();
-    }
-    startX.current = null;
-  };
+  // Mobile gestures are handled by the framer-motion drag on the inner
+  // track (matches the Hero carousel's Instagram-style snap). Desktop
+  // keeps wheel + arrow keys + click affordances.
 
   // Each slide matches the photo's natural aspect ratio (no letterboxing).
   // That way the visible image fills the whole slide and the rounded corners
@@ -557,14 +545,29 @@ function PhotoCarousel({ project }: { project: Project }) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.45, delay: 0.05, ease: SOFT }}
         onClick={(e) => e.stopPropagation()}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
       >
         <motion.div
           className="flex h-full items-center"
           animate={{ x }}
-          transition={{ duration: 0.5, ease: PREMIUM }}
-          style={{ gap }}
+          transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          style={{ gap, touchAction: isDesktop ? undefined : "pan-y" }}
+          drag={isDesktop ? false : "x"}
+          dragConstraints={{
+            left: -((files.length - 1) * container.w),
+            right: 0,
+          }}
+          dragElastic={0.08}
+          dragMomentum={false}
+          onDragEnd={(_, info) => {
+            const { offset, velocity } = info;
+            const SNAP = container.w * 0.12;
+            const VEL = 250;
+            if ((offset.x < -SNAP || velocity.x < -VEL) && canNext) {
+              next();
+            } else if ((offset.x > SNAP || velocity.x > VEL) && canPrev) {
+              prev();
+            }
+          }}
         >
           {files.map((f, i) => {
             const isCurrent = i === idx;
