@@ -56,7 +56,12 @@ export default function ProjectOverlay({
 
   if (!mounted) return null;
   return createPortal(
-    <AnimatePresence>
+    // onExitComplete clears `rendered` once the close animation has finished
+    // so we never render a frame of the old project while `project` is null.
+    // Without this, navigating back left the inner motion.div (carousel
+    // track) running its `animate={{ x }}` tween against stale measurements
+    // for the duration of the exit, producing a jittering box mid-screen.
+    <AnimatePresence onExitComplete={() => { if (!project) setRendered(null); }}>
       {project && rendered && (
         <Overlay
           key="project-overlay"
@@ -551,23 +556,31 @@ function PhotoCarousel({ project }: { project: Project }) {
           animate={{ x }}
           transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           style={{ gap, touchAction: isDesktop ? undefined : "pan-y" }}
-          drag={isDesktop ? false : "x"}
-          dragConstraints={{
-            left: -((files.length - 1) * container.w),
-            right: 0,
-          }}
-          dragElastic={0.08}
-          dragMomentum={false}
-          onDragEnd={(_, info) => {
-            const { offset, velocity } = info;
-            const SNAP = container.w * 0.12;
-            const VEL = 250;
-            if ((offset.x < -SNAP || velocity.x < -VEL) && canNext) {
-              next();
-            } else if ((offset.x > SNAP || velocity.x > VEL) && canPrev) {
-              prev();
-            }
-          }}
+          // Only attach drag props on mobile. Passing `drag={false}` still
+          // wires up framer-motion's drag listeners and keeps an internal
+          // x motion value that fights with `animate={{ x }}` while the
+          // overlay is exiting — we'd see the carousel track jitter for the
+          // duration of the close animation. Spread the drag config only
+          // when the carousel actually needs it.
+          {...(!isDesktop && {
+            drag: "x" as const,
+            dragConstraints: {
+              left: -((files.length - 1) * container.w),
+              right: 0,
+            },
+            dragElastic: 0.08,
+            dragMomentum: false,
+            onDragEnd: (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
+              const { offset, velocity } = info;
+              const SNAP = container.w * 0.12;
+              const VEL = 250;
+              if ((offset.x < -SNAP || velocity.x < -VEL) && canNext) {
+                next();
+              } else if ((offset.x > SNAP || velocity.x > VEL) && canPrev) {
+                prev();
+              }
+            },
+          })}
         >
           {files.map((f, i) => {
             const isCurrent = i === idx;
