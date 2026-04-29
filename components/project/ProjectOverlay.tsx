@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Project } from "@/data/projects";
 import dynamic from "next/dynamic";
@@ -40,10 +40,26 @@ export default function ProjectOverlay({
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [rendered, setRendered] = useState<Project | null>(project);
+  const isExiting = !project && !!rendered;
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     if (project) setRendered(project);
   }, [project]);
+
+  // AnimatePresence in this tree was leaving the bg-black div frozen in the
+  // DOM at opacity 0 after the close animation (one of the nested motion
+  // components — header, footer, PhotoCarousel container — wasn't reporting
+  // exit completion, so the parent unmount never fired). The dead overlay
+  // then sat at z-150 for the rest of the session, painting a stale GPU
+  // layer over the landing on every back-navigation.
+  // Drive the close manually instead: keep `rendered` populated for the
+  // exit duration so the fade still plays, then null it out so React tears
+  // the whole subtree down with no AnimatePresence in the loop.
+  useEffect(() => {
+    if (!isExiting) return;
+    const t = window.setTimeout(() => setRendered(null), 480);
+    return () => window.clearTimeout(t);
+  }, [isExiting]);
 
   useEffect(() => {
     if (!project) return;
@@ -54,32 +70,24 @@ export default function ProjectOverlay({
     };
   }, [project]);
 
-  if (!mounted) return null;
+  if (!mounted || !rendered) return null;
   return createPortal(
-    // onExitComplete clears `rendered` once the close animation has finished
-    // so we never render a frame of the old project while `project` is null.
-    // Without this, navigating back left the inner motion.div (carousel
-    // track) running its `animate={{ x }}` tween against stale measurements
-    // for the duration of the exit, producing a jittering box mid-screen.
-    <AnimatePresence onExitComplete={() => { if (!project) setRendered(null); }}>
-      {project && rendered && (
-        <Overlay
-          key="project-overlay"
-          project={rendered}
-          prevProject={prevProject}
-          nextProject={nextProject}
-          onClose={onClose}
-          onOpenPrev={onOpenPrev}
-          onOpenNext={onOpenNext}
-        />
-      )}
-    </AnimatePresence>,
+    <Overlay
+      project={rendered}
+      isExiting={isExiting}
+      prevProject={prevProject}
+      nextProject={nextProject}
+      onClose={onClose}
+      onOpenPrev={onOpenPrev}
+      onOpenNext={onOpenNext}
+    />,
     document.body,
   );
 }
 
 function Overlay({
   project,
+  isExiting,
   prevProject,
   nextProject,
   onClose,
@@ -87,6 +95,7 @@ function Overlay({
   onOpenNext,
 }: {
   project: Project;
+  isExiting: boolean;
   prevProject: Project | null;
   nextProject: Project | null;
   onClose: () => void;
@@ -102,13 +111,11 @@ function Overlay({
   return (
     // No key on the overlay shell — switching projects in-place must NOT
     // remount this div, otherwise React tears down the black backdrop for a
-    // frame between unmount and mount and the landing flashes through. The
-    // AnimatePresence at the portal level still drives open/close.
+    // frame between unmount and mount and the landing flashes through.
     <motion.div
       className="fixed inset-0 z-[150] bg-black"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      animate={{ opacity: isExiting ? 0 : 1 }}
       transition={{ duration: 0.45, ease: SOFT }}
       role="dialog"
       aria-modal="true"
@@ -556,31 +563,23 @@ function PhotoCarousel({ project }: { project: Project }) {
           animate={{ x }}
           transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           style={{ gap, touchAction: isDesktop ? undefined : "pan-y" }}
-          // Only attach drag props on mobile. Passing `drag={false}` still
-          // wires up framer-motion's drag listeners and keeps an internal
-          // x motion value that fights with `animate={{ x }}` while the
-          // overlay is exiting — we'd see the carousel track jitter for the
-          // duration of the close animation. Spread the drag config only
-          // when the carousel actually needs it.
-          {...(!isDesktop && {
-            drag: "x" as const,
-            dragConstraints: {
-              left: -((files.length - 1) * container.w),
-              right: 0,
-            },
-            dragElastic: 0.08,
-            dragMomentum: false,
-            onDragEnd: (_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
-              const { offset, velocity } = info;
-              const SNAP = container.w * 0.12;
-              const VEL = 250;
-              if ((offset.x < -SNAP || velocity.x < -VEL) && canNext) {
-                next();
-              } else if ((offset.x > SNAP || velocity.x > VEL) && canPrev) {
-                prev();
-              }
-            },
-          })}
+          drag={isDesktop ? false : "x"}
+          dragConstraints={{
+            left: -((files.length - 1) * container.w),
+            right: 0,
+          }}
+          dragElastic={0.08}
+          dragMomentum={false}
+          onDragEnd={(_, info) => {
+            const { offset, velocity } = info;
+            const SNAP = container.w * 0.12;
+            const VEL = 250;
+            if ((offset.x < -SNAP || velocity.x < -VEL) && canNext) {
+              next();
+            } else if ((offset.x > SNAP || velocity.x > VEL) && canPrev) {
+              prev();
+            }
+          }}
         >
           {files.map((f, i) => {
             const isCurrent = i === idx;
