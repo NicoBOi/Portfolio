@@ -362,7 +362,6 @@ function VideoMedia({ project }: { project: Project }) {
           poster={cover ? `/projects/${project.slug}/${cover}` : undefined}
           autoPlay
           loop
-          muted
           playsInline
           preload="auto"
           controls
