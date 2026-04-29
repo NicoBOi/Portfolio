@@ -6,176 +6,21 @@ import VideoControls from "./VideoControls";
 
 export { getVimeoId, getYoutubeId } from "@/lib/video";
 
-interface YTPlayer {
-  playVideo(): void;
-  pauseVideo(): void;
-  seekTo(seconds: number, allowSeekAhead?: boolean): void;
-  mute(): void;
-  unMute(): void;
-  setVolume(v: number): void;
-  setPlaybackQuality(quality: string): void;
-  getAvailableQualityLevels(): string[];
-  getPlaybackQuality(): string;
-  destroy(): void;
-}
-
-interface YTWindow {
-  YT?: { Player: new (id: string, opts: object) => YTPlayer };
-  onYouTubeIframeAPIReady?: () => void;
-}
-
 // ─────────────────────────────────────────────────────────────
-// YouTube
+// YouTube — native player UI (no custom overlay).
 // ─────────────────────────────────────────────────────────────
 export function YouTubePlayer({ youtubeId }: { youtubeId: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<YTPlayer | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const [volume, setVolume] = useState(80);
-  const [ready, setReady] = useState(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  // Show the controls only when the cursor is over the player or the
-  // video is paused. Touch devices have no hover so we keep them visible
-  // there (matchMedia is read once on mount).
-  const [hovered, setHovered] = useState(false);
-  const [hoverCapable, setHoverCapable] = useState(true);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setHoverCapable(window.matchMedia("(hover: hover)").matches);
-  }, []);
-  const iframeId = `yt-vp-${youtubeId}`;
-
-  useEffect(() => {
-    let player: YTPlayer | null = null;
-
-    const createPlayer = () => {
-      const yt = (window as unknown as YTWindow).YT!;
-      player = new yt.Player(iframeId, {
-        events: {
-          onReady: () => {
-            setReady(true);
-            try { player?.setPlaybackQuality("hd1080"); } catch {}
-          },
-          onStateChange: (e: { data: number }) => {
-            const isPlaying = e.data === 1;
-            setPlaying(isPlaying);
-            if (isPlaying) {
-              setHasPlayed(true);
-              try { player?.setPlaybackQuality("hd1080"); } catch {}
-            }
-          },
-          onPlaybackQualityChange: () => {
-            try {
-              const q = player?.getPlaybackQuality();
-              if (q && !["hd1080", "hd1440", "hd2160", "highres"].includes(q)) {
-                player?.setPlaybackQuality("hd1080");
-              }
-            } catch {}
-          },
-        },
-      });
-      playerRef.current = player;
-    };
-
-    if ((window as unknown as YTWindow).YT?.Player) {
-      createPlayer();
-    } else {
-      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-        const tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-      }
-      const prevCb = (window as unknown as YTWindow).onYouTubeIframeAPIReady;
-      (window as unknown as YTWindow).onYouTubeIframeAPIReady = () => {
-        if (prevCb) prevCb();
-        createPlayer();
-      };
-    }
-
-    return () => {
-      player?.destroy();
-      playerRef.current = null;
-      setReady(false);
-      setPlaying(false);
-      setHasPlayed(false);
-    };
-  }, [iframeId]);
-
-  const togglePlay = () => {
-    if (!playerRef.current) return;
-    if (playing) playerRef.current.pauseVideo();
-    else playerRef.current.playVideo();
-  };
-
-  const toggleMute = () => {
-    if (!playerRef.current) return;
-    if (muted) { playerRef.current.unMute(); setMuted(false); }
-    else { playerRef.current.mute(); setMuted(true); }
-  };
-
-  const handleVolume = (v: number) => {
-    if (!playerRef.current) return;
-    setVolume(v);
-    playerRef.current.setVolume(v);
-    if (v === 0) setMuted(true);
-    else if (muted) { playerRef.current.unMute(); setMuted(false); }
-  };
-
-  const handleFullscreen = () => {
-    if (!containerRef.current) return;
-    if (document.fullscreenElement) document.exitFullscreen();
-    else containerRef.current.requestFullscreen?.();
-  };
-
-  const src = `https://www.youtube-nocookie.com/embed/${youtubeId}?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&rel=0&vq=hd1080&playsinline=1`;
+  const src = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&rel=0&vq=hd1080&playsinline=1`;
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 bg-black"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+    <div className="absolute inset-0 bg-black">
       <iframe
-        id={iframeId}
         src={src}
         className="w-full h-full block"
-        style={{
-          border: 0,
-          backgroundColor: "#000",
-          verticalAlign: "bottom",
-          transform: "scale(1.02)",
-          transformOrigin: "center",
-        }}
+        style={{ border: 0, backgroundColor: "#000", verticalAlign: "bottom" }}
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
       />
-      <div
-        className="absolute inset-0 z-[5]"
-        onClick={togglePlay}
-        data-cursor={playing ? "Pause" : "Play"}
-        aria-hidden="true"
-      />
-      <VideoControls
-        playing={playing}
-        muted={muted}
-        volume={volume}
-        ready={ready}
-        visible={!hoverCapable || hovered || !playing}
-        onTogglePlay={togglePlay}
-        onToggleMute={toggleMute}
-        onVolumeChange={handleVolume}
-        onFullscreen={handleFullscreen}
-      />
-      {!hasPlayed && (
-        <div className="absolute inset-0 z-20 bg-black flex items-center justify-center pointer-events-none">
-          <div
-            className="w-8 h-8 rounded-full border border-white/20 animate-spin"
-            style={{ borderTopColor: "rgba(255,255,255,0.55)" }}
-          />
-        </div>
-      )}
     </div>
   );
 }
